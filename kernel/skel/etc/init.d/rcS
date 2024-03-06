@@ -1,0 +1,19 @@
+#!/bin/sh
+
+/bin/busybox --install -s /bin
+
+date `cat /buildtime` > /dev/null
+
+mount -t devtmpfs /dev /dev
+mount -a
+
+mkdir -p /dev/pts /var/run /var/log /var/lock
+
+syslogd
+
+hostname -F /etc/hostname
+mount -t devpts /dev/pts /dev/pts
+
+ifconfig lo 127.0.0.1
+
+/etc/init.d/rcS-local

@@ -1,0 +1,16 @@
+ifeq ($(P),rpi)
+LINUX_VER:=linux-5.10.110-rpi
+$(LINUX_VER)-FILE:=$(LINUX_VER).tar.gz
+$(LINUX_VER)-SHA256:=e3244061e44426eafe97541633b87a71b8be1828d1bc48a18ec4c83fddb2f4c5
+else
+LINUX_VER:=linux-5.10.143
+$(LINUX_VER)-FILE:=$(LINUX_VER).tar.xz
+$(LINUX_VER)-SHA256:=fa2c9edef272d39dca52e057e1d41433cf1b6ab6a00d24a00333c0b735054e91
+endif
+
+BUSY_VER:=busybox-1.34.1
+$(BUSY_VER)-URL:=https://busybox.net/downloads
+$(BUSY_VER)-FILE:=$(BUSY_VER).tar.bz2
+$(BUSY_VER)-SHA256:=415fbd89e5344c96acf449d94a6f956dbed62e18e835fc83e064db33a34bd549
+
+SRC_LIST:=LINUX BUSY
