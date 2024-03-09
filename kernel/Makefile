@@ -78,7 +78,7 @@ builddir: $(BLD)/$(KBUILD)
 irfs: $(BLD)/$(IRFS)
 
 $(BLD)/$(IRFS): | busybox
-	mkdir -p $@/proc $@/dev $@/tmp $@/var $@/sys
+	mkdir -p $@/proc $@/dev $@/tmp $@/var $@/sys $@/lib/modules
 	cp -rP skel/* $@/
 	cp -rP skel-$(T)-$(P)/* $@/
 	cp $(BLD)/$(BUSY_VER)/busybox $@/bin
@@ -105,14 +105,14 @@ ifeq ($(P),rpi)
 endif
 
 #make modules_first will build the modules, and create the install directory without building the kernel
-#this can come handy, if modules needed to be placed in embedded initramfs (doesn't make sense rn)
 modules_first: modules
 	touch $(BLD)/$(KBUILD)/modules.builtin $(BLD)/$(KBUILD)/modules.builtin.modinfo $(BLD)/$(KBUILD)/System.map
 	$(MAKE) -C $(BLD)/$(KBUILD) INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 V=1 $(HCCACHE) $(XCCACHE) ARCH=$(T) modules_install
+#Copy required kernel modules to embedded InitRD here
 
 kernelimage: $(BLD)/$(KBUILD)/$(NAME).krnl
 
-$(BLD)/$(KBUILD)/$(NAME).krnl: $(BLD)/$(KBUILD)/modules.order
+$(BLD)/$(KBUILD)/$(NAME).krnl: modules_first
 #.version will be increased by kernel builder automatically
 	cp $(BNF) $(BLD)/$(KBUILD)/.version
 

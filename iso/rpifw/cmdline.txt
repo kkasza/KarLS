@@ -1,0 +1,1 @@
+console=ttyGS0,115200 quiet

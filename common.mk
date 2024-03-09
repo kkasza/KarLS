@@ -16,7 +16,7 @@ endif
 #Valid Targets - Architectures
 VALID_T:=x86_64 arm
 #Valid platforms per target
-VALID_P_x86_64:=qemu
+VALID_P_x86_64:=iso qemu
 VALID_P_arm:=rpi
 
 #Default target
@@ -80,8 +80,8 @@ libncurses5-dev \
 uuid-dev \
 squashfs-tools lz4 \
 libssl-dev dosfstools \
-qemu-system-x86 qemu-system-arm \
-minicom
+genisoimage \
+qemu-system-x86 qemu-system-arm
 
 .PHONY: default install_deps _local_clean clean distclean download sha256sum genpatch
 

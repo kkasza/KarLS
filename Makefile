@@ -21,14 +21,8 @@ cmpl:
 kernel: | cmpl
 	$(MAKE) -C $@ $@
 
-osimg: kernel
+iso: kernel
 	$(MAKE) -C $@ $@
-
-devimg: osimg
-	$(MAKE) -C $@ $@
-
-qemu: devimg
-	$(MAKE) -C $< $@
 
 install_deps:
 	$(MAKE) -C cmpl $@
@@ -37,14 +31,6 @@ imgclean:
 #	$(MAKE) -C kernel _local_clean
 	$(MAKE) -C osimg _local_clean
 	$(MAKE) -C devimg _local_clean
-
-httpd: devimg
-	sudo busybox httpd
-	/sbin/ifconfig | grep inet | grep -v inet6
-
-minicom:
-	sudo chmod 666 /dev/ttyACM0
-	minicom
 
 #Targets to be run on all components
 clean distclean mrproper download sha256sum:

@@ -1,0 +1,6 @@
+.ccache*
+build-*
+devimg-*
+*.img
+dl/
+src/
