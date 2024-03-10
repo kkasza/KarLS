@@ -1,6 +1,0 @@
-# http://rpf.io/configtxt
-# Additional overlays and parameters are documented /boot/overlays/README
-
-[all]
-#enable_uart=1
-dtoverlay=dwc2,dr_mode=peripheral

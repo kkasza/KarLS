@@ -117,10 +117,10 @@ else
 	@echo -n "Current Kernel build date  : "
 	@ls -al kernel/buildno-$(T)-$(P) | tr -s [:blank:] | cut -d' ' -f6-8
 
-	@echo -n "Current $(NICENAME) build number  : #"
-	@cat osimg/buildno-$(T)
-	@echo -n "Current $(NICENAME) build date    : "
-	@ls -al osimg/buildno-$(T) | tr -s [:blank:] | cut -d' ' -f6-8
+#	@echo -n "Current $(NICENAME) build number  : #"
+#	@cat osimg/buildno-$(T)
+#	@echo -n "Current $(NICENAME) build date    : "
+#	@ls -al osimg/buildno-$(T) | tr -s [:blank:] | cut -d' ' -f6-8
 endif
 
 #Instal DEBIAN dependencies

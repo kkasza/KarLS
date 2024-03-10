@@ -2,9 +2,9 @@
 #Complete system builder
 
 #Components list in order
-COMPONENTS:=cmpl kernel osimg devimg
+COMPONENTS:=cmpl kernel iso
 
-.PHONY: default all cmpl kernel osimg devimg qemu install_deps imgclean clean distclean mrproper download sha256sum
+.PHONY: default all cmpl kernel iso qemu install_deps imgclean clean distclean mrproper download sha256sum
 
 default:
 	@make --no-print-directory -f common.mk CALLEDFROMROOT=1
@@ -29,8 +29,7 @@ install_deps:
 
 imgclean:
 #	$(MAKE) -C kernel _local_clean
-	$(MAKE) -C osimg _local_clean
-	$(MAKE) -C devimg _local_clean
+	$(MAKE) -C iso _local_clean
 
 #Targets to be run on all components
 clean distclean mrproper download sha256sum:
