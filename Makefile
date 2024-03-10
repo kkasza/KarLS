@@ -28,7 +28,7 @@ install_deps:
 	$(MAKE) -C cmpl $@
 
 imgclean:
-#	$(MAKE) -C kernel _local_clean
+	$(MAKE) -C kernel _local_clean
 	$(MAKE) -C iso _local_clean
 
 #Targets to be run on all components

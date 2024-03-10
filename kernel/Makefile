@@ -9,12 +9,18 @@ CMPL_INST:=$(CMPL)/cmpl-$(T)
 KERNEL_PLH:=__karls__
 KVER:=1.0
 
+ifeq ($(P),rpi)
+KFLAV:=$(P)
+else
+KFLAV:=generic
+endif
+
 #Build Number for kernel (after #)
-BNF:=buildno-$(T)-$(P)
+BNF:=buildno-$(T)-$(KFLAV)
 BN:=$$(( $(shell cat $(BNF))+1 ))
 DBN:=$(info *** Kernel: Current build number is: #$(shell cat $(BNF)) *** )
 
-KBUILD:=$(LINUX_VER)-$(T)-$(P)
+KBUILD:=$(LINUX_VER)-$(T)-$(KFLAV)
 IRFS:=irfs
 
 ifdef DBG_NOCC
@@ -80,7 +86,7 @@ irfs: $(BLD)/$(IRFS)
 $(BLD)/$(IRFS): | busybox
 	mkdir -p $@/proc $@/dev $@/tmp $@/var $@/sys $@/lib/modules
 	cp -rP skel/* $@/
-	cp -rP skel-$(T)-$(P)/* $@/
+	cp -rP skel-$(T)-$(KFLAV)/* $@/
 	cp $(BLD)/$(BUSY_VER)/busybox $@/bin
 	$(SUDO) mknod -m 600 $@/dev/console c 5 1
 	date +%m%d%H%M%Y > $@/buildtime
@@ -90,7 +96,7 @@ $(BLD)/$(KBUILD): | src/$(LINUX_VER) $(BLD)/$(IRFS)
 	cp $(KBUILD).config $@/.config
 #For RPI kernel source
 #	sed -i 's/^CONFIG_CROSS_COMPILE=\"$(KERNEL_PLH)\"/CONFIG_CROSS_COMPILE=\"$(subst /,\/,${CMPL_INST})\/bin\/$(subst /,\/,$(TARGET-ARCH))-\"/' $@/.config
-	sed -i 's/^CONFIG_LOCALVERSION=\"$(KERNEL_PLH)\"/CONFIG_LOCALVERSION=\"-$(NAME)_$(KVER)-$(P)\"/' $@/.config
+	sed -i 's/^CONFIG_LOCALVERSION=\"$(KERNEL_PLH)\"/CONFIG_LOCALVERSION=\"-$(NAME)_$(KVER)-$(KFLAV)\"/' $@/.config
 	sed -i 's/^CONFIG_INITRAMFS_SOURCE=\"$(KERNEL_PLH)\"/CONFIG_INITRAMFS_SOURCE=\"$(subst /,\/,$(PWD)/$(BLD)/$(IRFS))\"/' $@/.config
 	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) prepare
 #some old hack, now disabled
@@ -129,10 +135,10 @@ endif
 	$(MAKE) -C $(BLD)/$(KBUILD) INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 V=1 $(HCCACHE) $(XCCACHE) ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" modules_install
 	rm -f $(BLD)/$(KBUILD)/modules/lib/modules/*/build $(BLD)/$(KBUILD)/modules/lib/modules/*/source
 
-kernel: kernel-$(T)-$(P)
+kernel: kernel-$(T)-$(KFLAV)
 	$(DBN)
 
-kernel-$(T)-$(P): $(BLD)/$(KBUILD)/$(NAME).krnl
+kernel-$(T)-$(KFLAV): $(BLD)/$(KBUILD)/$(NAME).krnl
 	mkdir -p $@
 	cp $(BLD)/$(KBUILD)/$(NAME).krnl $@/
 	cp $(BLD)/$(KBUILD)/System.map $@/
@@ -144,10 +150,10 @@ ifeq ($(P),rpi)
 endif
 
 #just to test kernel
-qemu: kernel-$(T)-$(P)
+qemu: kernel-$(T)-$(KFLAV)
 ifeq ($(T),x86_64)
 	qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -nographic -vnc :0 \
-	-kernel kernel-$(T)-$(P)/$(NAME).krnl -append "console=ttyS0"
+	-kernel kernel-$(T)-$(KFLAV)/$(NAME).krnl -append "console=ttyS0"
 endif
 ifeq ($(T),arm)
 	qemu-system-arm -M raspi0 -m 512 -nographic -vnc :0 \
@@ -159,5 +165,6 @@ endif
 
 _local_clean:
 	$(foreach i,$(VALID_T), \
+		rm -rf $(PWD)/kernel-$(i)-$(KFLAV); \
 		$(foreach j,$(VALID_P_$(i)), \
-			rm -rf $(PWD)/kernel-$(i)-$(j);))
+			rm -rf $(PWD)/kernel-$(i)-$(j);  ))

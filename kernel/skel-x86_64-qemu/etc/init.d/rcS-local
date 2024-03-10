@@ -1,5 +1,0 @@
-#!/bin/sh
-
-#for k in 1 2 3 4; do
-#   mount -r /dev/vda$k /flash$k
-#done
