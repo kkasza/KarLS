@@ -80,7 +80,7 @@ libncurses5-dev \
 uuid-dev \
 squashfs-tools lz4 \
 libssl-dev dosfstools \
-genisoimage \
+xorriso \
 qemu-system-x86 qemu-system-arm
 
 .PHONY: default install_deps _local_clean clean distclean download sha256sum genpatch
@@ -173,7 +173,7 @@ genpatch:
 ifdef PTCCOMMENT
 	echo $(PTCCOMMENT) >> patch/$(PPKG)-$(PTCNAME).patch
 endif
-	diff -ru --no-dereference src/$(PPKG).orig/$(PPKG) src/$(PPKG) >> patch/$(PPKG)-$(PTCNAME).patch || true
+	diff -ruN --no-dereference src/$(PPKG).orig/$(PPKG) src/$(PPKG) >> patch/$(PPKG)-$(PTCNAME).patch || true
 	rm -rf src/$(PPKG).orig
 	@echo =================================================
 	@echo Generated patch PPKG=$(PPKG) - PTCNAME=$(PTCNAME) - PTCCOMMENT=$(PTCCOMMENT)
