@@ -4,6 +4,7 @@
 #Used in different parts of compiled programs
 NAME:=karls
 NICENAME:=KarLS
+VERSION=1.0
 
 UTAR:=tar -xvaf
 PWD:=$(shell pwd)
@@ -112,10 +113,10 @@ ifndef CALLEDFROMROOT
 	@ccache -s
 else
 	@echo ==================================================================================================
-	@echo -n "Current Kernel build number: #"
-	@cat kernel/buildno-$(T)-$(P)
-	@echo -n "Current Kernel build date  : "
-	@ls -al kernel/buildno-$(T)-$(P) | tr -s [:blank:] | cut -d' ' -f6-8
+#	@echo -n "Current Kernel build number: #"
+#	@cat kernel/buildno-$(T)-$(P)
+#	@echo -n "Current Kernel build date  : "
+#	@ls -al kernel/buildno-$(T)-$(P) | tr -s [:blank:] | cut -d' ' -f6-8
 
 #	@echo -n "Current $(NICENAME) build number  : #"
 #	@cat osimg/buildno-$(T)

@@ -65,7 +65,7 @@ efi.img: $(BLD)/$(GRUB_VER)
 	$(SUDO) mount $@ $@.mnt
 
 	$(SUDO) mkdir -p $@.mnt/EFI/BOOT
-	$(SUDO) $</grub-mkimage -c grub.cfg -o $@.mnt/EFI/BOOT/BOOTX64.EFI -O x86_64-efi -p /boot/grub -d $</grub-core \
+	$(SUDO) $</grub-mkimage -o $@.mnt/EFI/BOOT/BOOTX64.EFI -O x86_64-efi -p /boot/grub -d $</grub-core \
 	boot.mod cat.mod configfile.mod cpuid.mod disk.mod elf.mod exfat.mod ext2.mod fat.mod file.mod hdparm.mod help.mod iso9660.mod linux.mod loadenv.mod \
 	lsefi.mod ls.mod msdospart.mod normal.mod ntfs.mod part_gpt.mod part_msdos.mod reboot.mod scsi.mod search_fs_file.mod search.mod \
 	serial.mod syslinuxcfg.mod terminal.mod terminfo.mod usb_keyboard.mod usbserial_common.mod usbserial_pl2303.mod
@@ -79,7 +79,7 @@ $(IMAGE): src/$(SYSLIN_VER) efi.img
 	cp -rv ../kernel/kernel-$(T)-$(KFLAV)/* $@.tmp
 	mv -v $@.tmp/$(NAME).krnl $@.tmp/System.map $@.tmp/boot
 
-	xorriso -as mkisofs -r -o $@ -J -joliet-long -isohybrid-mbr $</bios/mbr/isohdpfx.bin -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat \
+	xorriso -as mkisofs -volid KarLS -r -o $@ -J -joliet-long -isohybrid-mbr $</bios/mbr/isohdpfx.bin -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat \
 	-boot-load-size 4 -boot-info-table -no-emul-boot -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus $@.tmp
 
 	touch $@
