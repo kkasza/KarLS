@@ -1,6 +1,8 @@
 .ccache*
 build-*
 *.iso
+*.img
+*.img.mnt
 *.iso.tmp
 dl/
 src/
