@@ -76,8 +76,8 @@ $(IMAGE): src/$(SYSLIN_VER) efi.img
 	mkdir -p $@.tmp/boot/isolinux $@.tmp/boot/grub
 	cp -rv $</bios/core/isolinux.bin $</bios/com32/elflink/ldlinux/ldlinux.c32 isolinux.cfg $@.tmp/boot/isolinux
 	cp -rv efi.img grub.cfg $@.tmp/boot/grub
-	cp -rv ../kernel/kernel-$(T)-$(KFLAV)/* $@.tmp
-	mv -v $@.tmp/$(NAME).krnl $@.tmp/System.map $@.tmp/boot
+	cp -rv ../kernel/kernel-$(T)-$(KFLAV)/$(NAME).krnl $@.tmp/boot
+	cp -rv ../kernel/kernel-$(T)-$(KFLAV)/System.map $@.tmp/boot
 
 	xorriso -as mkisofs -volid KarLS -r -o $@ -J -joliet-long -isohybrid-mbr $</bios/mbr/isohdpfx.bin -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat \
 	-boot-load-size 4 -boot-info-table -no-emul-boot -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus $@.tmp

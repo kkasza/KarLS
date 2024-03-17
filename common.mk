@@ -5,6 +5,7 @@
 NAME:=karls
 NICENAME:=KarLS
 VERSION=1.0
+VERSION_TAG=Ardi
 
 UTAR:=tar -xvaf
 PWD:=$(shell pwd)

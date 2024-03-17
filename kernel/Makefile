@@ -90,6 +90,7 @@ $(BLD)/$(IRFS): | busybox
 	cp $(BLD)/$(BUSY_VER)/busybox $@/bin
 	$(SUDO) mknod -m 600 $@/dev/console c 5 1
 	date +%m%d%H%M%Y > $@/buildtime
+	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
 
 $(BLD)/$(KBUILD): | src/$(LINUX_VER) $(BLD)/$(IRFS)
 	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) allnoconfig
@@ -115,6 +116,8 @@ modules_first: modules
 	touch $(BLD)/$(KBUILD)/modules.builtin $(BLD)/$(KBUILD)/modules.builtin.modinfo $(BLD)/$(KBUILD)/System.map
 	$(MAKE) -C $(BLD)/$(KBUILD) INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 V=1 $(HCCACHE) $(XCCACHE) ARCH=$(T) modules_install
 #Copy required kernel modules to embedded InitRD here
+	cp -rv $(BLD)/$(KBUILD)/modules/* $(BLD)/$(IRFS)
+	rm -f $(BLD)/$(IRFS)/lib/modules/*/build $(BLD)/$(IRFS)/lib/modules/*/source
 
 kernelimage: $(BLD)/$(KBUILD)/$(NAME).krnl
 
