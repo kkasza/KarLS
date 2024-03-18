@@ -1,3 +1,19 @@
 #!/bin/sh
 
-find /sys/ -name modalias | xargs sort -u | xargs -n 1 modprobe
+#Run twice, because new devices found after initial module load
+find /sys/ -name modalias | xargs sort -u | xargs -n 1 modprobe 2> /dev/null
+find /sys/ -name modalias | xargs sort -u | xargs -n 1 modprobe 2> /dev/null
+
+#Kernel parameter, hardcoded into isolinux and grub in iso image
+if [ "$KARLS_MEDIA" == "CDROM" ]; then
+
+ #A CD-ROM should be present, as we booted from it?
+ CDROM=`grep "drive name" /proc/sys/dev/cdrom/info | rev | cut -f1 | rev` 2> /dev/null
+ if [ ! -z "$CDROM" ]; then
+  ln -s $CDROM /dev/cdrom 2> /dev/null &&
+  mkdir -p /mnt/cdrom &&
+  mount -t iso9660 /dev/cdrom /mnt/cdrom 2> /dev/null &&
+  ln -s /mnt/cdrom/boot /boot 2> /dev/null
+ fi
+
+fi
