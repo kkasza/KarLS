@@ -1,0 +1,30 @@
+#!/bin/sh
+
+mkdir -p /mnt/iso
+ln -s /mnt/iso/boot /boot 2> /dev/null
+
+#A CD-ROM could be present, as we booted from it?
+CDROM=`grep "drive name" /proc/sys/dev/cdrom/info | rev | cut -f1 | rev` 2> /dev/null
+if [ -b "/dev/$CDROM" ]; then
+ mount -t iso9660 -o ro /dev/$CDROM /mnt/iso 2> /dev/null
+fi
+
+#If iso is not mounted, or not the correct disk was mounted, try to use the first FAT32 partition found
+if [ ! -e "/mnt/iso/karls_iso" ]; then
+ #Just in case
+ umount /mnt/iso 2> /dev/null
+
+ #Reduce USB Mass storage delay, so we can detect the pendrive
+ echo 0 > /sys/module/usb_storage/parameters/delay_use
+ #But still wait 1 second to let the partition table to be read
+ sleep 1
+
+ USBDRIVE=`fdisk -l | grep -m 1 FAT32 | cut -d' ' -f1`
+ if [ -b "$USBDRIVE" ]; then
+  mount -t vfat -o ro $USBDRIVE /mnt/iso 2> /dev/null
+  #Unmount again if it's not to correct drive
+  if [ ! -e "/mnt/iso/karls_iso" ]; then
+   umount /mnt/iso 2> /dev/null
+  fi
+ fi
+fi

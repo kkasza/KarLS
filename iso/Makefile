@@ -79,7 +79,7 @@ $(IMAGE): src/$(SYSLIN_VER) efi.img
 	cp -rv ../kernel/kernel-$(T)-$(KFLAV)/$(NAME).krnl $@.tmp/boot
 	cp -rv ../kernel/kernel-$(T)-$(KFLAV)/System.map $@.tmp/boot
 
-	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@.tmp/version
+	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@.tmp/karls_iso
 
 	xorriso -as mkisofs -volid KarLS -r -o $@ -J -joliet-long -isohybrid-mbr $</bios/mbr/isohdpfx.bin -b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat \
 	-boot-load-size 4 -boot-info-table -no-emul-boot -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus $@.tmp
