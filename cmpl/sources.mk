@@ -31,10 +31,10 @@ $(LINUX_VER)-FILE:=$(LINUX_VER).tar.gz
 $(LINUX_VER)-REALDIR:=linux-8e1110a580887f4b82303b9354c25d7e2ff5860e
 $(LINUX_VER)-SHA256:=e3244061e44426eafe97541633b87a71b8be1828d1bc48a18ec4c83fddb2f4c5
 else
-LINUX_VER:=linux-5.10.143
-$(LINUX_VER)-URL:=https://cdn.kernel.org/pub/linux/kernel/v5.x
+LINUX_VER:=linux-6.6.22
+$(LINUX_VER)-URL:=https://cdn.kernel.org/pub/linux/kernel/v6.x
 $(LINUX_VER)-FILE:=$(LINUX_VER).tar.xz
-$(LINUX_VER)-SHA256:=fa2c9edef272d39dca52e057e1d41433cf1b6ab6a00d24a00333c0b735054e91
+$(LINUX_VER)-SHA256:=23e3e7b56407250f5411bdab95763d0bc4e3a19dfa431d951df7eacabd61a2f4
 endif
 
 MUSL_VER:=musl-1.2.5

@@ -79,7 +79,7 @@ gawk bison bc sed flex texinfo \
 libtool m4 pkg-config \
 autotools-dev automake \
 libncurses5-dev \
-uuid-dev \
+uuid-dev libelf-dev \
 squashfs-tools lz4 \
 libssl-dev dosfstools \
 xorriso \

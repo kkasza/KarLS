@@ -31,11 +31,11 @@ HCCACHE:=HOSTCC="ccache gcc" HOSTCXX="ccache g++"
 XCCACHE:=CC="ccache $(CMPL_INST)/bin/gcc" CXX="ccache $(CMPL_INST)/bin/g++"
 endif
 
-.PHONY: $(BLD)/$(LINUX_VER)-kconfig
+.PHONY: $(BLD)/$(LINUX_VER)-kconfig $(BLD)/$(BUSY_VER)-bconfig
 
 busybox: $(BLD)/$(BUSY_VER)
 
-$(BLD)/$(BUSY_VER): | src/$(BUSY_VER)
+$(BLD)/$(BUSY_VER): src/$(BUSY_VER)
 	mkdir -p $(BLD)
 	cp -rP src/$(BUSY_VER) $@
 	cp $(BUSY_VER).config $@/.config
@@ -79,8 +79,6 @@ $(BLD)/$(LINUX_VER)-kconfig: src/$(LINUX_VER)
 	diff -q $(KBUILD).config $(KBUILD).config.new && rm -f $(KBUILD).config.new || diff -u $(KBUILD).config $(KBUILD).config.new > $(KBUILD).config.diff || true
 	touch $<
 
-builddir: $(BLD)/$(KBUILD)
-
 irfs: $(BLD)/$(IRFS)
 
 $(BLD)/$(IRFS): | busybox
@@ -92,40 +90,32 @@ $(BLD)/$(IRFS): | busybox
 	date +%m%d%H%M%Y > $@/buildtime
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
 
-initrd: $(BLD)/initrd.gz
+initrd: | $(BLD)/initrd.gz
 
-$(BLD)/initrd.gz: $(BLD)/$(IRFS) modules_first
+$(BLD)/initrd.gz: $(BLD)/$(IRFS) modules
+	cp -rv $(BLD)/$(KBUILD)/modules/* $<
+	rm -f $</lib/modules/*/build $</lib/modules/*/source
 	cd $<; find . | cpio -H newc -V -o | gzip -9 -n > ../../$@
 
-$(BLD)/$(KBUILD): | src/$(LINUX_VER) $(BLD)/$(IRFS)
+$(BLD)/$(KBUILD): src/$(LINUX_VER)
 	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) allnoconfig
 	cp $(KBUILD).config $@/.config
 #For RPI kernel source
 #	sed -i 's/^CONFIG_CROSS_COMPILE=\"$(KERNEL_PLH)\"/CONFIG_CROSS_COMPILE=\"$(subst /,\/,${CMPL_INST})\/bin\/$(subst /,\/,$(TARGET-ARCH))-\"/' $@/.config
 	sed -i 's/^CONFIG_LOCALVERSION=\"$(KERNEL_PLH)\"/CONFIG_LOCALVERSION=\"-$(NAME)_$(KVER)-$(KFLAV)\"/' $@/.config
 #	sed -i 's/^CONFIG_INITRAMFS_SOURCE=\"$(KERNEL_PLH)\"/CONFIG_INITRAMFS_SOURCE=\"$(subst /,\/,$(PWD)/$(BLD)/$(IRFS))\"/' $@/.config
-	sed -i 's/^CONFIG_INITRAMFS_SOURCE=\"$(KERNEL_PLH)\"/CONFIG_INITRAMFS_SOURCE=\"\"/' $@/.config
-	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) prepare
+	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) prepare
 
-modules: | $(BLD)/$(KBUILD)/modules.order
-
-$(BLD)/$(KBUILD)/modules.order: | $(BLD)/$(KBUILD)
+modules: kernelimage
 	$(MAKE) -C $(BLD)/$(KBUILD) V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" modules
 ifeq ($(P),rpi)
 	$(MAKE) -C $(BLD)/$(KBUILD) V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" dtbs
 endif
+	$(MAKE) -C $(BLD)/$(KBUILD) INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) modules_install
 
-#make modules_first will build the modules, and create the install directory without building the kernel
-modules_first: modules
-	touch $(BLD)/$(KBUILD)/modules.builtin $(BLD)/$(KBUILD)/modules.builtin.modinfo $(BLD)/$(KBUILD)/System.map
-	$(MAKE) -C $(BLD)/$(KBUILD) INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 V=1 $(HCCACHE) $(XCCACHE) ARCH=$(T) modules_install
-#Copy required kernel modules to embedded InitRD here
-	cp -rv $(BLD)/$(KBUILD)/modules/* $(BLD)/$(IRFS)
-	rm -f $(BLD)/$(IRFS)/lib/modules/*/build $(BLD)/$(IRFS)/lib/modules/*/source
+kernelimage: | $(BLD)/$(KBUILD)/$(NAME).krnl
 
-kernelimage: $(BLD)/$(KBUILD)/$(NAME).krnl
-
-$(BLD)/$(KBUILD)/$(NAME).krnl: initrd
+$(BLD)/$(KBUILD)/$(NAME).krnl: $(BLD)/$(KBUILD)
 #.version will be increased by kernel builder automatically
 	cp $(BNF) $(BLD)/$(KBUILD)/.version
 
@@ -139,18 +129,17 @@ endif
 	chmod 644 $@
 	echo $(BN) > $(BNF)
 
-	$(MAKE) -C $(BLD)/$(KBUILD) INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 V=1 $(HCCACHE) $(XCCACHE) ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" modules_install
-	rm -f $(BLD)/$(KBUILD)/modules/lib/modules/*/build $(BLD)/$(KBUILD)/modules/lib/modules/*/source
+#	$(MAKE) -C $(BLD)/$(KBUILD) INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 V=1 $(HCCACHE) $(XCCACHE) ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" modules_install
+#	rm -f $(BLD)/$(KBUILD)/modules/lib/modules/*/build $(BLD)/$(KBUILD)/modules/lib/modules/*/source
 
 kernel: kernel-$(T)-$(KFLAV)
 	$(DBN)
 
-kernel-$(T)-$(KFLAV): $(BLD)/$(KBUILD)/$(NAME).krnl
+kernel-$(T)-$(KFLAV): kernelimage modules initrd
 	mkdir -p $@
 	cp $(BLD)/$(KBUILD)/$(NAME).krnl $@/
 	cp $(BLD)/$(KBUILD)/System.map $@/
 	cp $(BLD)/initrd.gz $@/
-	cp -rv $(BLD)/$(KBUILD)/modules/* $@/
 ifeq ($(P),rpi)
 	cp -rv $(BLD)/$(KBUILD)/arch/arm/boot/dts/*.dtb $@/
 	mkdir -p $@/overlays

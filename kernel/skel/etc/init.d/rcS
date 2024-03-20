@@ -14,7 +14,8 @@ syslogd
 hostname -F /etc/hostname
 mount -t devpts /dev/pts /dev/pts
 
-#Run twice, because new devices found after initial module load
+#Run 3 times, because new devices found after initial module load
+find /sys/ -name modalias | xargs sort -u | xargs -n 1 modprobe 2> /dev/null
 find /sys/ -name modalias | xargs sort -u | xargs -n 1 modprobe 2> /dev/null
 find /sys/ -name modalias | xargs sort -u | xargs -n 1 modprobe 2> /dev/null
 
