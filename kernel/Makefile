@@ -130,9 +130,9 @@ $(BLD)/$(KBUILD)/$(NAME).krnl: initrd
 	cp $(BNF) $(BLD)/$(KBUILD)/.version
 
 ifeq ($(T),x86_64)
-	$(MAKE) -C $(BLD)/$(KBUILD) V=1 $(HCCACHE) $(XCCACHE) ARCH=$(T) bzImage
+	$(MAKE) -C $(BLD)/$(KBUILD) V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" bzImage
 else
-	$(MAKE) -C $(BLD)/$(KBUILD) V=1 $(HCCACHE) $(XCCACHE) ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" zImage
+	$(MAKE) -C $(BLD)/$(KBUILD) V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" zImage
 endif
 
 	cp -L --remove-destination $(BLD)/$(KBUILD)/arch/$(TARGET-CPU)/boot/*zImage $@
