@@ -74,10 +74,11 @@ efi.img: $(BLD)/$(GRUB_VER)
 
 $(IMAGE): src/$(SYSLIN_VER) efi.img
 	mkdir -p $@.tmp/boot/isolinux $@.tmp/boot/grub $@.tmp/packages
-	cp -rv $</bios/core/isolinux.bin $</bios/com32/elflink/ldlinux/ldlinux.c32 isolinux.cfg $@.tmp/boot/isolinux
-	cp -rv efi.img grub.cfg $@.tmp/boot/grub
-	cp -rv ../kernel/kernel-$(T)-$(KFLAV)/$(NAME).krnl $@.tmp/boot
-	cp -rv ../kernel/kernel-$(T)-$(KFLAV)/System.map $@.tmp/boot
+	cp $</bios/core/isolinux.bin $</bios/com32/elflink/ldlinux/ldlinux.c32 isolinux.cfg $@.tmp/boot/isolinux
+	cp efi.img grub.cfg $@.tmp/boot/grub
+	cp ../kernel/kernel-$(T)-$(KFLAV)/$(NAME).krnl $@.tmp/boot
+	cp ../kernel/kernel-$(T)-$(KFLAV)/initrd.gz $@.tmp/boot
+	cp ../kernel/kernel-$(T)-$(KFLAV)/System.map $@.tmp/boot
 
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@.tmp/karls_iso
 

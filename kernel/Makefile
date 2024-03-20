@@ -92,16 +92,20 @@ $(BLD)/$(IRFS): | busybox
 	date +%m%d%H%M%Y > $@/buildtime
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
 
+initrd: $(BLD)/initrd.gz
+
+$(BLD)/initrd.gz: $(BLD)/$(IRFS) modules_first
+	cd $<; find . | cpio -H newc -V -o | gzip -9 -n > ../../$@
+
 $(BLD)/$(KBUILD): | src/$(LINUX_VER) $(BLD)/$(IRFS)
 	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) allnoconfig
 	cp $(KBUILD).config $@/.config
 #For RPI kernel source
 #	sed -i 's/^CONFIG_CROSS_COMPILE=\"$(KERNEL_PLH)\"/CONFIG_CROSS_COMPILE=\"$(subst /,\/,${CMPL_INST})\/bin\/$(subst /,\/,$(TARGET-ARCH))-\"/' $@/.config
 	sed -i 's/^CONFIG_LOCALVERSION=\"$(KERNEL_PLH)\"/CONFIG_LOCALVERSION=\"-$(NAME)_$(KVER)-$(KFLAV)\"/' $@/.config
-	sed -i 's/^CONFIG_INITRAMFS_SOURCE=\"$(KERNEL_PLH)\"/CONFIG_INITRAMFS_SOURCE=\"$(subst /,\/,$(PWD)/$(BLD)/$(IRFS))\"/' $@/.config
+#	sed -i 's/^CONFIG_INITRAMFS_SOURCE=\"$(KERNEL_PLH)\"/CONFIG_INITRAMFS_SOURCE=\"$(subst /,\/,$(PWD)/$(BLD)/$(IRFS))\"/' $@/.config
+	sed -i 's/^CONFIG_INITRAMFS_SOURCE=\"$(KERNEL_PLH)\"/CONFIG_INITRAMFS_SOURCE=\"\"/' $@/.config
 	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) prepare
-#some old hack, now disabled
-#	rm -rf $@/include
 
 modules: | $(BLD)/$(KBUILD)/modules.order
 
@@ -121,7 +125,7 @@ modules_first: modules
 
 kernelimage: $(BLD)/$(KBUILD)/$(NAME).krnl
 
-$(BLD)/$(KBUILD)/$(NAME).krnl: modules_first
+$(BLD)/$(KBUILD)/$(NAME).krnl: initrd
 #.version will be increased by kernel builder automatically
 	cp $(BNF) $(BLD)/$(KBUILD)/.version
 
@@ -145,6 +149,7 @@ kernel-$(T)-$(KFLAV): $(BLD)/$(KBUILD)/$(NAME).krnl
 	mkdir -p $@
 	cp $(BLD)/$(KBUILD)/$(NAME).krnl $@/
 	cp $(BLD)/$(KBUILD)/System.map $@/
+	cp $(BLD)/initrd.gz $@/
 	cp -rv $(BLD)/$(KBUILD)/modules/* $@/
 ifeq ($(P),rpi)
 	cp -rv $(BLD)/$(KBUILD)/arch/arm/boot/dts/*.dtb $@/
