@@ -79,6 +79,7 @@ $(IMAGE): src/$(SYSLIN_VER) efi.img
 	cp ../kernel/kernel-$(T)-$(KFLAV)/$(NAME).krnl $@.tmp/boot
 	cp ../kernel/kernel-$(T)-$(KFLAV)/initrd.gz $@.tmp/boot
 	cp ../kernel/kernel-$(T)-$(KFLAV)/System.map $@.tmp/boot
+	cp ../LICENSE ../UEFI_SECURE_BOOT.NOTE $@.tmp
 
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@.tmp/karls_iso
 

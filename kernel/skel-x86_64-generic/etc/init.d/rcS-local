@@ -3,4 +3,10 @@
 #Kernel parameter, hardcoded into isolinux and grub in iso image
 if [ "$KARLS_MEDIA" == "ISO" ]; then
  /usr/bin/mount_iso
+ #Try a 4th (!!!) module load round after 3 secs, if ISO not found / maybe it's a slow USB
+ if [ ! -e "/mnt/iso/karls_iso" ]; then
+  sleep 3
+  /usr/bin/detect_kmods 2> /dev/null
+  /usr/bin/mount_iso
+ fi
 fi

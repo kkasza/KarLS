@@ -15,10 +15,16 @@ hostname -F /etc/hostname
 mount -t devpts /dev/pts /dev/pts
 
 #Run 3 times, because new devices found after initial module load
-find /sys/ -name modalias | xargs sort -u | xargs -n 1 modprobe 2> /dev/null
-find /sys/ -name modalias | xargs sort -u | xargs -n 1 modprobe 2> /dev/null
-find /sys/ -name modalias | xargs sort -u | xargs -n 1 modprobe 2> /dev/null
+/usr/bin/detect_kmods 2> /dev/null
+sleep 1
+/usr/bin/detect_kmods 2> /dev/null
+sleep 1
+/usr/bin/detect_kmods 2> /dev/null
 
 ifconfig lo up 127.0.0.1
 
 /etc/init.d/rcS-local
+
+echo ""
+echo -n "Welcome to "
+cat /etc/karls_version

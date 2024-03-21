@@ -1,0 +1,17 @@
+
+Secure Boot (UEFI + TPM) with KarLS is cuurently not supported.
+
+The viable solution to support SB would be signing our own version of SHIM
+with Microsoft's $99 party signing key, as most serious distros do.
+This solution has lots of requirements, and for SHIM eve more.
+See the following document, especially Section 12 at:
+
+https://techcommunity.microsoft.com/t5/hardware-dev-center/updated-uefi-signing-requirements/ba-p/1062916
+
+This may come in the future, but currently the gain does not worth the effort.
+See the SHIM review board at:
+
+https://github.com/rhboot/shim-review
+
+https://learn.microsoft.com/bg-bg/windows-hardware/drivers/dashboard/file-signing-reqs
+

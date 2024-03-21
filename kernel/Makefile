@@ -92,10 +92,15 @@ $(BLD)/$(IRFS): | busybox
 
 initrd: | $(BLD)/initrd.gz
 
-$(BLD)/initrd.gz: $(BLD)/$(IRFS) modules
-	cp -rv $(BLD)/$(KBUILD)/modules/* $<
-	rm -f $</lib/modules/*/build $</lib/modules/*/source
-	cd $<; find . | cpio -H newc -V -o | gzip -9 -n > ../../$@
+$(BLD)/initrd.gz: | $(BLD)/$(IRFS) modules
+	cp -r $(BLD)/$(KBUILD)/modules/* $(BLD)/irfs
+	rm -f $(BLD)/irfs/lib/modules/*/build $(BLD)/irfs/lib/modules/*/source
+	cd $(BLD)/irfs; find . | cpio -H newc -V -o | gzip -9 -n > ../../$@
+
+rebuild_initrd:
+	rm -rf $(BLD)/$(IRFS) $(BLD)/initrd.gz
+	make initrd
+	cp $(BLD)/initrd.gz kernel-$(T)-$(KFLAV)/
 
 $(BLD)/$(KBUILD): src/$(LINUX_VER)
 	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) allnoconfig
@@ -106,7 +111,9 @@ $(BLD)/$(KBUILD): src/$(LINUX_VER)
 #	sed -i 's/^CONFIG_INITRAMFS_SOURCE=\"$(KERNEL_PLH)\"/CONFIG_INITRAMFS_SOURCE=\"$(subst /,\/,$(PWD)/$(BLD)/$(IRFS))\"/' $@/.config
 	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) prepare
 
-modules: kernelimage
+modules: | $(BLD)/$(KBUILD)/modules
+
+$(BLD)/$(KBUILD)/modules: | kernelimage
 	$(MAKE) -C $(BLD)/$(KBUILD) V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" modules
 ifeq ($(P),rpi)
 	$(MAKE) -C $(BLD)/$(KBUILD) V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" dtbs
@@ -135,7 +142,7 @@ endif
 kernel: kernel-$(T)-$(KFLAV)
 	$(DBN)
 
-kernel-$(T)-$(KFLAV): kernelimage modules initrd
+kernel-$(T)-$(KFLAV): | kernelimage modules initrd
 	mkdir -p $@
 	cp $(BLD)/$(KBUILD)/$(NAME).krnl $@/
 	cp $(BLD)/$(KBUILD)/System.map $@/
