@@ -11,11 +11,7 @@ ifneq ($(P),iso)
 $(error Not building an ISO as platform)
 endif
 
-ifeq ($(P),rpi)
-KFLAV:=$(P)
-else
 KFLAV:=generic
-endif
 
 IMAGE:=$(NAME)-$(VERSION)-$(T).iso
 
@@ -108,10 +104,7 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
 iso: $(IMAGE)
 
 qemu: iso
-ifeq ($(T),x86_64)
-	qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -nographic -vnc :0 \
-	-drive file=$(IMAGE).img,if=virtio,format=raw
-endif
+	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot d -cdrom $(IMAGE) -nographic -vnc :0
 
 _local_clean:
 	rm -rf $(IMAGE).tmp efi.img efi.img.mnt
