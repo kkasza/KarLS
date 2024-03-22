@@ -34,9 +34,13 @@ IMAGE:=$(NAME)-$(VERSION)-$(T).iso
 
 #XPATH:=PATH=$(PATH):$(CMPL_INST)/bin
 
-GRUB_OPTS_X86_64:=--with-platform=efi --disable-efiemu
+GRUB_OPTS_PC:=--with-platform=pc
 
-GRUB_OPTS:=--disable-mm-debug \
+GRUB_OPTS_EFI:=--with-platform=efi
+
+GRUB_OPTS:= \
+--disable-efiemu \
+--disable-mm-debug \
 --disable-cache-stats \
 --disable-boot-time \
 --disable-grub-emu-sdl \
@@ -46,25 +50,26 @@ GRUB_OPTS:=--disable-mm-debug \
 --disable-grub-mount \
 --disable-device-mapper \
 --disable-liblzma \
---disable-libzfs
+--disable-libzfs \
+$(CCACHE)
 #--host=$(TARGET-ARCH) \
 #$(XCCACHE) \
 #$(HCCACHE)
 
 $(BLD)/$(GRUB_VER): src/$(GRUB_VER)
 	mkdir -p $@
-	cd $@; ../../src/$(GRUB_VER)/configure $(GRUB_OPTS)
-	$(MAKE) -C $@ V=1
+	cd $@; ../../src/$(GRUB_VER)/configure $(GRUB_OPTS) $(GRUB_OPTS_PC)
+	$(MAKE) -C $@ V=1 $(CCACHE)
 
 #	cd $@; $(XPATH) ../../src/$(GRUB_VER)/configure $(GRUB_OPTS)
 #	$(XPATH) $(MAKE) -C $@ V=1
 
-$(BLD)/$(GRUB_VER)-x86_64: src/$(GRUB_VER)
+$(BLD)/$(GRUB_VER)-efi: src/$(GRUB_VER)
 	mkdir -p $@
-	cd $@; ../../src/$(GRUB_VER)/configure $(GRUB_OPTS) $(GRUB_OPTS_X86_64)
-	$(MAKE) -C $@ V=1
+	cd $@; ../../src/$(GRUB_VER)/configure $(GRUB_OPTS) $(GRUB_OPTS_EFI)
+	$(MAKE) -C $@ V=1 $(CCACHE)
 
-efi.img: $(BLD)/$(GRUB_VER)-x86_64
+efi.img: $(BLD)/$(GRUB_VER)-efi
 	$(SUDO) mkfs.msdos -I -C $@ 2048
 	mkdir -p $@.mnt
 	$(SUDO) mount $@ $@.mnt
