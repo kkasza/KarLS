@@ -88,15 +88,14 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
 
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@.tmp/karls_iso
 
-	$(BLD)/$(GRUB_VER)/grub-mkimage -o $@.tmp/boot/grub/core.img -O i386-pc -p /boot/grub -d $(BLD)/$(GRUB_VER)/grub-core \
+	$(BLD)/$(GRUB_VER)/grub-mkimage -o $@.tmp/boot/grub/grub.img -O i386-pc -p /boot/grub -d $(BLD)/$(GRUB_VER)/grub-core \
 	boot.mod biosdisk.mod cat.mod configfile.mod cpuid.mod disk.mod elf.mod exfat.mod ext2.mod fat.mod file.mod hdparm.mod help.mod iso9660.mod linux.mod loadenv.mod \
 	ls.mod msdospart.mod normal.mod ntfs.mod part_gpt.mod part_msdos.mod reboot.mod scsi.mod search_fs_file.mod search.mod \
 	serial.mod terminal.mod terminfo.mod usb_keyboard.mod usbserial_common.mod usbserial_pl2303.mod
-	cat $(BLD)/$(GRUB_VER)/grub-core/cdboot.img $@.tmp/boot/grub/core.img > $@.tmp/boot/grub/grub.img
-	rm $@.tmp/boot/grub/core.img
+	cat $(BLD)/$(GRUB_VER)/grub-core/cdboot.img $@.tmp/boot/grub/grub.img > $@.tmp/boot/grub/grub-cd.img
 
 	xorriso -as mkisofs -volid KarLS -r -o $@ -J -joliet-long \
-	-b boot/grub/grub.img -c boot/grub/boot.cat -boot-load-size 4 -boot-info-table -no-emul-boot \
+	-b boot/grub/grub-cd.img -c boot/grub/boot.cat -boot-load-size 4 -boot-info-table -no-emul-boot \
 	--grub2-boot-info --grub2-mbr $(BLD)/$(GRUB_VER)/grub-core/boot_hybrid.img \
 	-eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \
 	$@.tmp
