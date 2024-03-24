@@ -156,16 +156,19 @@ endif
 #just to test kernel
 qemu: kernel-$(T)-$(KFLAV)
 ifeq ($(T),x86_64)
-	qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -nographic -vnc :0 \
-	-kernel kernel-$(T)-$(KFLAV)/$(NAME).krnl -append "console=ttyS0"
+	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -nographic \
+	-kernel kernel-$(T)-$(KFLAV)/$(NAME).krnl \
+	-initrd kernel-$(T)-$(KFLAV)/initrd.gz \
+	-append "console=ttyS0"
+
 endif
-ifeq ($(T),arm)
-	qemu-system-arm -M raspi0 -m 512 -nographic -vnc :0 \
-	-kernel kernel-$(T)-$(P)/$(NAME).krnl \
-	-dtb kernel-$(T)-$(P)/bcm2708-rpi-zero-w.dtb \
-	-append 'earlyprintk earlycon=pl011,0x20201000 console=ttyAMA0 loglevel=8 \
-	initcall_blacklist=bcm2835_pm_driver_init'
-endif
+#ifeq ($(T),arm)
+#	$(SUDO) qemu-system-arm -M raspi0 -m 512 -nographic -vnc :0 \
+#	-kernel kernel-$(T)-$(P)/$(NAME).krnl \
+#	-dtb kernel-$(T)-$(P)/bcm2708-rpi-zero-w.dtb \
+#	-append 'earlyprintk earlycon=pl011,0x20201000 console=ttyAMA0 loglevel=8 \
+#	initcall_blacklist=bcm2835_pm_driver_init'
+#ndif
 
 _local_clean:
 	$(foreach i,$(VALID_T), \
