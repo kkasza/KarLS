@@ -21,7 +21,10 @@ cmpl:
 kernel: | cmpl
 	$(MAKE) -C $@ $@
 
-iso: kernel
+pkg: | cmpl
+	$(MAKE) -C $@ $@
+
+iso: | kernel pkg
 	$(MAKE) -C $@ $@
 
 install_deps:

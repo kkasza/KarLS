@@ -1,1 +1,23 @@
-/bin/busybox
+#!/bin/sh
+
+/bin/busybox --install -s /bin
+
+mount -t devtmpfs /dev /dev
+mount -a
+
+mkdir -p /dev/pts /var/run /var/log /var/lock
+
+mount -t devpts /dev/pts /dev/pts
+
+#Run 3 times, because new devices found after initial module load
+/usr/bin/detect_kmods 2> /dev/null
+sleep 1
+/usr/bin/detect_kmods 2> /dev/null
+sleep 1
+/usr/bin/detect_kmods 2> /dev/null
+
+if [ "$KARLS_MEDIA" == "ISO" ]; then
+ echo Booting from ISO
+fi
+
+exec /bin/init <dev/console >dev/console 2>&1
