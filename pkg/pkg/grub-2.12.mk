@@ -37,12 +37,14 @@ $(BLD)/$(GRUB_VER): src/$(GRUB_VER)
 	cd $@; $(XPATH) $(XPCF) ../../src/$(GRUB_VER)/configure $(GRUB_OPTS) $(GRUB_OPTS_PC)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_txz_tmp install
+	rm $@/_txz_tmp/usr/lib/grub/i386-pc/*.module $@/_txz_tmp/usr/lib/grub/i386-pc/*.image
 
 $(BLD)/$(GRUB_VER)-efi: src/$(GRUB_VER)
 	mkdir -p $@
 	cd $@; $(XPATH) $(XPCF) ../../src/$(GRUB_VER)/configure $(GRUB_OPTS) $(GRUB_OPTS_EFI)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_txz_tmp install
+	rm $@/_txz_tmp/usr/lib/grub/x86_64-efi/*.module
 
 $(BLD)/$(GRUB_VER).txz: $(BLD)/$(GRUB_VER)
 	echo "#!/bin/sh" > $</_txz_tmp/INSTALL
