@@ -1,7 +1,6 @@
 #!/bin/sh
 
 mkdir -p /mnt/iso
-ln -s /mnt/iso/boot /boot 2> /dev/null
 
 #A CD-ROM could be present, as we booted from it?
 CDROM=`grep "drive name" /proc/sys/dev/cdrom/info | rev | cut -f1 | rev` 2> /dev/null

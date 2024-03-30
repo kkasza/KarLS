@@ -87,7 +87,6 @@ $(BLD)/$(IRFS): | busybox
 	cp -rP skel-$(T)-$(KFLAV)/* $@/
 	cp $(BLD)/$(BUSY_VER)/busybox $@/bin
 	$(SUDO) mknod -m 600 $@/dev/console c 5 1
-	date +%m%d%H%M%Y > $@/buildtime
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
 
 initrd: | $(BLD)/initrd.gz

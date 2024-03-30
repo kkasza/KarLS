@@ -35,5 +35,6 @@ $(BLD)/$(BUSYBOX_VER).txz: $(BLD)/$(BUSYBOX_VER)
 	ln -s /bin/busybox $</_txz_tmp/bin/init
 	ln -s /bin/busybox $</_txz_tmp/bin/sh
 	echo "#!/bin/sh" > $</_txz_tmp/INSTALL
+	echo "#KarLS INSTALL script for $(BUSYVOX_VER)" > $</_txz_tmp/INSTALL
 	echo "/bin/busybox --install -s /bin" >> $</_txz_tmp/INSTALL
 	tar -C $</_txz_tmp -cJv -f $@ --owner=0 --group=0 .

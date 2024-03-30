@@ -85,6 +85,7 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
 	cp ../kernel/kernel-$(T)-$(KFLAV)/initrd.gz $@.tmp/boot
 	cp ../kernel/kernel-$(T)-$(KFLAV)/System.map $@.tmp/boot
 	cp ../LICENSE ../UEFI_SECURE_BOOT.NOTE $@.tmp
+	cp install.sh $@.tmp
 	cp ../pkg/build-$(T)/*.txz $@.tmp/packages
 
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@.tmp/karls_iso
