@@ -94,7 +94,7 @@ initrd: | $(BLD)/initrd.gz
 $(BLD)/initrd.gz: | $(BLD)/$(IRFS) modules
 	cp -r $(BLD)/$(KBUILD)/modules/* $(BLD)/irfs
 	rm -f $(BLD)/irfs/lib/modules/*/build $(BLD)/irfs/lib/modules/*/source
-	cd $(BLD)/irfs; find . | cpio -H newc -V -o | gzip -9 -n > ../../$@
+	cd $(BLD)/irfs; find . | cpio -H newc -V -R 0:0 -o | gzip -9 -n > ../../$@
 
 rebuild_initrd:
 	rm -rf $(BLD)/$(IRFS) $(BLD)/initrd.gz

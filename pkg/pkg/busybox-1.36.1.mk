@@ -30,8 +30,9 @@ $(BLD)/$(BUSYBOX_VER)-bconfig: src/$(BUSYBOX_VER)
 	touch $<
 
 $(BLD)/$(BUSYBOX_VER).txz: $(BLD)/$(BUSYBOX_VER)
-	mkdir -p $</_txz_tmp/bin
+	mkdir -p $</_txz_tmp/bin $</_txz_tmp/usr/udhcpc
 	cp $</busybox $</_txz_tmp/bin
+	cp $</examples/udhcp/simple.script $</_txz_tmp/usr/udhcpc/default.script
 	ln -s /bin/busybox $</_txz_tmp/bin/init
 	ln -s /bin/busybox $</_txz_tmp/bin/sh
 	echo "#!/bin/sh" > $</_txz_tmp/INSTALL

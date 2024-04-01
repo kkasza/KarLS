@@ -10,11 +10,11 @@ mkdir -p /dev/pts /var/run /var/log /var/lock
 mount -t devpts /dev/pts /dev/pts
 
 #Run 3 times, because new devices found after initial module load
-/usr/bin/detect_kmods 2> /dev/null
+/etc/init.d/rcS-detect_kmods 2> /dev/null
 sleep 1
-/usr/bin/detect_kmods 2> /dev/null
+/etc/init.d/rcS-detect_kmods 2> /dev/null
 sleep 1
-/usr/bin/detect_kmods 2> /dev/null
+/etc/init.d/rcS-detect_kmods 2> /dev/null
 
 if [ "$KARLS_MEDIA" == "ISO" ]; then
  echo Booting from ISO

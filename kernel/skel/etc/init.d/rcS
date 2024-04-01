@@ -8,6 +8,6 @@ ifconfig lo up 127.0.0.1
 
 /etc/init.d/rcS-local
 
+KARLS=`cat /etc/karls_version`
 echo ""
-echo -n "Welcome to "
-cat /etc/karls_version
+echo "Welcome to $KARLS Initrd System"
