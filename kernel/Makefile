@@ -7,13 +7,8 @@ CMPL:=$(PWD)/../cmpl
 CMPL_INST:=$(CMPL)/cmpl-$(T)
 
 KERNEL_PLH:=__karls__
-KVER:=1.0
 
-ifeq ($(P),rpi)
-KFLAV:=$(P)
-else
-KFLAV:=generic
-endif
+KVER:=$(NAME)_1.0-$(KFLAV)
 
 #Build Number for kernel (after #)
 BNF:=buildno-$(T)-$(KFLAV)
@@ -99,24 +94,24 @@ $(BLD)/$(IRFS): | busybox
 	cp $(PWD)/../pkg/pkg/kpm $@/bin
 	chmod 755 $@/bin/kpm
 
-initrd: | $(BLD)/initrd.gz
+initrd: | $(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz
 
-$(BLD)/initrd.gz: | $(BLD)/$(IRFS) modules
+$(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz: | $(BLD)/$(IRFS) modules
 	cp -r $(BLD)/$(KBUILD)/modules/* $(BLD)/irfs
 	rm -f $(BLD)/irfs/lib/modules/*/build $(BLD)/irfs/lib/modules/*/source
 	cd $(BLD)/irfs; find . | cpio -H newc -V -R 0:0 -o | gzip -9 -n > ../../$@
 
 rebuild_initrd:
-	rm -rf $(BLD)/$(IRFS) $(BLD)/initrd.gz
+	rm -rf $(BLD)/$(IRFS) $(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz
 	make initrd
-	cp $(BLD)/initrd.gz kernel-$(T)-$(KFLAV)/
+	cp $(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz kernel-$(T)-$(KFLAV)/
 
 $(BLD)/$(KBUILD): src/$(LINUX_VER)
 	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) allnoconfig
 	cp $(KBUILD).config $@/.config
 #For RPI kernel source
 #	sed -i 's/^CONFIG_CROSS_COMPILE=\"$(KERNEL_PLH)\"/CONFIG_CROSS_COMPILE=\"$(subst /,\/,${CMPL_INST})\/bin\/$(subst /,\/,$(TARGET-ARCH))-\"/' $@/.config
-	sed -i 's/^CONFIG_LOCALVERSION=\"$(KERNEL_PLH)\"/CONFIG_LOCALVERSION=\"-$(NAME)_$(KVER)-$(KFLAV)\"/' $@/.config
+	sed -i 's/^CONFIG_LOCALVERSION=\"$(KERNEL_PLH)\"/CONFIG_LOCALVERSION=\"-$(KVER)\"/' $@/.config
 #	sed -i 's/^CONFIG_INITRAMFS_SOURCE=\"$(KERNEL_PLH)\"/CONFIG_INITRAMFS_SOURCE=\"$(subst /,\/,$(PWD)/$(BLD)/$(IRFS))\"/' $@/.config
 	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) prepare
 
@@ -129,9 +124,9 @@ ifeq ($(P),rpi)
 endif
 	$(MAKE) -C $(BLD)/$(KBUILD) INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) modules_install
 
-kernelimage: | $(BLD)/$(KBUILD)/$(NAME).krnl
+kernelimage: | $(BLD)/$(KBUILD)/vmlinuz-$(LINUX_SVER)-$(KVER)
 
-$(BLD)/$(KBUILD)/$(NAME).krnl: $(BLD)/$(KBUILD)
+$(BLD)/$(KBUILD)/vmlinuz-$(LINUX_SVER)-$(KVER): $(BLD)/$(KBUILD)
 #.version will be increased by kernel builder automatically
 	cp $(BNF) $(BLD)/$(KBUILD)/.version
 
@@ -153,9 +148,10 @@ kernel: kernel-$(T)-$(KFLAV)
 
 kernel-$(T)-$(KFLAV): | kernelimage modules initrd
 	mkdir -p $@
-	cp $(BLD)/$(KBUILD)/$(NAME).krnl $@/
-	cp $(BLD)/$(KBUILD)/System.map $@/
-	cp $(BLD)/initrd.gz $@/
+	cp $(BLD)/$(KBUILD)/vmlinuz-$(LINUX_SVER)-$(KVER) $@/
+	cp $(BLD)/$(KBUILD)/System.map $@/System.map-$(LINUX_SVER)-$(KVER)
+	cp $(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz $@/
+	echo $(LINUX_SVER)-$(KVER) > $@/kernel_version
 ifeq ($(P),rpi)
 	cp -rv $(BLD)/$(KBUILD)/arch/arm/boot/dts/*.dtb $@/
 	mkdir -p $@/overlays
@@ -166,8 +162,8 @@ endif
 qemu: kernel-$(T)-$(KFLAV)
 ifeq ($(T),x86_64)
 	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -nographic \
-	-kernel kernel-$(T)-$(KFLAV)/$(NAME).krnl \
-	-initrd kernel-$(T)-$(KFLAV)/initrd.gz \
+	-kernel kernel-$(T)-$(KFLAV)/vmlinuz-$(LINUX_SVER)-$(KVER) \
+	-initrd kernel-$(T)-$(KFLAV)/initrd-$(LINUX_SVER)-$(KVER).gz \
 	-append "console=ttyS0"
 
 endif

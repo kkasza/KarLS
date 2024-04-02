@@ -72,6 +72,12 @@ endif
 
 BLD:=build-$(TARGET-CPU)
 
+ifeq ($(P),rpi)
+KFLAV:=$(P)
+else
+KFLAV:=generic
+endif
+
 #Dependencies on Debian build system
 MYDEPS:=sudo wget tar rsync \
 gcc g++ ccache \

@@ -58,9 +58,9 @@ mount "$TRGT"1 /mnt/target > /dev/null
 
 echo "Copying boot files..."
 mkdir -p /mnt/target/boot/grub
-cp /mnt/iso/boot/karls.krnl \
-/mnt/iso/boot/initrd.gz \
-/mnt/iso/boot/System.map \
+cp /mnt/iso/boot/vmlinuz-* \
+/mnt/iso/boot/initrd-*.gz \
+/mnt/iso/boot/System.map-* \
 /mnt/target/boot
 mkdir -p /mnt/target/lib
 cp -r /lib/modules /mnt/target/lib

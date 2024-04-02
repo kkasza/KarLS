@@ -11,24 +11,7 @@ ifneq ($(P),iso)
 $(error Not building an ISO as platform)
 endif
 
-KFLAV:=generic
-
 IMAGE:=$(NAME)-$(VERSION)-$(T).iso
-
-#CMPL_INST:=$(PWD)/../cmpl/cmpl-$(T)
-
-#Setup HOST and CROSS compilers with or without ccache
-#ifdef DBG_NOCC
-#HCCACHE:=HOSTCC="gcc" HOSTCXX="g++"
-#XCCACHE:=CC="$(CMPL_INST)/bin/gcc" CXX="$(CMPL_INST)/bin/g++"
-#else
-#HCCACHE:=HOSTCC="ccache gcc" HOSTCXX="ccache g++"
-#XCCACHE:=CC="ccache $(CMPL_INST)/bin/gcc" CXX="ccache $(CMPL_INST)/bin/g++"
-#endif
-
-#STRIP:=$(CMPL_INST)/bin/$(TARGET-ARCH)-strip -d --strip-unneeded
-
-#XPATH:=PATH=$(PATH):$(CMPL_INST)/bin
 
 GRUB_OPTS_PC:=--with-platform=pc
 
@@ -48,17 +31,11 @@ GRUB_OPTS:= \
 --disable-liblzma \
 --disable-libzfs \
 $(CCACHE)
-#--host=$(TARGET-ARCH) \
-#$(XCCACHE) \
-#$(HCCACHE)
 
 $(BLD)/$(GRUB_VER): src/$(GRUB_VER)
 	mkdir -p $@
 	cd $@; ../../src/$(GRUB_VER)/configure $(GRUB_OPTS) $(GRUB_OPTS_PC)
 	$(MAKE) -C $@ V=1 $(CCACHE)
-
-#	cd $@; $(XPATH) ../../src/$(GRUB_VER)/configure $(GRUB_OPTS)
-#	$(XPATH) $(MAKE) -C $@ V=1
 
 $(BLD)/$(GRUB_VER)-efi: src/$(GRUB_VER)
 	mkdir -p $@
@@ -78,12 +55,27 @@ efi.img: $(BLD)/$(GRUB_VER)-efi
 
 	$(SUDO) umount $@.mnt
 
+KVER:=$(shell cat ../kernel/kernel-$(T)-$(KFLAV)/kernel_version)
+
 $(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
 	mkdir -p $@.tmp/boot/grub $@.tmp/packages
 	cp efi.img grub.cfg $@.tmp/boot/grub
-	cp ../kernel/kernel-$(T)-$(KFLAV)/$(NAME).krnl $@.tmp/boot
-	cp ../kernel/kernel-$(T)-$(KFLAV)/initrd.gz $@.tmp/boot
-	cp ../kernel/kernel-$(T)-$(KFLAV)/System.map $@.tmp/boot
+
+	echo "menuentry \"KarLS ISO\" {" >> $@.tmp/boot/grub/grub.cfg
+	echo "	search -f /karls_iso --set=root" >> $@.tmp/boot/grub/grub.cfg
+	echo "	linux /boot/vmlinuz-$(KVER) vga=0x305 KARLS_MEDIA=ISO" >> $@.tmp/boot/grub/grub.cfg
+	echo "	initrd /boot/initrd-$(KVER).gz" >> $@.tmp/boot/grub/grub.cfg
+	echo "}" >> $@.tmp/boot/grub/grub.cfg
+	echo "" >> $@.tmp/boot/grub/grub.cfg
+	echo "menuentry \"KarLS ISO Serial Console\" {" >> $@.tmp/boot/grub/grub.cfg
+	echo "	search -f /karls_iso --set=root" >> $@.tmp/boot/grub/grub.cfg
+	echo "	linux /boot/vmlinuz-$(KVER) console=ttyS0,9600 KARLS_MEDIA=ISO" >> $@.tmp/boot/grub/grub.cfg
+	echo "	initrd /boot/initrd-$(KVER).gz" >> $@.tmp/boot/grub/grub.cfg
+	echo "}" >> $@.tmp/boot/grub/grub.cfg
+
+	cp ../kernel/kernel-$(T)-$(KFLAV)/vmlinuz-$(KVER) $@.tmp/boot
+	cp ../kernel/kernel-$(T)-$(KFLAV)/System.map-$(KVER) $@.tmp/boot
+	cp ../kernel/kernel-$(T)-$(KFLAV)/initrd-$(KVER).gz $@.tmp/boot
 	cp ../LICENSE ../UEFI_SECURE_BOOT.NOTE $@.tmp
 	cp -r install $@.tmp
 	cp ../pkg/build-$(T)/*.kp $@.tmp/packages
