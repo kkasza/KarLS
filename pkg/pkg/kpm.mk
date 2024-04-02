@@ -1,4 +1,4 @@
-KPM_VER:=kpm-1.2.5
+KPM_VER:=kpm-1.0
 
 PKG_LIST+=kpm
 

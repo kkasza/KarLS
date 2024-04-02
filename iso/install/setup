@@ -54,24 +54,49 @@ ret=$?
 echo "Mounting target..."
 mkdir -p /mnt/target
 mount "$TRGT"1 /mnt/target > /dev/null
+ret=$?
 [[ $ret -ne 0 ]] && { echo "mount error, installation cancelled!"; break; }
 
-echo "Copying boot files..."
+KVER=`cat /mnt/iso/boot/kernel_version`
+
+echo "Copying kernel files..."
 mkdir -p /mnt/target/boot/grub
-cp /mnt/iso/boot/vmlinuz-* \
-/mnt/iso/boot/initrd-*.gz \
-/mnt/iso/boot/System.map-* \
-/mnt/target/boot
-mkdir -p /mnt/target/lib
-cp -r /lib/modules /mnt/target/lib
+kpm install /mnt/iso/packages/kernel-$KVER.kp /mnt/target >/dev/null
+ret=$?
+[[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 
 echo "Installing GRUB boot loader..."
 grub-install --boot-directory=/mnt/target/boot "$TRGT"
+ret=$?
 [[ $ret -ne 0 ]] && { echo "grub-install error, installation cancelled!"; break; }
+
 cp /mnt/iso/install/grub.cfg /mnt/target/boot/grub
 
-echo "Installation finished!"
-echo "Press Ctrl-Alt-Delete or type \"reboot\" in shell to reboot!"
+BLK=`blkid "$TRGT"1 | cut -d' ' -f2 | cut -d= -f2`
+
+echo "menuentry \"KarLS\" {" >> /mnt/target/boot/grub/grub.cfg
+echo "	search -u $BLK --set=root" >> /mnt/target/boot/grub/grub.cfg
+echo "	linux /boot/vmlinuz-$KVER vga=0x305 root=$BLK" >> /mnt/target/boot/grub/grub.cfg
+echo "	initrd /boot/initrd-$KVER.gz" >> /mnt/target/boot/grub/grub.cfg
+echo "}" >> /mnt/target/boot/grub/grub.cfg
+echo "" >> /mnt/target/boot/grub/grub.cfg
+echo "menuentry \"KarLS Serial Console\" {" >> /mnt/target/boot/grub/grub.cfg
+echo "	search -u $BLK --set=root" >> /mnt/target/boot/grub/grub.cfg
+echo "	linux /boot/vmlinuz-$KVER console=ttyS0,9600 root=$BLK" >> /mnt/target/boot/grub/grub.cfg
+echo "	initrd /boot/initrd-$KVER.gz" >> /mnt/target/boot/grub/grub.cfg
+echo "}" >> /mnt/target/boot/grub/grub.cfg
+
+echo ""
+echo "KarLS Installation finished!"
 break
 
 done
+
+echo ""
+echo "Press Any Key to Reboot or \"S\" to drop to Live ISO Shell"
+read -s -n 1
+REP=`echo $REPLY | tr '[:upper:]' '[:lower:]'`
+[[ "$REP" == "s" ]] && exit 0
+
+umount /mnt/target 2> /dev/null
+reboot
