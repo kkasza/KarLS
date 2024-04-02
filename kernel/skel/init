@@ -16,8 +16,6 @@ sleep 1
 sleep 1
 /etc/init.d/rcS-detect_kmods 2> /dev/null
 
-if [ "$KARLS_MEDIA" == "ISO" ]; then
- echo Booting from ISO
-fi
+[[ "$KARLS_MEDIA" == "ISO" ]] && echo Booting from ISO
 
 exec /bin/init <dev/console >dev/console 2>&1

@@ -4,9 +4,7 @@ mkdir -p /mnt/iso
 
 #A CD-ROM could be present, as we booted from it?
 CDROM=`grep "drive name" /proc/sys/dev/cdrom/info | rev | cut -f1 | rev` 2> /dev/null
-if [ -b "/dev/$CDROM" ]; then
- mount -t iso9660 -o ro /dev/$CDROM /mnt/iso 2> /dev/null
-fi
+[[ -b "/dev/$CDROM" ]] && mount -t iso9660 -o ro /dev/$CDROM /mnt/iso 2> /dev/null
 
 #If iso is not mounted, or not the correct disk was mounted, try to use the first FAT32 partition found
 if [ ! -e "/mnt/iso/karls_iso" ]; then
@@ -22,8 +20,6 @@ if [ ! -e "/mnt/iso/karls_iso" ]; then
  if [ -b "$USBDRIVE" ]; then
   mount -t vfat -o ro $USBDRIVE /mnt/iso 2> /dev/null
   #Unmount again if it's not to correct drive
-  if [ ! -e "/mnt/iso/karls_iso" ]; then
-   umount /mnt/iso 2> /dev/null
-  fi
+  [[ ! -e "/mnt/iso/karls_iso" ]] && umount /mnt/iso 2> /dev/null
  fi
 fi

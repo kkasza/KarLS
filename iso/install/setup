@@ -8,13 +8,13 @@ echo ""
 echo "Welcome to $KARLS Installation/Live ISO"
 
 while true; do
+
 echo ""
 echo "Press Any Key to start Installation or \"S\" to drop to Live ISO Shell"
 read -s -n 1
 REP=`echo $REPLY | tr '[:upper:]' '[:lower:]'`
-if [ "$REP" == "s" ]; then
- exit 0
-fi
+[[ "$REP" == "s" ]] && exit 0
+
 echo ""
 echo "                        * * * WARNING * * *"
 echo ""
@@ -25,11 +25,9 @@ fdisk -l | grep Disk
 echo ""
 echo -n "Enter device to install: "
 read
-if [ ! -b "$REPLY" ]; then
- echo "[$REPLY] not found or not a device!"
- continue
-fi
+[[ ! -b "$REPLY" ]] && { echo "[$REPLY] not found or not a device!"; continue; }
 TRGT="$REPLY"
+
 echo ""
 echo "Insallation target is [$TRGT]!"
 fdisk -l $TRGT
@@ -38,36 +36,24 @@ echo "             * * * LAST CHANCE! Do you really want to continue? * * *"
 echo ""
 echo "KarLS will be installed on [$TRGT], and all pre-existing data will be destroyed there!"
 echo ""
-echo -n "Type \"CONTINUE\" to continue installation: "
+echo -n "Type \"YES\" to continue installation: "
 read
-if [ "$REPLY" != "CONTINUE" ]; then
- echo "Installation cancelled!"
- continue
-fi
+[[ "$REPLY" != "YES" ]] && { echo "Installation cancelled!"; continue; }
 
 echo "Partitioning disk..."
 echo -e "o\nn\np\n1\n2048\n\na\n1\nw\n" | fdisk $TRGT > /dev/null
 ret=$?
-if [ $ret -ne 0 ]; then
- echo "fdisk error, installation cancelled!"
- break
-fi
+[[ $ret -ne 0 ]] && { echo "fdisk error, installation cancelled!"; break; }
 
 echo "Formatting ext2 partition..."
 mkfs.ext2 "$TRGT"1 > /dev/null
 ret=$?
-if [ $ret -ne 0 ]; then
- echo "mkfs.ext2 error, installation cancelled!"
- break
-fi
+[[ $ret -ne 0 ]] && { echo "mkfs.ext2 error, installation cancelled!"; break; }
 
 echo "Mounting target..."
 mkdir -p /mnt/target
 mount "$TRGT"1 /mnt/target > /dev/null
-if [ $ret -ne 0 ]; then
- echo "mount error, installation cancelled!"
- break
-fi
+[[ $ret -ne 0 ]] && { echo "mount error, installation cancelled!"; break; }
 
 echo "Copying boot files..."
 mkdir -p /mnt/target/boot/grub
@@ -80,13 +66,11 @@ cp -r /lib/modules /mnt/target/lib
 
 echo "Installing GRUB boot loader..."
 grub-install --boot-directory=/mnt/target/boot "$TRGT"
-if [ $ret -ne 0 ]; then
- echo "grub-install error, installation cancelled!"
- break
-fi
+[[ $ret -ne 0 ]] && { echo "grub-install error, installation cancelled!"; break; }
 cp /mnt/iso/install/grub.cfg /mnt/target/boot/grub
 
 echo "Installation finished!"
 echo "Press Ctrl-Alt-Delete or type \"reboot\" in shell to reboot!"
 break
+
 done
