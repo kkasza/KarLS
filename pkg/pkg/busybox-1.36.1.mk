@@ -6,7 +6,7 @@ $(BUSYBOX_VER)-SHA256:=b8cc24c9574d809e7279c3be349795c5d5ceb6fdf19ca709f80cde50e
 SRC_LIST+=BUSYBOX
 PKG_LIST+=busybox
 
-busybox: $(BLD)/$(BUSYBOX_VER).txz
+busybox: $(BLD)/$(BUSYBOX_VER).kp
 
 $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 	mkdir -p $(BLD)
@@ -29,13 +29,13 @@ $(BLD)/$(BUSYBOX_VER)-bconfig: src/$(BUSYBOX_VER)
 	rm -f pkg/$(BUSYBOX_VER).config.new || diff -u pkg/$(BUSYBOX_VER).config pkg/$(BUSYBOX_VER).config.new > pkg/$(BUSYBOX_VER).config.diff || true
 	touch $<
 
-$(BLD)/$(BUSYBOX_VER).txz: $(BLD)/$(BUSYBOX_VER)
-	mkdir -p $</_txz_tmp/bin $</_txz_tmp/usr/udhcpc
-	cp $</busybox $</_txz_tmp/bin
-	cp $</examples/udhcp/simple.script $</_txz_tmp/usr/udhcpc/default.script
-	ln -s /bin/busybox $</_txz_tmp/bin/init
-	ln -s /bin/busybox $</_txz_tmp/bin/sh
-	echo "#!/bin/sh" > $</_txz_tmp/INSTALL
-	echo "#KarLS INSTALL script for $(BUSYVOX_VER)" > $</_txz_tmp/INSTALL
-	echo "/bin/busybox --install -s /bin" >> $</_txz_tmp/INSTALL
-	tar -C $</_txz_tmp -cJv -f $@ --owner=0 --group=0 .
+$(BLD)/$(BUSYBOX_VER).kp: $(BLD)/$(BUSYBOX_VER)
+	mkdir -p $</_kp_tmp/bin $</_kp_tmp/usr/udhcpc
+	cp $</busybox $</_kp_tmp/bin
+	cp $</examples/udhcp/simple.script $</_kp_tmp/usr/udhcpc/default.script
+	ln -s /bin/busybox $</_kp_tmp/bin/init
+	ln -s /bin/busybox $</_kp_tmp/bin/sh
+	echo "#!/bin/sh" > $</_kp_tmp/INSTALL
+	echo "#KarLS INSTALL script for $(BUSYBOX_VER)" > $</_kp_tmp/INSTALL
+	echo "/bin/busybox --install -s \$$1/bin" >> $</_kp_tmp/INSTALL
+	tar -C $</_kp_tmp -cJv -f $@ --owner=0 --group=0 .

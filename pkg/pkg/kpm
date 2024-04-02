@@ -1,0 +1,34 @@
+#!/bin/sh
+
+VER="1.0"
+
+usage()
+{
+ echo "kpm - KarLS Package Manager $VER"
+ echo "kpm: $1" 1>&2
+ echo ""
+ echo "Usage: $0 <Command> <Package> <Destination directory - defaults to />"
+ echo "Valid commands: install"
+ exit 1
+}
+
+CMD=`echo $1 | tr '[:upper:]' '[:lower:]'`
+[[ "$CMD" == "" ]] && usage "Not enough parameters"
+[[ "$CMD" != "install" ]] && usage "Unknown command $CMD"
+
+KPF=$2
+[[ ! -f "$KPF" ]] && usage "Package file $KPF not found"
+
+[[ "$3" == "" ]] && DST="/" || DST=$3
+[[ ! -d "$DST" ]] && usage "Destination directory $DST not found"
+
+echo "Unpacking $KPF to $DST..."
+tar -C $DST -xJf $KPF
+ret=$?
+[[ $ret -ne 0 ]] && { echo "Package error with $KPF, installation cancelled!" 1>&2; exit 1; }
+
+if [ -f "$DST/INSTALL" ]; then
+ echo "Running install script..."
+ . $DST/INSTALL $DST
+ rm $DST/INSTALL
+fi

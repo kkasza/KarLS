@@ -1,7 +1,8 @@
 #!/bin/sh
 
-tar -C / -xJf /mnt/iso/packages/musl-1.2.5.txz
-tar -C / -xJf /mnt/iso/packages/grub-2.12.txz
+#Unpack musl and grub to ramdisk
+kpm install /mnt/iso/packages/musl-1.2.5.kp >/dev/null
+kpm install /mnt/iso/packages/grub-2.12.kp >/dev/null
 
 KARLS=`cat /mnt/iso/karls_iso`
 echo ""

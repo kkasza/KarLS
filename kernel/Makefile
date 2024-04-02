@@ -82,12 +82,22 @@ $(BLD)/$(LINUX_VER)-kconfig: src/$(LINUX_VER)
 irfs: $(BLD)/$(IRFS)
 
 $(BLD)/$(IRFS): | busybox
-	mkdir -p $@/proc $@/dev $@/tmp $@/var $@/sys $@/lib/modules
+	mkdir -p $@/proc $@/dev $@/tmp $@/var $@/sys $@/lib/modules $@/bin $@/usr/udhcpc
+	ln -s /var/run $@/run
+	ln -s /bin $@/sbin
+
 	cp -rP skel/* $@/
 	cp -rP skel-$(T)-$(KFLAV)/* $@/
+
 	cp $(BLD)/$(BUSY_VER)/busybox $@/bin
+	cp $(BLD)/$(BUSY_VER)/examples/udhcp/simple.script $@/usr/udhcpc/default.script
+	ln -s /bin/busybox $@/bin/init
+	ln -s /bin/busybox $@/bin/sh
+
 	$(SUDO) mknod -m 600 $@/dev/console c 5 1
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
+	cp $(PWD)/../pkg/pkg/kpm $@/bin
+	chmod 755 $@/bin/kpm
 
 initrd: | $(BLD)/initrd.gz
 
