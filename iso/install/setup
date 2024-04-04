@@ -98,5 +98,8 @@ read -s -n 1
 REP=`echo $REPLY | tr '[:upper:]' '[:lower:]'`
 [[ "$REP" == "s" ]] && exit 0
 
-umount /mnt/target 2> /dev/null
-reboot
+#Force reboot
+sync
+umount -r /mnt/target 2> /dev/null
+echo 1 > /proc/sys/kernel/sysrq
+echo b > /proc/sysrq-trigger
