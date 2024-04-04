@@ -94,6 +94,8 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
 
 iso: $(IMAGE)
 
+rebuild_iso: _local_clean iso
+
 qemu: iso
 	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot d -cdrom $(IMAGE) -nographic -vnc :0
 

@@ -3,9 +3,10 @@
 /bin/busybox --install -s /bin
 
 mount -t devtmpfs /dev /dev
+#Mount fstab - /proc /sys /tmp
 mount -a
 
-mkdir -p /dev/pts /var/run /var/log /var/lock
+mkdir -p /dev/pts /tmp/var/run /tmp/var/log /tmp/var/lock
 
 mount -t devpts /dev/pts /dev/pts
 
@@ -15,7 +16,5 @@ sleep 1
 /etc/init.d/rcS-detect_kmods 2> /dev/null
 sleep 1
 /etc/init.d/rcS-detect_kmods 2> /dev/null
-
-[[ "$KARLS_MEDIA" == "ISO" ]] && echo Booting from ISO
 
 exec /bin/init <dev/console >dev/console 2>&1
