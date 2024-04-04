@@ -47,11 +47,7 @@ $(BLD)/$(GRUB_VER)-efi: src/$(GRUB_VER)
 	rm $@/_kp_tmp/usr/lib/grub/x86_64-efi/*.module
 
 $(BLD)/$(GRUB_VER).kp: $(BLD)/$(GRUB_VER)
-	echo "#!/bin/sh" > $</_kp_tmp/INSTALL
-	echo "#KarLS INSTALL script for $(GRUB_VER)" > $</_kp_tmp/INSTALL
-	tar -C $</_kp_tmp -cJv -f $@ --owner=0 --group=0 INSTALL usr/bin usr/sbin usr/lib usr/share/grub
+	tar -C $</_kp_tmp -cJv -f $@ --owner=0 --group=0 usr/bin usr/sbin usr/lib usr/share/grub
 
 $(BLD)/$(GRUB_VER)-efi.kp: $(BLD)/$(GRUB_VER)-efi
-	echo "#!/bin/sh" > $</_kp_tmp/INSTALL
-	echo "#KarLS INSTALL script for $(GRUB_VER)-efi" > $</_kp_tmp/INSTALL
-	tar -C $</_kp_tmp -cJv -f $@ --owner=0 --group=0 INSTALL usr/bin usr/sbin usr/lib usr/share/grub
+	tar -C $</_kp_tmp -cJv -f $@ --owner=0 --group=0 usr/bin usr/sbin usr/lib usr/share/grub

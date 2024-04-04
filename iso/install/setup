@@ -1,9 +1,5 @@
 #!/bin/sh
 
-#Unpack musl and grub to ramdisk
-kpm install /mnt/iso/packages/musl-1.2.5.kp >/dev/null
-kpm install /mnt/iso/packages/grub-2.12.kp >/dev/null
-
 KARLS=`cat /mnt/iso/karls_iso`
 echo ""
 echo "Welcome to $KARLS Installation/Live ISO"
@@ -57,15 +53,27 @@ mount "$TRGT"1 /mnt/target > /dev/null
 ret=$?
 [[ $ret -ne 0 ]] && { echo "mount error, installation cancelled!"; break; }
 
-KVER=`cat /mnt/iso/boot/kernel_version`
+echo "Unpacking installation dependencies to ramdisk..."
+for pkg in `cat /mnt/iso/install/instdep.list`; do
+kpm install /mnt/iso/packages/$pkg > /dev/null
+ret=$?
+[[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+done
 
-echo "Copying kernel files..."
+echo "Installing Kernel files..."
+KVER=`cat /mnt/iso/boot/kernel_version`
 mkdir -p /mnt/target/boot/grub
-kpm install /mnt/iso/packages/kernel-$KVER.kp /mnt/target >/dev/null
+kpm install /mnt/iso/packages/kernel-$KVER.kp /mnt/target > /dev/null
 ret=$?
 [[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 
 echo "Installing GRUB boot loader..."
+GRUBVER=`cat /mnt/iso/install/grub_ver`
+
+kpm install /mnt/iso/packages/grub-$GRUBVER.kp > /dev/null
+ret=$?
+[[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+
 grub-install --boot-directory=/mnt/target/boot "$TRGT"
 ret=$?
 [[ $ret -ne 0 ]] && { echo "grub-install error, installation cancelled!"; break; }
@@ -86,6 +94,18 @@ echo "	linux /boot/vmlinuz-$KVER console=ttyS0,9600 root=$BLK" >> /mnt/target/bo
 echo "	initrd /boot/initrd-$KVER.gz" >> /mnt/target/boot/grub/grub.cfg
 echo "}" >> /mnt/target/boot/grub/grub.cfg
 
+echo "Installing base OS packages..."
+
+for pkg in `cat /mnt/iso/install/base.list`; do
+kpm install /mnt/iso/packages/$pkg /mnt/target > /dev/null
+ret=$?
+[[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+done
+
+kpm install /mnt/iso/packages/grub-$GRUBVER.kp /mnt/target > /dev/null
+ret=$?
+[[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+
 echo ""
 echo "KarLS Installation finished!"
 break
@@ -100,6 +120,6 @@ REP=`echo $REPLY | tr '[:upper:]' '[:lower:]'`
 
 #Force reboot
 sync
-umount -r /mnt/target 2> /dev/null
+umount -r /mnt/target
 echo 1 > /proc/sys/kernel/sysrq
 echo b > /proc/sysrq-trigger

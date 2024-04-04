@@ -17,4 +17,15 @@ sleep 1
 sleep 1
 /etc/init.d/rcS-detect_kmods 2> /dev/null
 
+#Check if we can find a rootfs then try to mount it
+ROOTUUID=`cat /proc/cmdline | tr ' ' '\n' | grep root= | cut -d= -f2`
+[[ ! -z "$ROOTUUID" ]] && ROOTDISK=`blkid | grep $ROOTUUID | cut -d: -f1`
+
+if [ -b "$ROOTDISK" ]; then
+ mkdir /newroot
+ mount -o ro $ROOTDISK /newroot
+ ret=$?
+ [[ $ret -ne 0 ]] && echo "Could not mount root FS!"
+fi
+
 exec /bin/init <dev/console >dev/console 2>&1

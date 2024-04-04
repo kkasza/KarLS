@@ -1,0 +1,11 @@
+#!/bin/sh
+
+hostname -F /etc/hostname
+
+syslogd
+
+ifconfig lo up 127.0.0.1
+
+KARLS=`cat /etc/karls_version`
+echo ""
+echo "Welcome to $KARLS"

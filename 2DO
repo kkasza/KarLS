@@ -2,5 +2,5 @@
 * Automatic BIOS / EFI install
 * Serial Console as default GRUB choice if installed over it
 * Basic root filesystem package
-* Initrd to do pivot_root if root= kernel parameter present - if root not found, drop back to Initrd shell
+* Initrd to do pivot_root/switch_root if root= kernel parameter present - if root not found, drop back to Initrd shell
 * kpm installed packages directory, kpm package manifest for uninstalling
