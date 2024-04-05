@@ -1,7 +1,7 @@
 #!/bin/sh
 
 mkdir -p /dev/pts
-mount -t devpts /dev/pts /dev/pts
+mount -t devpts -o nosuid,noexec devpts /dev/pts
 
 hostname -F /etc/hostname
 

@@ -8,7 +8,7 @@ $(BLD)/$(ROOTSKEL_VER):
 	mkdir -p $@
 	cp -r pkg/rootskel/* $@
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
-	mkdir -p $@/dev $@/proc $@/sys $@/var/run $@/var/lock $@/var/log $@/tmp
+	mkdir -p $@/dev $@/proc $@/sys $@/var/run $@/var/lock $@/var/log $@/tmp $@/var/tmp /root
 
 $(BLD)/$(ROOTSKEL_VER).kp: $(BLD)/$(ROOTSKEL_VER)
 	tar -C $< -cJv -f $@ --owner=0 --group=0 .

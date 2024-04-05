@@ -16,14 +16,13 @@ $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 	sed -i 's/^CONFIG_SYSROOT=\"\"/CONFIG_SYSROOT=\"$(subst /,\/,$(CMPL_INST))\"/' $@/.config
 	sed -i 's/^CONFIG_UNAME_OSNAME=\"GNU\/Linux\"/CONFIG_UNAME_OSNAME=\"$(subst /,\/,$(NAME))\"/' $@/.config
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
-	mkdir -p $@/_kp_tmp/bin $@/_kp_tmp/usr/udhcpc
-	cp $@/busybox $@/_kp_tmp/bin
+	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 CONFIG_PREFIX=`pwd`/$@/_kp_tmp install
+	mkdir -p $@/_kp_tmp/usr/udhcpc
 	cp $@/examples/udhcp/simple.script $@/_kp_tmp/usr/udhcpc/default.script
-	ln -s /bin/busybox $@/_kp_tmp/bin/init
-	ln -s /bin/busybox $@/_kp_tmp/bin/sh
-	echo "#!/bin/sh" > $@/_kp_tmp/INSTALL
-	echo "#KarLS INSTALL script for $(BUSYBOX_VER)" >> $@/_kp_tmp/INSTALL
-	echo "/bin/busybox --install -s \$$1/bin" >> $@/_kp_tmp/INSTALL
+#	NOTE: busybox may need setuid root...
+#	echo "#!/bin/sh" > $@/_kp_tmp/INSTALL
+#	echo "#KarLS INSTALL script for $(BUSYBOX_VER)" >> $@/_kp_tmp/INSTALL
+#	echo "/bin/busybox --install -s \$$1/bin" >> $@/_kp_tmp/INSTALL
 
 busybox-config: $(BLD)/$(BUSYBOX_VER)-bconfig
 

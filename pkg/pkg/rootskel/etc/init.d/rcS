@@ -1,7 +1,8 @@
 #!/bin/sh
 
 mkdir -p /dev/pts
-mount -t devpts /dev/pts /dev/pts
+#Mount remaining filesystems - devpts, /tmp, etc.
+mount -a
 
 hostname -F /etc/hostname
 

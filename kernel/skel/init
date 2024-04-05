@@ -2,11 +2,9 @@
 
 /bin/busybox --install -s /bin
 
-mount -t devtmpfs /dev /dev
-#Mount fstab - /proc /sys /tmp
+mount -t devtmpfs -o nosuid devtmpfs /dev
+#Mount fstab - /proc /sys
 mount -a
-
-mkdir -p /tmp/var/run /tmp/var/log /tmp/var/lock
 
 #Run 3 times, because new devices found after initial module load
 /etc/init.d/rcS-detect_kmods 2> /dev/null
@@ -23,7 +21,7 @@ if [ -b "$ROOTDISK" ]; then
  #Ugly, ugly, ugly. It will never loop ofc, but I can abort commands before switch_rooe this way
  while true; do
  mkdir /newroot
- mount $ROOTDISK /newroot
+ mount -o errors=remount-ro $ROOTDISK /newroot
  [[ $? -ne 0 ]] && { echo "Could not mount root FS!"; break; }
  mount --move /sys /newroot/sys
  [[ $? -ne 0 ]] && { echo "Could not move mount point for /sys!"; break; }
@@ -31,7 +29,7 @@ if [ -b "$ROOTDISK" ]; then
  [[ $? -ne 0 ]] && { echo "Could not move mount point for /dev!"; break; }
  mount --move /proc /newroot/proc
  [[ $? -ne 0 ]] && { echo "Could not move mount point for /proc!"; break; }
- exec switch_root /newroot /bin/init
+ exec switch_root /newroot /sbin/init
  break
  done
 fi

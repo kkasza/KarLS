@@ -1,3 +1,9 @@
-proc			/proc	proc	defaults 0 0
-sysfs			/sys	sysfs	defaults 0 0
-tmpfs			/tmp	tmpfs	defaults 0 0
+#These 3 along with the root should already be mounted by the initrd
+#devtmpfs		/dev	devtmpfs	defaults,nosuid 0 0
+#proc			/proc	proc		defaults,nosuid,nodev,noexec 0 0
+#sysfs			/sys	sysfs		defaults,nosuid,nodev,noexec 0 0
+
+devpts 			/dev/pts	devpts	defaults,nosuid,noexec 0 0
+tmpfs			/tmp		tmpfs	defaults,nosuid,nodev 0 0
+tmpfs			/var/lock	tmpfs	defaults,nosuid,nodev,noexec 0 0
+tmpfs			/var/run	tmpfs	defaults,nosuid,nodev,noexec 0 0

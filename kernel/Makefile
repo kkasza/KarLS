@@ -77,7 +77,7 @@ $(BLD)/$(LINUX_VER)-kconfig: src/$(LINUX_VER)
 irfs: $(BLD)/$(IRFS)
 
 $(BLD)/$(IRFS): | busybox
-	mkdir -p $@/proc $@/dev $@/tmp $@/sys $@/lib/modules $@/usr/udhcpc
+	mkdir -p $@/proc $@/dev $@/tmp $@/sys $@/lib/modules $@/usr/udhcpc $@/var/run $@/var/log $@/var/lock $@/var/tmp
 
 	cp -rP skel/* $@/
 	cp -rP skel-$(T)-$(KFLAV)/* $@/
