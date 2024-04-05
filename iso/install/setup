@@ -73,6 +73,16 @@ grub-install --boot-directory=/mnt/target/boot "$TRGT"
 
 cp /mnt/iso/install/grub.cfg /mnt/target/boot/grub
 
+SERIALCON=`grep console=ttyS0 /proc/cmdline`
+if [ -z "$SERIALCON" ]; then
+ echo "set default=0" >> /mnt/target/boot/grub/grub.cfg
+else
+ echo "Installing over Serial Console, setting as default choice for boot menu"
+ echo "set default=1" >> /mnt/target/boot/grub/grub.cfg
+fi
+
+echo "" >> /mnt/target/boot/grub/grub.cfg
+
 BLK=`blkid "$TRGT"1 | cut -d' ' -f2 | cut -d= -f2`
 
 echo "menuentry \"KarLS\" {" >> /mnt/target/boot/grub/grub.cfg
