@@ -24,8 +24,7 @@ KPF=$2
 
 echo "Unpacking $KPF to $DST..."
 tar -C $DST -xJf $KPF
-ret=$?
-[[ $ret -ne 0 ]] && { echo "Package error with $KPF, installation cancelled!" 1>&2; exit 1; }
+[[ $? -ne 0 ]] && { echo "Package error with $KPF, installation cancelled!" 1>&2; exit 1; }
 
 if [ -f "$DST/INSTALL" ]; then
  echo "Running install script..."

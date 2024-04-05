@@ -6,9 +6,7 @@ mount -t devtmpfs /dev /dev
 #Mount fstab - /proc /sys /tmp
 mount -a
 
-mkdir -p /dev/pts /tmp/var/run /tmp/var/log /tmp/var/lock
-
-mount -t devpts /dev/pts /dev/pts
+mkdir -p /tmp/var/run /tmp/var/log /tmp/var/lock
 
 #Run 3 times, because new devices found after initial module load
 /etc/init.d/rcS-detect_kmods 2> /dev/null
@@ -22,10 +20,21 @@ ROOTUUID=`cat /proc/cmdline | tr ' ' '\n' | grep root= | cut -d= -f2`
 [[ ! -z "$ROOTUUID" ]] && ROOTDISK=`blkid | grep $ROOTUUID | cut -d: -f1`
 
 if [ -b "$ROOTDISK" ]; then
+ #Ugly, ugly, ugly. It will never loop ofc, but I can abort commands before switch_rooe this way
+ while true; do
  mkdir /newroot
- mount -o ro $ROOTDISK /newroot
- ret=$?
- [[ $ret -ne 0 ]] && echo "Could not mount root FS!"
+ mount $ROOTDISK /newroot
+ [[ $? -ne 0 ]] && { echo "Could not mount root FS!"; break; }
+ mount --move /sys /newroot/sys
+ [[ $? -ne 0 ]] && { echo "Could not move mount point for /sys!"; break; }
+ mount --move /dev /newroot/dev
+ [[ $? -ne 0 ]] && { echo "Could not move mount point for /dev!"; break; }
+ mount --move /proc /newroot/proc
+ [[ $? -ne 0 ]] && { echo "Could not move mount point for /proc!"; break; }
+ exec switch_root /newroot /bin/init
+ break
+ done
 fi
 
+#Fall back to Initrd Init if no root found - this will launch setup for example if ISO parameter found
 exec /bin/init <dev/console >dev/console 2>&1

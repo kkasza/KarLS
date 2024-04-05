@@ -62,13 +62,13 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
 	cp efi.img grub.cfg $@.tmp/boot/grub
 
 	echo "menuentry \"KarLS ISO\" {" >> $@.tmp/boot/grub/grub.cfg
-	echo "	search -l "KarLS-ISO" --set=root" >> $@.tmp/boot/grub/grub.cfg
+	echo "	search -l "KARLSISO" --set=root" >> $@.tmp/boot/grub/grub.cfg
 	echo "	linux /boot/vmlinuz-$(KVER) vga=0x305 KARLS_MEDIA=ISO" >> $@.tmp/boot/grub/grub.cfg
 	echo "	initrd /boot/initrd-$(KVER).gz" >> $@.tmp/boot/grub/grub.cfg
 	echo "}" >> $@.tmp/boot/grub/grub.cfg
 	echo "" >> $@.tmp/boot/grub/grub.cfg
 	echo "menuentry \"KarLS ISO Serial Console\" {" >> $@.tmp/boot/grub/grub.cfg
-	echo "	search -l "KarLS-ISO" --set=root" >> $@.tmp/boot/grub/grub.cfg
+	echo "	search -l "KARLSISO" --set=root" >> $@.tmp/boot/grub/grub.cfg
 	echo "	linux /boot/vmlinuz-$(KVER) console=ttyS0,9600 KARLS_MEDIA=ISO" >> $@.tmp/boot/grub/grub.cfg
 	echo "	initrd /boot/initrd-$(KVER).gz" >> $@.tmp/boot/grub/grub.cfg
 	echo "}" >> $@.tmp/boot/grub/grub.cfg
@@ -86,7 +86,7 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
 	serial.mod terminal.mod terminfo.mod usb_keyboard.mod usbserial_common.mod usbserial_pl2303.mod
 	cat $(BLD)/$(GRUB_VER)/grub-core/cdboot.img $@.tmp/boot/grub/grub.img > $@.tmp/boot/grub/grub-cd.img
 
-	xorriso -as mkisofs -volid KarLS-ISO -r -o $@ -J -joliet-long \
+	xorriso -as mkisofs -volid KARLSISO -r -o $@ -J -joliet-long \
 	-b boot/grub/grub-cd.img -c boot/grub/boot.cat -boot-load-size 4 -boot-info-table -no-emul-boot \
 	--grub2-boot-info --grub2-mbr $(BLD)/$(GRUB_VER)/grub-core/boot_hybrid.img \
 	-eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \

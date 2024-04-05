@@ -1,5 +1,8 @@
 #!/bin/sh
 
+mkdir -p /dev/pts
+mount -t devpts /dev/pts /dev/pts
+
 hostname -F /etc/hostname
 
 syslogd

@@ -39,44 +39,37 @@ read
 
 echo "Partitioning disk..."
 echo -e "o\nn\np\n1\n2048\n\na\n1\nw\n" | fdisk $TRGT > /dev/null
-ret=$?
-[[ $ret -ne 0 ]] && { echo "fdisk error, installation cancelled!"; break; }
+[[ $? -ne 0 ]] && { echo "fdisk error, installation cancelled!"; break; }
 
 echo "Formatting ext2 partition..."
 mkfs.ext2 "$TRGT"1 > /dev/null
-ret=$?
-[[ $ret -ne 0 ]] && { echo "mkfs.ext2 error, installation cancelled!"; break; }
+[[ $? -ne 0 ]] && { echo "mkfs.ext2 error, installation cancelled!"; break; }
 
 echo "Mounting target..."
 mkdir -p /mnt/target
 mount "$TRGT"1 /mnt/target > /dev/null
-ret=$?
-[[ $ret -ne 0 ]] && { echo "mount error, installation cancelled!"; break; }
+[[ $? -ne 0 ]] && { echo "mount error, installation cancelled!"; break; }
 
 echo "Unpacking installation dependencies to ramdisk..."
 for pkg in `cat /mnt/iso/install/instdep.list`; do
 kpm install /mnt/iso/packages/$pkg > /dev/null
-ret=$?
-[[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+[[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 done
 
 echo "Installing Kernel files..."
 KVER=`cat /mnt/iso/boot/kernel_version`
 mkdir -p /mnt/target/boot/grub
 kpm install /mnt/iso/packages/kernel-$KVER.kp /mnt/target > /dev/null
-ret=$?
-[[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+[[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 
 echo "Installing GRUB boot loader..."
 GRUBVER=`cat /mnt/iso/install/grub_ver`
 
 kpm install /mnt/iso/packages/grub-$GRUBVER.kp > /dev/null
-ret=$?
-[[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+[[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 
 grub-install --boot-directory=/mnt/target/boot "$TRGT"
-ret=$?
-[[ $ret -ne 0 ]] && { echo "grub-install error, installation cancelled!"; break; }
+[[ $? -ne 0 ]] && { echo "grub-install error, installation cancelled!"; break; }
 
 cp /mnt/iso/install/grub.cfg /mnt/target/boot/grub
 
@@ -98,13 +91,11 @@ echo "Installing base OS packages..."
 
 for pkg in `cat /mnt/iso/install/base.list`; do
 kpm install /mnt/iso/packages/$pkg /mnt/target > /dev/null
-ret=$?
-[[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+[[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 done
 
 kpm install /mnt/iso/packages/grub-$GRUBVER.kp /mnt/target > /dev/null
-ret=$?
-[[ $ret -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+[[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 
 echo ""
 echo "KarLS Installation finished!"
