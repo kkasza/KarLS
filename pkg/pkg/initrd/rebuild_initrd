@@ -1,0 +1,42 @@
+#!/bin/sh
+
+VER="1.0"
+
+usage()
+{
+ echo "rebuild_initrd - Rebuild the Initrd for KarLS $VER"
+ echo "rebuild_initrd: $1" 1>&2
+ echo ""
+ echo "Usage: $0 <Destination root> <Kernel version - defaults to uname -r>"
+ exit 1
+}
+
+[[ "$1" == "" ]] && usage "Not enough parameters"
+DST="$1"
+[[ ! -d "$DST" ]] && usage "Destination directory $DST not found"
+
+[[ "$2" == "" ]] && KVER=`uname -r` || KVER=$2
+
+echo Rebuilding Initrd for $KVER to $DST/boot...
+
+#Create temp dir and extract skeleton
+ITMP=`mktemp -d`
+
+tar -C $ITMP -xJf $DST/usr/share/initrd/initrd-skel.txz
+
+#List loaded modules
+MODS=`lsmod | tail +2 | cut -d' ' -f1`
+
+#Find loaded modules by filename and attempt to copy them from a kernel module tree to the initrd skeleton
+for M in $MODS; do
+ MLOC=`modinfo $M -n | sed s/$(uname -r)/$KVER/g`
+ mkdir -p $ITMP/`dirname $MLOC`
+ cp $MLOC $ITMP/$MLOC
+done
+
+cp /lib/modules/$KVER/modules.* $ITMP/lib/modules/$KVER
+
+#Make cpio archive for initrd
+cd $ITMP; find . | cpio -H newc -v -R 0:0 -o | gzip -9 -n > $DST/boot/initrd-$KVER.gz
+
+rm -rf $ITMP

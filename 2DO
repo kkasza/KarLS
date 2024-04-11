@@ -2,4 +2,3 @@
 * Proper util-linux package for install - fdisk
 * Proper e2fsprogs package for install - mkfs.ext4, fsck, etc.
 * Automatic BIOS / EFI install
-* Automatic Initrd build for installed system

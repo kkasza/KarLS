@@ -24,7 +24,7 @@ $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 #	NOTE: busybox may need setuid root...
 #	echo "#!/bin/sh" > $@/_kp_tmp/INSTALL
 #	echo "#KarLS INSTALL script for $(BUSYBOX_VER)" >> $@/_kp_tmp/INSTALL
-#	echo "/bin/busybox --install -s \$$1/bin" >> $@/_kp_tmp/INSTALL
+#	echo "\$$1/bin/busybox --install -s \$$1/bin" >> $@/_kp_tmp/INSTALL
 
 busybox-config: $(BLD)/$(BUSYBOX_VER)-bconfig
 

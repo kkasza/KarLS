@@ -9,7 +9,6 @@ $(BLD)/$(KERNEL_VER):
 	mkdir -p $@/_kp_tmp/FILES/boot $@/_kp_tmp/FILES/lib
 	cp ../kernel/kernel-$(T)-$(KFLAV)/vmlinuz-$(KVER) $@/_kp_tmp/FILES/boot
 	cp ../kernel/kernel-$(T)-$(KFLAV)/System.map-$(KVER) $@/_kp_tmp/FILES/boot
-	cp ../kernel/kernel-$(T)-$(KFLAV)/initrd-$(KVER).gz $@/_kp_tmp/FILES/boot
 	cp -r ../kernel/$(BLD)/linux-*-$(T)-$(KFLAV)/modules/* $@/_kp_tmp/FILES
 	rm -f $@/_kp_tmp/FILES/lib/modules/*/build $@/_kp_tmp/FILES/lib/modules/*/source
 	echo "$(KERNEL_VER) : The LINUX Kernel" > $@/_kp_tmp/DESC
