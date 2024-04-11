@@ -1,0 +1,16 @@
+
+ KPM / KarLS Package Manager
+
+ kpm command used for installing, listing, uninstalling packages
+
+ kpm <command> <package .kp> <destination directory>
+
+ KarLS Package Format 1.0
+
+ .kp files are .txz compressed files renamed.
+
+ * FILES directory contains payload, i.e. /usr/bin/whatever
+ * DESC file for 1 line description - <pkg name>-<version> : <description>
+ * MANIFEST file for list of all files in FILES subdirectory / used for uninstalling - created by find . -type f,l,c,b > ../MANIFEST
+ * KARLS_PACKAGE file for authenticating packages and version, contains "KarLS Package Format 1.0"
+ * INSTALL file is an install script run after all files are placed on their intended places. It's 1st parameter is the destination subdirectory for kpm command

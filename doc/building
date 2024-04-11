@@ -1,0 +1,24 @@
+
+ KarLS / Karl's absolutely reduced Linux System
+ 1.0 - Ardi
+
+ KarLS started as an LFS project with musl and busybox using Makefiles for reproducibilty.
+ I learnt a lot from buildroot (a really great and waaaaay more professional - and complicated - project).
+
+ KarLS can be built using simple Makefiles - the almighty make command.
+
+ Currently KarLS supports only the x86_64 architecture (some arm may be on the way, I've got a few Raspberry Pis).
+ KarLS can be built into an ISO (it supports CD and USB, BIOS or - unsecured - EFI).
+ I tested it mostly on VMware and some QEMU.
+
+ The building process:
+
+ - First build a (cross-)compiler for X86_64 with musl as libc. This is the default, later arm and other target architectures can come.
+ - Then build a Kernel with modules and a really minimal initrd.
+ - Then the OS packages.
+ - Then the ISO for installing.
+
+ make cmpl
+ make kernel
+ make pkg
+ make iso
