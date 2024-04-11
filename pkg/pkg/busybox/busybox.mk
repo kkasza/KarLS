@@ -16,9 +16,11 @@ $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 	sed -i 's/^CONFIG_SYSROOT=\"\"/CONFIG_SYSROOT=\"$(subst /,\/,$(CMPL_INST))\"/' $@/.config
 	sed -i 's/^CONFIG_UNAME_OSNAME=\"GNU\/Linux\"/CONFIG_UNAME_OSNAME=\"$(subst /,\/,$(NAME))\"/' $@/.config
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
-	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 CONFIG_PREFIX=`pwd`/$@/_kp_tmp install
-	mkdir -p $@/_kp_tmp/usr/udhcpc
-	cp $@/examples/udhcp/simple.script $@/_kp_tmp/usr/udhcpc/default.script
+	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 CONFIG_PREFIX=`pwd`/$@/_kp_tmp/FILES install
+	mkdir -p $@/_kp_tmp/FILES/usr/udhcpc
+	cp $@/examples/udhcp/simple.script $@/_kp_tmp/FILES/usr/udhcpc/default.script
+	echo "$(BUSYBOX_VER) : BusyBox is a software suite that provides several Unix utilities in a single executable file." > $@/_kp_tmp/DESC
+
 #	NOTE: busybox may need setuid root...
 #	echo "#!/bin/sh" > $@/_kp_tmp/INSTALL
 #	echo "#KarLS INSTALL script for $(BUSYBOX_VER)" >> $@/_kp_tmp/INSTALL

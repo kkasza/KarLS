@@ -23,11 +23,19 @@ KPF=$2
 [[ ! -d "$DST" ]] && usage "Destination directory $DST not found"
 
 echo "Unpacking $KPF to $DST..."
-tar -C $DST -xJf $KPF
+PTMP=`mktemp -d`
+tar -C $PTMP -xJf $KPF
 [[ $? -ne 0 ]] && { echo "Package error with $KPF, installation cancelled!" 1>&2; exit 1; }
+[[ ! -f "$PTMP/KARLS_PACKAGE" ]] && { echo "$KPF is not a KarLS Package, installation cancelled!" 1>&2; exit 1; }
+cp -Rpf $PTMP/FILES/* $DST
 
-if [ -f "$DST/INSTALL" ]; then
+KPN=`basename $KPF`
+mkdir -p $DST/etc/kpm/$KPN
+cp $PTMP/MANIFEST $PTMP/DESC $PTMP/KARLS_PACKAGE $DST/etc/kpm/$KPN
+
+if [ -f "$PTMP/INSTALL" ]; then
  echo "Running install script..."
- . $DST/INSTALL $DST
- rm $DST/INSTALL
+ . $PTMP/INSTALL $DST
 fi
+
+rm -rf $PTMP

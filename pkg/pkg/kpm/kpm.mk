@@ -5,6 +5,7 @@ PKG_LIST+=kpm
 kpm: $(BLD)/$(KPM_VER).kp
 
 $(BLD)/$(KPM_VER):
-	mkdir -p $@/_kp_tmp/bin
-	cp pkg/kpm/kpm $@/_kp_tmp/bin
-	chmod 755 $@/_kp_tmp/bin/kpm
+	mkdir -p $@/_kp_tmp/FILES/bin
+	cp pkg/kpm/kpm $@/_kp_tmp/FILES/bin
+	chmod 755 $@/_kp_tmp/FILES/bin/kpm
+	echo "$(KPM_VER) : KarLS Package Manager" > $@/_kp_tmp/DESC
