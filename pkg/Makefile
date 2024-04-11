@@ -20,6 +20,10 @@ XPATH:=PATH=$(PATH):$(CMPL_INST)/bin
 XPCF:=PKG_CONFIG_PATH=$(PWD)/$(BLD)/xpc
 
 include pkg/*.mk
+include pkg/*/*.mk
+
+$(BLD)/%.kp: $(BLD)/$$*
+	tar -C $</_kp_tmp -cJv -f $@ --owner=0 --group=0 .
 
 pkg: | $(PKG_LIST)
 

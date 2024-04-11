@@ -45,9 +45,3 @@ $(BLD)/$(GRUB_VER)-efi: src/$(GRUB_VER)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_kp_tmp install
 	rm $@/_kp_tmp/usr/lib/grub/x86_64-efi/*.module
-
-$(BLD)/$(GRUB_VER).kp: $(BLD)/$(GRUB_VER)
-	tar -C $</_kp_tmp -cJv -f $@ --owner=0 --group=0 usr/bin usr/sbin usr/lib usr/share/grub
-
-$(BLD)/$(GRUB_VER)-efi.kp: $(BLD)/$(GRUB_VER)-efi
-	tar -C $</_kp_tmp -cJv -f $@ --owner=0 --group=0 usr/bin usr/sbin usr/lib usr/share/grub

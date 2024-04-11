@@ -11,7 +11,7 @@ busybox: $(BLD)/$(BUSYBOX_VER).kp
 $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 	mkdir -p $(BLD)
 	cp -rP src/$(BUSYBOX_VER) $@
-	cp pkg/$(BUSYBOX_VER).config $@/.config
+	cp pkg/busybox/$(BUSYBOX_VER).config $@/.config
 	sed -i 's/^CONFIG_CROSS_COMPILER_PREFIX=\"\"/CONFIG_CROSS_COMPILER_PREFIX=\"$(subst /,\/,${CMPL_INST})\/bin\/$(subst /,\/,$(TARGET-ARCH))-\"/' $@/.config
 	sed -i 's/^CONFIG_SYSROOT=\"\"/CONFIG_SYSROOT=\"$(subst /,\/,$(CMPL_INST))\"/' $@/.config
 	sed -i 's/^CONFIG_UNAME_OSNAME=\"GNU\/Linux\"/CONFIG_UNAME_OSNAME=\"$(subst /,\/,$(NAME))\"/' $@/.config
@@ -35,6 +35,3 @@ $(BLD)/$(BUSYBOX_VER)-bconfig: src/$(BUSYBOX_VER)
 	diff -q pkg/$(BUSYBOX_VER).config pkg/$(BUSYBOX_VER).config.new && \
 	rm -f pkg/$(BUSYBOX_VER).config.new || diff -u pkg/$(BUSYBOX_VER).config pkg/$(BUSYBOX_VER).config.new > pkg/$(BUSYBOX_VER).config.diff || true
 	touch $<
-
-$(BLD)/$(BUSYBOX_VER).kp: $(BLD)/$(BUSYBOX_VER)
-	tar -C $</_kp_tmp -cJv -f $@ --owner=0 --group=0 .

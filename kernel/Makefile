@@ -87,7 +87,7 @@ $(BLD)/$(IRFS): | busybox
 
 	$(SUDO) mknod -m 600 $@/dev/console c 5 1
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
-	cp $(PWD)/../pkg/pkg/kpm $@/bin
+	cp $(PWD)/../pkg/pkg/kpm/kpm $@/bin
 	chmod 755 $@/bin/kpm
 
 initrd: | $(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz

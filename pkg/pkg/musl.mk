@@ -5,9 +5,6 @@ PKG_LIST+=musl
 musl: $(BLD)/$(MUSL_VER).kp
 
 $(BLD)/$(MUSL_VER):
-	mkdir -p $@/lib
-	cp $(CMPL_INST)/lib/libc.so $@/lib
-	ln -s libc.so $@/lib/ld-musl-$(T).so.1
-
-$(BLD)/$(MUSL_VER).kp: $(BLD)/$(MUSL_VER)
-	tar -C $< -cJv -f $@ --owner=0 --group=0 .
+	mkdir -p $@/_kp_tmp/lib
+	cp $(CMPL_INST)/lib/libc.so $@/_kp_tmp/lib
+	ln -s libc.so $@/_kp_tmp/lib/ld-musl-$(T).so.1
