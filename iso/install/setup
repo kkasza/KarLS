@@ -2,7 +2,7 @@
 
 KARLS=`cat /mnt/iso/karls_iso`
 echo ""
-echo "Welcome to $KARLS Installation/Live ISO"
+echo "Welcome to $KARLS ISO Installation/Live System"
 
 while true; do
 
@@ -103,6 +103,12 @@ for pkg in `cat /mnt/iso/install/base.list`; do
 kpm install /mnt/iso/packages/$pkg /mnt/target > /dev/null
 [[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 done
+
+if [ -z "$SERIALCON" ]; then
+ rm /mnt/target/etc/inittab-serial
+else
+ mv /mnt/target/etc/inittab-serial /mnt/target/etc/inittab
+fi
 
 kpm install /mnt/iso/packages/grub-$GRUBVER.kp /mnt/target > /dev/null
 [[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }

@@ -8,6 +8,7 @@ $(BLD)/$(ROOTSKEL_VER):
 	mkdir -p $@/_kp_tmp/FILES
 	cp -r pkg/rootskel/rootskel/* $@/_kp_tmp/FILES
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/_kp_tmp/FILES/etc/version
+	printf '%s\n\n' '$(NICENAME) $(VERSION) $(VERSION_TAG) \n \l' > $@/_kp_tmp/FILES/etc/issue
 	cd $@/_kp_tmp/FILES; mkdir -p \
 	dev \
 	proc \

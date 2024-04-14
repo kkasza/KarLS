@@ -9,8 +9,8 @@ syslogd
 
 ifconfig lo up 127.0.0.1
 
-/etc/init.d/rcS-local
+[[ -f "/etc/init.d/rcS-local" ]] && /etc/init.d/rcS-local
 
 KARLS=`cat /etc/karls_version`
 echo ""
-echo "Welcome to $KARLS Initrd System"
+echo "Welcome to $KARLS ISO Initrd System"
