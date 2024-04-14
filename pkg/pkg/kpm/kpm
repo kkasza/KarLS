@@ -5,36 +5,72 @@ VER="1.0"
 usage()
 {
  echo "kpm - KarLS Package Manager $VER"
- echo "kpm: $1" 1>&2
+ echo "$1" 1>&2
  echo ""
  echo "Usage: $0 <Command> <Package> <Destination directory - defaults to />"
  echo "Valid commands: install"
  exit 1
 }
 
+error()
+{
+ echo "$1" 1>&2
+ exit 1
+}
+
+noerror()
+{
+ echo "$1"
+ exit 0
+}
+
 CMD=`echo $1 | tr '[:upper:]' '[:lower:]'`
 [[ "$CMD" == "" ]] && usage "Not enough parameters"
 [[ "$CMD" != "install" ]] && usage "Unknown command $CMD"
 
-KPF=$2
-[[ ! -f "$KPF" ]] && usage "Package file $KPF not found"
-
 [[ "$3" == "" ]] && DST="/" || DST=$3
-[[ ! -d "$DST" ]] && usage "Destination directory $DST not found"
+[[ ! -d "$DST" ]] && error "Destination directory $DST not found"
 
-echo "Unpacking $KPF to $DST..."
-PTMP=`mktemp -d`
-tar -C $PTMP -xJf $KPF
-[[ $? -ne 0 ]] && { echo "Package error with $KPF, installation cancelled!" 1>&2; exit 1; }
-[[ ! -f "$PTMP/KARLS_PACKAGE" ]] && { echo "$KPF is not a KarLS Package, installation cancelled!" 1>&2; exit 1; }
-cp -Rpf $PTMP/FILES/* $DST
+KPF=$2
+if [ ! -f "$KPF" ]; then
+ if [ -f "$DST/etc/kpm/repo" ]; then
+  REPO=`head -1 $DST/etc/kpm/repo`
+  if [ ! -f "$REPO/$KPF" ]; then
+   if [ ! -f "$REPO/$KPF.kp" ]; then
+    error "Package file $KPF not found"
+   else
+    KPF="$REPO/$KPF.kp"
+   fi
+  else
+   KPF="$REPO/$KPF"
+  fi
+ else
+  error "No repo. Package file $KPF not found"
+ fi
+fi
 
 KPN=`basename $KPF`
-mkdir -p $DST/etc/kpm/$KPN
-cp $PTMP/MANIFEST $PTMP/DESC $PTMP/KARLS_PACKAGE $DST/etc/kpm/$KPN
+[[ -d "$DST/etc/kpm/pkg/$KPN" ]] && noerror "Package $KPN is already installed to $DST"
+
+echo "Installing $KPN to $DST"
+PTMP=`mktemp -d`
+tar -C $PTMP -xJf $KPF
+[[ $? -ne 0 ]] && error "Package error with $KPF, installation cancelled!"
+[[ ! -f "$PTMP/KARLS_PACKAGE" ]] && error "$KPF is not a KarLS Package, installation cancelled!"
+if [ -f "$PTMP/PREREQ" ]; then
+ for pkg in `cat $PTMP/PREREQ`; do
+  echo "Installing $pkg as Prerequisite for $KPN"
+  kpm install $pkg $DST
+  [[ $? -ne 0 ]] && error "Error installing $pkg, installation of $KPN cancelled"
+ done
+fi
+cp -Rpf $PTMP/FILES/* $DST 2> /dev/null
+
+mkdir -p $DST/etc/kpm/pkg/$KPN
+cp $PTMP/MANIFEST $PTMP/DESC $PTMP/KARLS_PACKAGE $DST/etc/kpm/pkg/$KPN
 
 if [ -f "$PTMP/INSTALL" ]; then
- echo "Running install script..."
+ echo "Running install script for $KPN"
  chmod 755 $PTMP/INSTALL && $PTMP/INSTALL $DST
 fi
 

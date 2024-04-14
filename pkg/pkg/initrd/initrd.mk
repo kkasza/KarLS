@@ -36,3 +36,4 @@ $(BLD)/$(INITRD_VER): | busybox
 	echo "#!/bin/sh" > $@/_kp_tmp/INSTALL
 	echo "#KarLS INSTALL script for $(INITRD_VER)" >> $@/_kp_tmp/INSTALL
 	echo "\$$1/usr/sbin/rebuild_initrd \$$1" >> $@/_kp_tmp/INSTALL
+	echo "busybox-1.36.1" > $@/_kp_tmp/PREREQ

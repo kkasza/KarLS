@@ -1,5 +1,8 @@
 #!/bin/sh
 
+GRUBVER="2.12"
+BASEVER="1.0"
+
 KARLS=`cat /mnt/iso/karls_iso`
 echo ""
 echo "Welcome to $KARLS ISO Installation/Live System"
@@ -50,22 +53,16 @@ mkdir -p /mnt/target
 mount "$TRGT"1 /mnt/target > /dev/null
 [[ $? -ne 0 ]] && { echo "mount error, installation cancelled!"; break; }
 
-echo "Unpacking installation dependencies to ramdisk..."
-for pkg in `cat /mnt/iso/install/instdep.list`; do
-kpm install /mnt/iso/packages/$pkg > /dev/null
-[[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
-done
-
 echo "Installing Kernel files..."
 KVER=`cat /mnt/iso/boot/kernel_version`
-mkdir -p /mnt/target/boot/grub
-kpm install /mnt/iso/packages/kernel-$KVER.kp /mnt/target > /dev/null
+mkdir -p /mnt/target/boot/grub /mnt/target/etc/kpm
+cp /etc/kpm/repo /mnt/target/etc/kpm
+kpm install kernel-$KVER /mnt/target
 [[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 
 echo "Installing GRUB boot loader..."
-GRUBVER=`cat /mnt/iso/install/grub_ver`
 
-kpm install /mnt/iso/packages/grub-$GRUBVER.kp > /dev/null
+kpm install grub-$GRUBVER
 [[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 
 grub-install --boot-directory=/mnt/target/boot "$TRGT"
@@ -99,10 +96,8 @@ echo "}" >> /mnt/target/boot/grub/grub.cfg
 
 echo "Installing base OS packages..."
 
-for pkg in `cat /mnt/iso/install/base.list`; do
-kpm install /mnt/iso/packages/$pkg /mnt/target > /dev/null
+kpm install karls_base-$BASEVER /mnt/target
 [[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
-done
 
 if [ -z "$SERIALCON" ]; then
  rm /mnt/target/etc/inittab-serial
@@ -110,7 +105,7 @@ else
  mv /mnt/target/etc/inittab-serial /mnt/target/etc/inittab
 fi
 
-kpm install /mnt/iso/packages/grub-$GRUBVER.kp /mnt/target > /dev/null
+kpm install grub-$GRUBVER /mnt/target
 [[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
 
 echo ""

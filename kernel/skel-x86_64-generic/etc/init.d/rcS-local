@@ -12,5 +12,7 @@ if [ "$KARLS_MEDIA" == "ISO" ]; then
   /etc/init.d/rcS-mount_iso
  fi
  #If ISO is found, setup system for install
+ mkdir -p /etc/kpm
+ echo "/mnt/iso/packages" > /etc/kpm/repo
  [[ -e "/mnt/iso/install/setup" ]] && . /mnt/iso/install/setup
 fi

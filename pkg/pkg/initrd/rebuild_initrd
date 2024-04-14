@@ -17,7 +17,7 @@ DST="$1"
 
 [[ "$2" == "" ]] && KVER=`uname -r` || KVER=$2
 
-echo Rebuilding Initrd for $KVER to $DST/boot...
+echo Rebuilding Initrd for $KVER to $DST/boot
 
 #Create temp dir and extract skeleton
 ITMP=`mktemp -d`
