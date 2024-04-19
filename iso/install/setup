@@ -141,6 +141,7 @@ if [ "$UEFI" == "0" ]; then
 kpm install grub-$GRUBVER /mnt/target || { echo "kpm error, installation cancelled!"; break; }
 else
 kpm install grub-$GRUBVER-efi /mnt/target || { echo "kpm error, installation cancelled!"; break; }
+echo "$TRGT""1		/boot/efi	vfat	ro,defaults,nosuid,nodev,noexec 0 0" >> /mnt/target/etc/fstab
 fi
 
 echo ""

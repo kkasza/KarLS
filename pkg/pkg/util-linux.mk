@@ -15,6 +15,11 @@ UTIL-LINUX_OPTS:= \
 --disable-login \
 --disable-nologin \
 --disable-su \
+--disable-sulogin \
+--disable-kill \
+--disable-last \
+--disable-mesg \
+--disable-dmesg \
 --disable-setpriv \
 --disable-runuser \
 --disable-pylibmount \
