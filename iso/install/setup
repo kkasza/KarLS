@@ -1,6 +1,7 @@
 #!/bin/sh
 
 GRUBVER="2.12"
+UTILVER="2.40"
 BASEVER="1.0"
 
 KARLS=`cat /mnt/iso/karls_iso`
@@ -40,33 +41,43 @@ echo -n "Type \"YES\" to continue installation: "
 read
 [[ "$REPLY" != "YES" ]] && { echo "Installation cancelled!"; continue; }
 
-echo "Partitioning disk..."
-echo -e "o\nn\np\n1\n2048\n\na\n1\nw\n" | fdisk $TRGT > /dev/null
-[[ $? -ne 0 ]] && { echo "fdisk error, installation cancelled!"; break; }
+UEFI=0
+[[ -d "/sys/firmware/efi" ]] && { echo "UEFI detected!"; UEFI=1; }
 
-echo "Formatting ext2 partition..."
-mkfs.ext2 "$TRGT"1 > /dev/null
-[[ $? -ne 0 ]] && { echo "mkfs.ext2 error, installation cancelled!"; break; }
+if [ "$UEFI" == "0" ]; then
+echo "Partitioning disk for MBR..."
+echo -e "o\nn\np\n1\n2048\n\na\n1\nw\n" | fdisk $TRGT > /dev/null || { echo "fdisk error, installation cancelled!"; break; }
+
+echo "Formatting Linux partition..."
+mkfs.ext2 "$TRGT"1 > /dev/null || { echo "mkfs.ext2 error, installation cancelled!"; break; }
 
 echo "Mounting target..."
 mkdir -p /mnt/target
-mount "$TRGT"1 /mnt/target > /dev/null
-[[ $? -ne 0 ]] && { echo "mount error, installation cancelled!"; break; }
+mount "$TRGT"1 /mnt/target > /dev/null || { echo "mount error, installation cancelled!"; break; }
+
+else
+kpm install util-linux-$UTILVER || { echo "kpm error, installation cancelled!"; break; }
+echo "Partitioning disk for GPT..."
+echo -e "g\nn\n1\n2048\n+64M\nt\n1\nn\n2\n\n\nw\n" | /usr/sbin/fdisk -W always $TRGT > /dev/null || { echo "fdisk error, installation cancelled!"; break; }
+
+echo "Formatting partitions..."
+mkfs.vfat "$TRGT"1 > /dev/null || { echo "mkfs.vfat error, installation cancelled!"; break; }
+mkfs.ext2 "$TRGT"2 > /dev/null || { echo "mkfs.ext2 error, installation cancelled!"; break; }
+
+echo "Mounting target..."
+mkdir -p /mnt/target
+mount "$TRGT"2 /mnt/target > /dev/null || { echo "mount error, installation cancelled!"; break; }
+mkdir -p /mnt/target/boot/efi
+mount -t vfat "$TRGT"1 /mnt/target/boot/efi > /dev/null || { echo "mount error, installation cancelled!"; break; }
+fi
 
 echo "Installing Kernel files..."
 KVER=`cat /mnt/iso/boot/kernel_version`
 mkdir -p /mnt/target/boot/grub /mnt/target/etc/kpm
 cp /etc/kpm/repo /mnt/target/etc/kpm
-kpm install kernel-$KVER /mnt/target
-[[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+kpm install kernel-$KVER /mnt/target || { echo "kpm error, installation cancelled!"; break; }
 
 echo "Installing GRUB boot loader..."
-
-kpm install grub-$GRUBVER
-[[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
-
-grub-install --boot-directory=/mnt/target/boot "$TRGT"
-[[ $? -ne 0 ]] && { echo "grub-install error, installation cancelled!"; break; }
 
 cp /mnt/iso/install/grub.cfg /mnt/target/boot/grub
 
@@ -80,7 +91,11 @@ fi
 
 echo "" >> /mnt/target/boot/grub/grub.cfg
 
-BLK=`blkid "$TRGT"1 | cut -d' ' -f2 | cut -d= -f2`
+if [ "$UEFI" == "0" ]; then
+ BLK=`blkid "$TRGT"1 | cut -d' ' -f2 | cut -d= -f2`
+else
+ BLK=`blkid "$TRGT"2 | cut -d' ' -f2 | cut -d= -f2`
+fi
 
 echo "menuentry \"KarLS\" {" >> /mnt/target/boot/grub/grub.cfg
 echo "	search -u $BLK --set=root" >> /mnt/target/boot/grub/grub.cfg
@@ -94,10 +109,27 @@ echo "	linux /boot/vmlinuz-$KVER console=ttyS0,9600 root=$BLK" >> /mnt/target/bo
 echo "	initrd /boot/initrd-$KVER.gz" >> /mnt/target/boot/grub/grub.cfg
 echo "}" >> /mnt/target/boot/grub/grub.cfg
 
+if [ "$UEFI" == "0" ]; then
+kpm install grub-$GRUBVER || { echo "kpm error, installation cancelled!"; break; }
+grub-install --boot-directory=/mnt/target/boot "$TRGT" || { echo "grub-install error, installation cancelled!"; break; }
+
+else
+kpm install grub-$GRUBVER-efi || { echo "kpm error, installation cancelled!"; break; }
+mkdir -p /mnt/target/boot/efi/EFI/BOOT
+
+echo "search -u $BLK --set=root" > /mnt/target/boot/grub/grub-early.cfg
+echo "configfile /boot/grub/grub.cfg" >> /mnt/target/boot/grub/grub-early.cfg
+
+grub-mkimage -o /mnt/target/boot/efi/EFI/BOOT/BOOTX64.EFI -O x86_64-efi -c /mnt/target/boot/grub/grub-early.cfg -p /boot/grub \
+boot.mod cat.mod configfile.mod cpuid.mod disk.mod elf.mod exfat.mod ext2.mod fat.mod file.mod hdparm.mod help.mod iso9660.mod linux.mod loadenv.mod \
+lsefi.mod ls.mod msdospart.mod normal.mod ntfs.mod part_gpt.mod part_msdos.mod reboot.mod scsi.mod search_fs_file.mod search.mod \
+serial.mod terminal.mod terminfo.mod usb_keyboard.mod usbserial_common.mod usbserial_pl2303.mod
+
+fi
+
 echo "Installing base OS packages..."
 
-kpm install karls_base-$BASEVER /mnt/target
-[[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+kpm install karls_base-$BASEVER /mnt/target || { echo "kpm error, installation cancelled!"; break; }
 
 if [ -z "$SERIALCON" ]; then
  rm /mnt/target/etc/inittab-serial
@@ -105,8 +137,11 @@ else
  mv /mnt/target/etc/inittab-serial /mnt/target/etc/inittab
 fi
 
-kpm install grub-$GRUBVER /mnt/target
-[[ $? -ne 0 ]] && { echo "kpm error, installation cancelled!"; break; }
+if [ "$UEFI" == "0" ]; then
+kpm install grub-$GRUBVER /mnt/target || { echo "kpm error, installation cancelled!"; break; }
+else
+kpm install grub-$GRUBVER-efi /mnt/target || { echo "kpm error, installation cancelled!"; break; }
+fi
 
 echo ""
 echo "KarLS Installation finished!"
@@ -122,6 +157,7 @@ REP=`echo $REPLY | tr '[:upper:]' '[:lower:]'`
 
 #Force reboot
 sync
+[[ "$UEFI" == "1" ]] && umount -r /mnt/target/boot/efi
 umount -r /mnt/target
 echo 1 > /proc/sys/kernel/sysrq
 echo b > /proc/sysrq-trigger

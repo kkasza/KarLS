@@ -11,3 +11,4 @@ $(BLD)/$(KARLS_BASE_VER):
 	echo "kpm-1.0" >> $@/_kp_tmp/PREREQ
 #Initrd pulls busybox, which pulls musl
 	echo "initrd-1.0" >> $@/_kp_tmp/PREREQ
+	echo "util-linux-2.40" >> $@/_kp_tmp/PREREQ
