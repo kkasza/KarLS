@@ -2,6 +2,7 @@
 
 GRUBVER="2.12"
 UTILVER="2.40"
+E2FSVER="1.47.0"
 BASEVER="1.0"
 
 KARLS=`cat /mnt/iso/karls_iso`
@@ -49,7 +50,8 @@ echo "Partitioning disk for MBR..."
 echo -e "o\nn\np\n1\n2048\n\na\n1\nw\n" | fdisk $TRGT > /dev/null || { echo "fdisk error, installation cancelled!"; break; }
 
 echo "Formatting Linux partition..."
-mkfs.ext2 "$TRGT"1 > /dev/null || { echo "mkfs.ext2 error, installation cancelled!"; break; }
+kpm install e2fsprogs-$E2FSVER || { echo "kpm error, installation cancelled!"; break; }
+mkfs.ext4 "$TRGT"1 > /dev/null || { echo "mkfs.ext4 error, installation cancelled!"; break; }
 
 echo "Mounting target..."
 mkdir -p /mnt/target
@@ -61,8 +63,9 @@ echo "Partitioning disk for GPT..."
 echo -e "g\nn\n1\n2048\n+64M\nt\n1\nn\n2\n\n\nw\n" | /usr/sbin/fdisk -W always $TRGT > /dev/null || { echo "fdisk error, installation cancelled!"; break; }
 
 echo "Formatting partitions..."
+kpm install e2fsprogs-$E2FSVER || { echo "kpm error, installation cancelled!"; break; }
 mkfs.vfat "$TRGT"1 > /dev/null || { echo "mkfs.vfat error, installation cancelled!"; break; }
-mkfs.ext2 "$TRGT"2 > /dev/null || { echo "mkfs.ext2 error, installation cancelled!"; break; }
+mkfs.ext4 "$TRGT"2 > /dev/null || { echo "mkfs.ext4 error, installation cancelled!"; break; }
 
 echo "Mounting target..."
 mkdir -p /mnt/target
