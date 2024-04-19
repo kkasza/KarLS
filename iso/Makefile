@@ -96,9 +96,12 @@ iso: $(IMAGE)
 
 rebuild_iso: _local_clean iso
 
-qemu: iso
-	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot d -cdrom $(IMAGE) -nographic -vnc :0
+testdisk.img:
+	dd if=/dev/zero of=$@ bs=1M count=1024
+
+qemu: iso testdisk.img
+	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot cd -cdrom $(IMAGE) -nographic -vnc :0 -drive file=testdisk.img,if=virtio,index=0
 
 _local_clean:
-	rm -rf $(IMAGE).tmp efi.img efi.img.mnt
+	rm -rf $(IMAGE).tmp efi.img efi.img.mnt testdisk.img
 	rm -rf $(IMAGE)
