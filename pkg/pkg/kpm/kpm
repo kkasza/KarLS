@@ -61,14 +61,13 @@ if [ "$CMD" == "install" ]; then
  [[ -d "$DST/etc/kpm/pkg/$KPN" ]] && noerror "Package $KPN is already installed to $DST"
  echo "Installing $KPN to $DST"
  PTMP=`mktemp -d`
- tar -C $PTMP -xJf $KPF
- [[ $? -ne 0 ]] && error "Package error with $KPF, installation cancelled!"
+ tar -C $PTMP -xJf $KPF || error "Package error with $KPF, installation cancelled!"
  [[ ! -f "$PTMP/KARLS_PACKAGE" ]] && error "$KPF is not a KarLS Package, installation cancelled!"
  if [ -f "$PTMP/PREREQ" ]; then
   for pkg in `cat $PTMP/PREREQ`; do
    echo "Installing $pkg as Prerequisite for $KPN"
-   kpm install $pkg $DST
-   [[ $? -ne 0 ]] && error "Error installing $pkg, installation of $KPN cancelled"
+   # Yup, this is true recursion
+   kpm install $pkg $DST || { rm -rf $PTMP; error "Error installing $pkg, installation of $KPN cancelled"; }
   done
  fi
  cp -Rpf $PTMP/FILES/* $DST 2> /dev/null
