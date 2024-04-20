@@ -1,12 +1,14 @@
-UTIL-LINUX_VER:=util-linux-2.40
-$(UTIL-LINUX_VER)-URL:=https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.40
-$(UTIL-LINUX_VER)-FILE:=$(UTIL-LINUX_VER).tar.xz
-$(UTIL-LINUX_VER)-SHA256:=d57a626081f9ead02fa44c63a6af162ec19c58f53e993f206ab7c3a6641c2cd7
+UTIL_LINUX_VER:=util_linux-2.40
+$(UTIL_LINUX_VER)-URL:=https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.40
+$(UTIL_LINUX_VER)-FILE:=$(UTIL_LINUX_VER).tar.xz
+$(UTIL_LINUX_VER)-REALDIR:=util-linux-2.40
+$(UTIL_LINUX_VER)-REALFILE:=$($(UTIL_LINUX_VER)-REALDIR).tar.xz
+$(UTIL_LINUX_VER)-SHA256:=d57a626081f9ead02fa44c63a6af162ec19c58f53e993f206ab7c3a6641c2cd7
 
-SRC_LIST+=UTIL-LINUX
-PKG_LIST+=util-linux
+SRC_LIST+=UTIL_LINUX
+PKG_LIST+=util_linux
 
-UTIL-LINUX_OPTS:= \
+UTIL_LINUX_OPTS:= \
 --bindir=/usr/bin \
 --libdir=/usr/lib \
 --runstatedir=/run \
@@ -36,14 +38,14 @@ UTIL-LINUX_OPTS:= \
 $(XCCACHE) \
 $(HCCACHE)
 
-util-linux: $(BLD)/$(UTIL-LINUX_VER).kp
+util_linux: $(BLD)/$(UTIL_LINUX_VER).kp
 
-$(BLD)/$(UTIL-LINUX_VER): src/$(UTIL-LINUX_VER)
+$(BLD)/$(UTIL_LINUX_VER): src/$(UTIL_LINUX_VER)
 	mkdir -p $@
-	cd $@; $(XPATH) $(XPCF) ../../src/$(UTIL-LINUX_VER)/configure $(UTIL-LINUX_OPTS)
+	cd $@; $(XPATH) $(XPCF) ../../src/$(UTIL_LINUX_VER)/configure $(UTIL_LINUX_OPTS)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_kp_tmp/FILES install
 	rm -rf $@/_kp_tmp/FILES/usr/share
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* $@/_kp_tmp/FILES/usr/lib/* || true
-	echo "$(UTIL-LINUX_VER) : util-linux is a random collection of Linux utilities" > $@/_kp_tmp/DESC
+	echo "$(UTIL_LINUX_VER) : util-linux is a random collection of Linux utilities" > $@/_kp_tmp/DESC
 	echo "musl-1.2.5" > $@/_kp_tmp/PREREQ

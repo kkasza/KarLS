@@ -58,7 +58,7 @@ mkdir -p /mnt/target
 mount "$TRGT"1 /mnt/target > /dev/null || { echo "mount error, installation cancelled!"; break; }
 
 else
-kpm install util-linux-$UTILVER || { echo "kpm error, installation cancelled!"; break; }
+kpm install util_linux-$UTILVER || { echo "kpm error, installation cancelled!"; break; }
 echo "Partitioning disk for GPT..."
 echo -e "g\nn\n1\n2048\n+64M\nt\n1\nn\n2\n\n\nw\n" | /usr/sbin/fdisk -W always $TRGT > /dev/null || { echo "fdisk error, installation cancelled!"; break; }
 

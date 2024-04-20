@@ -146,7 +146,7 @@ WGET:=wget --no-verbose --show-progress -P
 #Default download (And sha256sum) action for files defined in local sources.mk includes
 dl/%.tar.gz dl/%.tar.xz dl/%.tar.bz2:
 	$(if $($*-REALFILE),\
-	$(WGET) dl $($*-URL)/$($*-REALFILE); mv dl/$($*-REALFILE) dl/$($*-FILE),\
+	$(WGET) dl $($*-URL)/$($*-REALFILE) && mv dl/$($*-REALFILE) dl/$($*-FILE),\
 	$(WGET) dl $($*-URL)/$($*-FILE))
 	echo "$($*-SHA256)  dl/$($*-FILE)" | sha256sum -c
 
