@@ -33,22 +33,13 @@ busybox: $(BLD)/$(BUSY_VER)
 $(BLD)/$(BUSY_VER): src/$(BUSY_VER)
 	mkdir -p $(BLD)
 	cp -rP src/$(BUSY_VER) $@
-	cp $(BUSY_VER).config $@/.config
+	cp ../pkg/pkg/busybox/$(BUSY_VER).config $@/.config
 	sed -i 's/^CONFIG_CROSS_COMPILER_PREFIX=\"\"/CONFIG_CROSS_COMPILER_PREFIX=\"$(subst /,\/,${CMPL_INST})\/bin\/$(subst /,\/,$(TARGET-ARCH))-\"/' $@/.config
 	sed -i 's/^CONFIG_SYSROOT=\"\"/CONFIG_SYSROOT=\"$(subst /,\/,$(CMPL_INST))\"/' $@/.config
 	sed -i 's/^CONFIG_UNAME_OSNAME=\"GNU\/Linux\"/CONFIG_UNAME_OSNAME=\"$(subst /,\/,$(NAME))\"/' $@/.config
+	sed -i 's/^CONFIG_PIE=y/# CONFIG_PIE is not set/' $@/.config
+	sed -i 's/^# CONFIG_STATIC is not set/CONFIG_STATIC=y/' $@/.config
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
-
-bconfig: $(BLD)/$(BUSY_VER)-bconfig
-
-$(BLD)/$(BUSY_VER)-bconfig: src/$(BUSY_VER)
-	mkdir -p $(BLD)
-	cp -rP src/$(BUSY_VER) $@
-	cp $(BUSY_VER).config $@/.config
-	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 menuconfig
-	cp $@/.config $(BUSY_VER).config.new
-	diff -q $(BUSY_VER).config $(BUSY_VER).config.new && rm -f $(BUSY_VER).config.new || diff -u $(BUSY_VER).config $(BUSY_VER).config.new > $(BUSY_VER).config.diff || true
-	touch $<
 
 $(CMPL)/dl/$($(LINUX_VER)-FILE):
 	make -C $(CMPL) dl/$($(LINUX_VER)-FILE)

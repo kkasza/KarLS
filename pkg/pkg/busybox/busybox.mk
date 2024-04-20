@@ -33,9 +33,9 @@ busybox-config: $(BLD)/$(BUSYBOX_VER)-bconfig
 $(BLD)/$(BUSYBOX_VER)-bconfig: src/$(BUSYBOX_VER)
 	mkdir -p $(BLD)
 	cp -rP src/$(BUSYBOX_VER) $@
-	cp pkg/$(BUSYBOX_VER).config $@/.config
+	cp pkg/busybox/$(BUSYBOX_VER).config $@/.config
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 menuconfig
-	cp $@/.config pkg/$(BUSYBOX_VER).config.new
-	diff -q pkg/$(BUSYBOX_VER).config pkg/$(BUSYBOX_VER).config.new && \
-	rm -f pkg/$(BUSYBOX_VER).config.new || diff -u pkg/$(BUSYBOX_VER).config pkg/$(BUSYBOX_VER).config.new > pkg/$(BUSYBOX_VER).config.diff || true
+	cp $@/.config pkg/busybox/$(BUSYBOX_VER).config.new
+	diff -q pkg/busybox/$(BUSYBOX_VER).config pkg/busybox/$(BUSYBOX_VER).config.new && \
+	rm -f pkg/busybox/$(BUSYBOX_VER).config.new || diff -u pkg/busybox/$(BUSYBOX_VER).config pkg/busybox/$(BUSYBOX_VER).config.new > pkg/busybox/$(BUSYBOX_VER).config.diff || true
 	touch $<
