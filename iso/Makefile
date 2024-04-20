@@ -76,6 +76,7 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
 	cp ../kernel/kernel-$(T)-$(KFLAV)/* $@.tmp/boot
 	cp ../LICENSE ../UEFI_SECURE_BOOT.NOTE $@.tmp
 	cp -r install $@.tmp
+	cp ../pkg/pkg/kpm/kpm $@.tmp/install
 	cp ../pkg/build-$(T)/*.kp $@.tmp/packages
 
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@.tmp/karls_iso

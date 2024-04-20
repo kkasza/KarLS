@@ -20,3 +20,4 @@ $(BLD)/$(ROOTSKEL_VER):
 	tmp \
 	root
 	echo "$(ROOTSKEL_VER) : KarLS root FS skeleton" > $@/_kp_tmp/DESC
+	touch $@/_kp_tmp/ESSENTIAL

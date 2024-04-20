@@ -1,9 +1,13 @@
 #!/bin/sh
 
+KPMVER="1.0"
 GRUBVER="2.12"
 UTILVER="2.40"
 E2FSVER="1.47.0"
 BASEVER="1.0"
+
+#Install the packaged kpm first using the kpm which was on the ISO (may be a simplified version later)
+sh /mnt/iso/install/kpm install kpm-$KPMVER || { echo "kpm error, installation cancelled!"; break; }
 
 KARLS=`cat /mnt/iso/karls_iso`
 echo ""

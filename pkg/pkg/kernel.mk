@@ -12,3 +12,4 @@ $(BLD)/$(KERNEL_VER):
 	cp -r ../kernel/$(BLD)/linux-*-$(T)-$(KFLAV)/modules/* $@/_kp_tmp/FILES
 	rm -f $@/_kp_tmp/FILES/lib/modules/*/build $@/_kp_tmp/FILES/lib/modules/*/source
 	echo "$(KERNEL_VER) : The LINUX Kernel" > $@/_kp_tmp/DESC
+	touch $@/_kp_tmp/ESSENTIAL

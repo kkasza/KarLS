@@ -7,8 +7,12 @@ usage()
  echo "kpm - KarLS Package Manager $VER"
  echo "$1" 1>&2
  echo ""
- echo "Usage: $0 <Command> <Package> <Destination directory - defaults to />"
- echo "Valid commands: install"
+ echo "Usage: $0 <Command> (Package if needed) <Root directory - defaults to />"
+ echo "Valid commands:"
+ echo "install  - Install a package"
+ echo "uninstall  - Uninstall files installed by defined package"
+ echo "list     - List Installed packages"
+ echo "listrepo - List packages available in repository(s)"
  exit 1
 }
 
@@ -24,54 +28,106 @@ noerror()
  exit 0
 }
 
+[[ `id -u` != "0" ]] && usage "Run this program only as root!"
+
 CMD=`echo $1 | tr '[:upper:]' '[:lower:]'`
+
 [[ "$CMD" == "" ]] && usage "Not enough parameters"
-[[ "$CMD" != "install" ]] && usage "Unknown command $CMD"
 
-[[ "$3" == "" ]] && DST="/" || DST=$3
-[[ ! -d "$DST" ]] && error "Destination directory $DST not found"
+# INSTALL ----------------------------------------------------------------
+if [ "$CMD" == "install" ]; then
+ [[ "$3" == "" ]] && DST="/" || DST=$3
+ [[ ! -d "$DST" ]] && error "Root directory $DST not found"
 
-KPF=$2
-if [ ! -f "$KPF" ]; then
- if [ -f "$DST/etc/kpm/repo" ]; then
-  REPO=`head -1 $DST/etc/kpm/repo`
-  if [ ! -f "$REPO/$KPF" ]; then
-   if [ ! -f "$REPO/$KPF.kp" ]; then
-    error "Package file $KPF not found"
+ KPF=$2
+ if [ ! -f "$KPF" ]; then
+  if [ -f "$DST/etc/kpm/repo" ]; then
+   REPO=`head -1 $DST/etc/kpm/repo`
+   if [ ! -f "$REPO/$KPF" ]; then
+    if [ ! -f "$REPO/$KPF.kp" ]; then
+     error "Package file $KPF not found"
+    else
+     KPF="$REPO/$KPF.kp"
+    fi
    else
-    KPF="$REPO/$KPF.kp"
+    KPF="$REPO/$KPF"
    fi
   else
-   KPF="$REPO/$KPF"
+   error "No repo. Package file $KPF not found"
   fi
- else
-  error "No repo. Package file $KPF not found"
  fi
+
+ KPN=`basename $KPF`
+ [[ -d "$DST/etc/kpm/pkg/$KPN" ]] && noerror "Package $KPN is already installed to $DST"
+ echo "Installing $KPN to $DST"
+ PTMP=`mktemp -d`
+ tar -C $PTMP -xJf $KPF
+ [[ $? -ne 0 ]] && error "Package error with $KPF, installation cancelled!"
+ [[ ! -f "$PTMP/KARLS_PACKAGE" ]] && error "$KPF is not a KarLS Package, installation cancelled!"
+ if [ -f "$PTMP/PREREQ" ]; then
+  for pkg in `cat $PTMP/PREREQ`; do
+   echo "Installing $pkg as Prerequisite for $KPN"
+   kpm install $pkg $DST
+   [[ $? -ne 0 ]] && error "Error installing $pkg, installation of $KPN cancelled"
+  done
+ fi
+ cp -Rpf $PTMP/FILES/* $DST 2> /dev/null
+ mkdir -p $DST/etc/kpm/pkg/$KPN
+ cp $PTMP/MANIFEST $PTMP/DESC $PTMP/KARLS_PACKAGE $PTMP/INSTALL $PTMP/ESSENTIAL $DST/etc/kpm/pkg/$KPN 2> /dev/null
+ if [ -f "$PTMP/INSTALL" ]; then
+  echo "Running install script for $KPN"
+  chmod 755 $PTMP/INSTALL && $PTMP/INSTALL $DST
+ fi
+ rm -rf $PTMP
+ exit 0
 fi
+# END INSTALL ------------------------------------------------------------
 
-KPN=`basename $KPF`
-[[ -d "$DST/etc/kpm/pkg/$KPN" ]] && noerror "Package $KPN is already installed to $DST"
-
-echo "Installing $KPN to $DST"
-PTMP=`mktemp -d`
-tar -C $PTMP -xJf $KPF
-[[ $? -ne 0 ]] && error "Package error with $KPF, installation cancelled!"
-[[ ! -f "$PTMP/KARLS_PACKAGE" ]] && error "$KPF is not a KarLS Package, installation cancelled!"
-if [ -f "$PTMP/PREREQ" ]; then
- for pkg in `cat $PTMP/PREREQ`; do
-  echo "Installing $pkg as Prerequisite for $KPN"
-  kpm install $pkg $DST
-  [[ $? -ne 0 ]] && error "Error installing $pkg, installation of $KPN cancelled"
+# UNINSTALL --------------------------------------------------------------
+if [ "$CMD" == "uninstall" ]; then
+ [[ "$3" == "" ]] && DST="/" || DST=$3
+ [[ ! -d "$DST" ]] && error "Root directory $DST not found"
+ PKG=$2
+ PKGRN=$PKG
+ [[ ! -d "$DST/etc/kpm/pkg/$PKGRN" ]] && PKGRN=$PKG.kp
+ [[ ! -d "$DST/etc/kpm/pkg/$PKGRN" ]] && error "Package $PKG not found installed in $DST"
+ [[ ! -f "$DST/etc/kpm/pkg/$PKGRN/MANIFEST" ]] && error "Package MANIFEST for $PKG not found in $DST"
+ [[ -f "$DST/etc/kpm/pkg/$PKGRN/ESSENTIAL" ]] && error "Package $PKG is essential, can not be uninstalled"
+ echo "Uninstalling $PKG from $DST"
+ for pfile in `cat $DST/etc/kpm/pkg/$PKGRN/MANIFEST`; do
+  rm $DST/$pfile
  done
+  rm -rf $DST/etc/kpm/pkg/$PKGRN
+ exit 0
 fi
-cp -Rpf $PTMP/FILES/* $DST 2> /dev/null
+# END UNINSTALL ----------------------------------------------------------
 
-mkdir -p $DST/etc/kpm/pkg/$KPN
-cp $PTMP/MANIFEST $PTMP/DESC $PTMP/KARLS_PACKAGE $DST/etc/kpm/pkg/$KPN
-
-if [ -f "$PTMP/INSTALL" ]; then
- echo "Running install script for $KPN"
- chmod 755 $PTMP/INSTALL && $PTMP/INSTALL $DST
+# LIST -------------------------------------------------------------------
+if [ "$CMD" == "list" ]; then
+ [[ "$2" == "" ]] && DST="/" || DST=$2
+ [[ ! -d "$DST" ]] && error "Root directory $DST not found"
+ [[ ! -d "$DST/etc/kpm/pkg" ]] && noerror "No installed packages repo found in Root directory $DST"
+ echo "Installed packages in $DST:"
+ for pkgname in `ls -1 $DST/etc/kpm/pkg`; do
+  DSC=`tail -1 $DST/etc/kpm/pkg/$pkgname/DESC`
+  [[ -f "$DST/etc/kpm/pkg/$pkgname/ESSENTIAL" ]] && DSC="$DSC !!! Essential package"
+  echo $DSC
+ done
+ exit 0
 fi
+# END LIST ---------------------------------------------------------------
 
-rm -rf $PTMP
+# LIST REPO --------------------------------------------------------------
+if [ "$CMD" == "listrepo" ]; then
+ [[ "$2" == "" ]] && DST="/" || DST=$2
+ [[ ! -d "$DST" ]] && error "Root directory $DST not found"
+ [[ ! -f "$DST/etc/kpm/repo" ]] && error "Repo not found in Root directory $DST"
+ REPO=`head -1 $DST/etc/kpm/repo`
+ [[ ! -d "$REPO" ]] && error "Repo directory $REPO not found"
+ echo "Packages in repo in $DST:"
+ ls -1 $REPO
+ exit 0
+fi
+# END LIST REPO ----------------------------------------------------------
+
+usage "Unknown command"

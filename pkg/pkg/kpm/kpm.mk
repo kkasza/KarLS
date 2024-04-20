@@ -9,3 +9,4 @@ $(BLD)/$(KPM_VER):
 	cp pkg/kpm/kpm $@/_kp_tmp/FILES/bin
 	chmod 755 $@/_kp_tmp/FILES/bin/kpm
 	echo "$(KPM_VER) : KarLS Package Manager" > $@/_kp_tmp/DESC
+	touch $@/_kp_tmp/ESSENTIAL

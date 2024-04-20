@@ -2,7 +2,7 @@
 
 #Kernel parameter, hardcoded into isolinux and grub in iso image
 if [ "$KARLS_MEDIA" == "ISO" ]; then
- echo Booting from ISO
+ echo "Booting from ISO"
 
  /etc/init.d/rcS-mount_iso
  #Try a 4th (!!!) module load round after 3 secs, if ISO not found / maybe it's a slow USB
@@ -12,7 +12,12 @@ if [ "$KARLS_MEDIA" == "ISO" ]; then
   /etc/init.d/rcS-mount_iso
  fi
  #If ISO is found, setup system for install
- mkdir -p /etc/kpm
- echo "/mnt/iso/packages" > /etc/kpm/repo
- [[ -e "/mnt/iso/install/setup" ]] && . /mnt/iso/install/setup
+ if [ -e "/mnt/iso/karls_iso" ]; then
+  mkdir -p /etc/kpm
+  echo "/mnt/iso/packages" > /etc/kpm/repo
+  [[ -e "/mnt/iso/install/setup" ]] && . /mnt/iso/install/setup
+ else
+  echo "Install media not found!"
+  cat /etc/version
+ fi
 fi
