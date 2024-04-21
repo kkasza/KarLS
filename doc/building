@@ -11,14 +11,49 @@
  KarLS can be built into an ISO (it supports CD and USB, BIOS or - unsecured - EFI).
  I tested it mostly on VMware and some QEMU.
 
- The building process:
+ KarLS shoudl be build on Debian with a non-root account with sudo access to root
 
+ The building process:
  - First build a (cross-)compiler for X86_64 with musl as libc. This is the default, later arm and other target architectures can come.
  - Then build a Kernel with modules and a really minimal initrd.
  - Then the OS packages.
  - Then the ISO for installing.
 
- make cmpl
- make kernel
- make pkg
- make iso
+ Parameters:
+ - Running 'make' should display possible
+  - Targets (Architectures to compile to, like X86_64 and Arm)
+  - Platforms (Output for images for different Arcdhitectures like ISOs and Images)
+  - Debug paramters for ccahe: DBG_NOCC to turn off, DBG_CCLOG for logging
+  - Debug parameter for make: DBG_MAKE to turn off -j parellel make
+  - Some build statistics
+
+ Make targetss:
+ - standard make targets:
+   * make clean - delete compiled objects (build-$TARGET directory) and invoke _local_clean
+   * make distclean - call clean and also delete uncompressed/patched sources (src) and ccache
+   * make mrproper - distclean and also delete downloaded sources (dl)
+   * make download - download all required sources to dl
+   * make sha256sum - double check downloaded sources integrity with supplied sha256 hashes
+   * make genpatch - generate patch for modified source in src directory - use PPKG= for package, PTCNAME= for patch name, PTCCOMMENT= for comment in diff
+
+ - Standard top level target: make install_deps: installs dependencies for make system using apt on debian
+ - Standard local target: make _local_clean: delete local files not cleaned otherwise - like tmp files for img creation
+
+ COMPILER: cmpl directory (the gcc compiler and associated programs)
+   make cmpl - will compile the whole binutils+gcc+musl compiler environment (with target architecture specific kernel headers)
+
+ KERNEL: kernel directory (the Linux kernel and some prebuilt Initrd-s w/ static musl busybox)
+   make kernel - will compile the Target and Platform specific Kernel w/ Initrd using the Target specific Compiler in ../cmpl
+   make kconfig - enter make menuconfig for Kernel and save a new kernel config as config-$TARGET.new and create a .diff with the supplied config
+   make rebuild_initrd - rebuild the Initrd after changes in skel or skel-$TARGET directories
+   make qemu - test the compiled Kernel with Initrd in qemu
+
+ PACKAGES: pkg directory for custom distribution packages
+  Packages are in pkg/ subdirectory as <Packagename>.mk or <Packege name directory + files>/<Packagename.mk>
+  The download subsystem uses wget and can be used to save to different filenames and source directories for building - see util_linux.mk for example
+   make pkg - compile all packages
+
+ ISO: iso directory for building an X86_64 ISO file for BIOS and (Unsecure!!!) UEFI booting
+  make iso - will build the ISO image
+  make rebuild_iso - reconstruct to ISO without recompiling GRUB and such - also deletes the qemu image mentioned below
+  make qemu - Launch a qemu to test ISO with a 1GB disk to test installing to

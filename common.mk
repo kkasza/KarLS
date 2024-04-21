@@ -18,7 +18,7 @@ endif
 #Valid Targets - Architectures
 VALID_T:=x86_64 arm
 #Valid platforms per target
-VALID_P_x86_64:=iso qemu
+VALID_P_x86_64:=iso
 VALID_P_arm:=rpi
 
 #Default target
@@ -101,7 +101,6 @@ default:
 	@echo Possible targets: $(VALID_T) - default: $(firstword $(VALID_T)) - use make T=\<target\> to choose
 	@echo Possible platforms for $(T): $(VALID_P_$(T)) - default: $(firstword $(VALID_P_$(T))) - use make T=\<target\> P=\<platform\> to choose
 	@echo Possible debug parameters: DBG_MAKE DBG_CCLOG DBG_NOCC
-	@echo Possible additional package parameters: CONNTRACK
 	@echo MAKE: $(MAKE)
 ifdef DBG_MAKE
 	@echo DEBUG enabled - no make -j*
@@ -111,9 +110,6 @@ ifdef DBG_CCLOG
 endif
 ifdef DBG_NOCC
 	@echo DEBUG enabled - no ccache
-endif
-ifdef CONNTRACK
-	@echo Building conntrack
 endif
 ifndef CALLEDFROMROOT
 	@echo ==================================================================================================
