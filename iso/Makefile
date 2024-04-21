@@ -63,7 +63,14 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
 
 	echo "menuentry \"KarLS ISO\" {" >> $@.tmp/boot/grub/grub.cfg
 	echo "	search -l "KARLSISO" --set=root" >> $@.tmp/boot/grub/grub.cfg
-	echo "	linux /boot/vmlinuz-$(KVER) vga=0x305 KARLS_MEDIA=ISO" >> $@.tmp/boot/grub/grub.cfg
+	echo "	linux /boot/vmlinuz-$(KVER) KARLS_MEDIA=ISO" >> $@.tmp/boot/grub/grub.cfg
+	echo "	initrd /boot/initrd-$(KVER).gz" >> $@.tmp/boot/grub/grub.cfg
+	echo "}" >> $@.tmp/boot/grub/grub.cfg
+	echo "" >> $@.tmp/boot/grub/grub.cfg
+	echo "menuentry \"KarLS ISO No Framebuffer\" {" >> $@.tmp/boot/grub/grub.cfg
+	echo "	search -l "KARLSISO" --set=root" >> $@.tmp/boot/grub/grub.cfg
+	echo "	set gfxpayload=text" >> $@.tmp/boot/grub/grub.cfg
+	echo "	linux /boot/vmlinuz-$(KVER) nofb nomodeset KARLS_MEDIA=ISO" >> $@.tmp/boot/grub/grub.cfg
 	echo "	initrd /boot/initrd-$(KVER).gz" >> $@.tmp/boot/grub/grub.cfg
 	echo "}" >> $@.tmp/boot/grub/grub.cfg
 	echo "" >> $@.tmp/boot/grub/grub.cfg
