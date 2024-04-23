@@ -4,7 +4,7 @@ PKG_LIST+=initrd
 
 initrd: $(BLD)/$(INITRD_VER).kp
 
-$(BLD)/$(INITRD_VER): | busybox
+$(BLD)/$(INITRD_VER): | busybox-static
 	mkdir -p $@/initrd-skel $@/_kp_tmp/FILES/usr/share/initrd $@/_kp_tmp/FILES/usr/sbin
 	cp -r pkg/initrd/initrd-skel/* $@/initrd-skel
 
@@ -20,9 +20,8 @@ $(BLD)/$(INITRD_VER): | busybox
 	var/lock \
 	var/tmp
 
-#Static busybox from kernel initrd
-	cp ../kernel/$(BLD)/$(BUSYBOX_VER)/busybox $@/initrd-skel/bin
-	cp ../kernel/$(BLD)/$(BUSYBOX_VER)/examples/udhcp/simple.script $@/initrd-skel/usr/udhcpc/default.script
+	cp $(BLD)/$(BUSYBOX_VER)-static/busybox $@/initrd-skel/bin
+	cp $(BLD)/$(BUSYBOX_VER)-static/examples/udhcp/simple.script $@/initrd-skel/usr/udhcpc/default.script
 
 	$(SUDO) mknod -m 600 $@/initrd-skel/dev/console c 5 1
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/initrd-skel/etc/version

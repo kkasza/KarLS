@@ -4,9 +4,11 @@ $(BUSYBOX_VER)-FILE:=$(BUSYBOX_VER).tar.bz2
 $(BUSYBOX_VER)-SHA256:=b8cc24c9574d809e7279c3be349795c5d5ceb6fdf19ca709f80cde50e47de314
 
 SRC_LIST+=BUSYBOX
-PKG_LIST+=busybox
+PKG_LIST+=busybox busybox-static
 
 busybox: $(BLD)/$(BUSYBOX_VER).kp
+
+busybox-static: $(BLD)/$(BUSYBOX_VER)-static
 
 $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 	mkdir -p $(BLD)
@@ -27,6 +29,17 @@ $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 #	echo "#!/bin/sh" > $@/_kp_tmp/INSTALL
 #	echo "#KarLS INSTALL script for $(BUSYBOX_VER)" >> $@/_kp_tmp/INSTALL
 #	echo "\$$1/bin/busybox --install -s \$$1/bin" >> $@/_kp_tmp/INSTALL
+
+$(BLD)/$(BUSYBOX_VER)-static: src/$(BUSYBOX_VER)
+	mkdir -p $(BLD)
+	cp -rP src/$(BUSYBOX_VER) $@
+	cp pkg/busybox/$(BUSYBOX_VER).config $@/.config
+	sed -i 's/^CONFIG_CROSS_COMPILER_PREFIX=\"\"/CONFIG_CROSS_COMPILER_PREFIX=\"$(subst /,\/,${CMPL_INST})\/bin\/$(subst /,\/,$(TARGET-ARCH))-\"/' $@/.config
+	sed -i 's/^CONFIG_SYSROOT=\"\"/CONFIG_SYSROOT=\"$(subst /,\/,$(CMPL_INST))\"/' $@/.config
+	sed -i 's/^CONFIG_UNAME_OSNAME=\"GNU\/Linux\"/CONFIG_UNAME_OSNAME=\"$(subst /,\/,$(NAME))\"/' $@/.config
+	sed -i 's/^CONFIG_PIE=y/# CONFIG_PIE is not set/' $@/.config
+	sed -i 's/^# CONFIG_STATIC is not set/CONFIG_STATIC=y/' $@/.config
+	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
 
 busybox-config: $(BLD)/$(BUSYBOX_VER)-bconfig
 

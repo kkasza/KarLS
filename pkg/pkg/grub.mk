@@ -38,7 +38,7 @@ $(BLD)/$(GRUB_VER): src/$(GRUB_VER)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_kp_tmp/FILES install
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* || true
-	rm $@/_kp_tmp/FILES/usr/lib/grub/i386-pc/*.module $@/_kp_tmp/FILES/usr/lib/grub/i386-pc/*.image
+	rm -rf $@/_kp_tmp/FILES/usr/lib/grub/i386-pc/*.module $@/_kp_tmp/FILES/usr/lib/grub/i386-pc/*.image $@/_kp_tmp/FILES/usr/share $@/_kp_tmp/FILES/etc
 	echo "$(GRUB_VER) : GRUB Boot Manager, BIOS version" > $@/_kp_tmp/DESC
 	echo "musl-1.2.5" > $@/_kp_tmp/PREREQ
 	touch $@/_kp_tmp/ESSENTIAL
@@ -49,7 +49,7 @@ $(BLD)/$(GRUB_VER)-efi: src/$(GRUB_VER)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_kp_tmp/FILES install
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* || true
-	rm $@/_kp_tmp/FILES/usr/lib/grub/x86_64-efi/*.module
+	rm -rf $@/_kp_tmp/FILES/usr/lib/grub/x86_64-efi/*.module $@/_kp_tmp/FILES/usr/share $@/_kp_tmp/FILES/etc
 	echo "$(GRUB_VER)-efi : GRUB Boot Manager, EFI version" > $@/_kp_tmp/DESC
 	echo "musl-1.2.5" > $@/_kp_tmp/PREREQ
 	touch $@/_kp_tmp/ESSENTIAL
