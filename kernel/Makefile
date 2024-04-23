@@ -16,7 +16,6 @@ BN:=$$(( $(shell cat $(BNF))+1 ))
 DBN:=$(info *** Kernel: Current build number is: #$(shell cat $(BNF)) *** )
 
 KBUILD:=$(LINUX_VER)-$(T)-$(KFLAV)
-IRFS:=irfs
 
 ifdef DBG_NOCC
 HCCACHE:=HOSTCC="gcc" HOSTCXX="g++"
@@ -26,20 +25,7 @@ HCCACHE:=HOSTCC="ccache gcc" HOSTCXX="ccache g++"
 XCCACHE:=CC="ccache $(CMPL_INST)/bin/gcc" CXX="ccache $(CMPL_INST)/bin/g++"
 endif
 
-.PHONY: $(BLD)/$(LINUX_VER)-kconfig $(BLD)/$(BUSY_VER)-bconfig
-
-busybox: $(BLD)/$(BUSY_VER)
-
-$(BLD)/$(BUSY_VER): src/$(BUSY_VER)
-	mkdir -p $(BLD)
-	cp -rP src/$(BUSY_VER) $@
-	cp ../pkg/pkg/busybox/$(BUSY_VER).config $@/.config
-	sed -i 's/^CONFIG_CROSS_COMPILER_PREFIX=\"\"/CONFIG_CROSS_COMPILER_PREFIX=\"$(subst /,\/,${CMPL_INST})\/bin\/$(subst /,\/,$(TARGET-ARCH))-\"/' $@/.config
-	sed -i 's/^CONFIG_SYSROOT=\"\"/CONFIG_SYSROOT=\"$(subst /,\/,$(CMPL_INST))\"/' $@/.config
-	sed -i 's/^CONFIG_UNAME_OSNAME=\"GNU\/Linux\"/CONFIG_UNAME_OSNAME=\"$(subst /,\/,$(NAME))\"/' $@/.config
-	sed -i 's/^CONFIG_PIE=y/# CONFIG_PIE is not set/' $@/.config
-	sed -i 's/^# CONFIG_STATIC is not set/CONFIG_STATIC=y/' $@/.config
-	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
+.PHONY: $(BLD)/$(LINUX_VER)-kconfig
 
 $(CMPL)/dl/$($(LINUX_VER)-FILE):
 	make -C $(CMPL) dl/$($(LINUX_VER)-FILE)
@@ -64,32 +50,6 @@ $(BLD)/$(LINUX_VER)-kconfig: src/$(LINUX_VER)
 	cp $@/.config $(KBUILD).config.new
 	diff -q $(KBUILD).config $(KBUILD).config.new && rm -f $(KBUILD).config.new || diff -u $(KBUILD).config $(KBUILD).config.new > $(KBUILD).config.diff || true
 	touch $<
-
-irfs: $(BLD)/$(IRFS)
-
-$(BLD)/$(IRFS): | busybox
-	mkdir -p $@/proc $@/dev $@/tmp $@/sys $@/lib/modules $@/usr/udhcpc $@/var/run $@/var/log $@/var/lock $@/var/tmp
-
-	cp -rP skel/* $@/
-	cp -rP skel-$(T)-$(KFLAV)/* $@/
-
-	cp $(BLD)/$(BUSY_VER)/busybox $@/bin
-	cp $(BLD)/$(BUSY_VER)/examples/udhcp/simple.script $@/usr/udhcpc/default.script
-
-	$(SUDO) mknod -m 600 $@/dev/console c 5 1
-	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
-
-initrd: | $(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz
-
-$(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz: | $(BLD)/$(IRFS) modules
-	cp -r $(BLD)/$(KBUILD)/modules/* $(BLD)/irfs
-	rm -f $(BLD)/irfs/lib/modules/*/build $(BLD)/irfs/lib/modules/*/source
-	cd $(BLD)/irfs; find . | cpio -H newc -V -R 0:0 -o | gzip -9 -n > ../../$@
-
-rebuild_initrd:
-	rm -rf $(BLD)/$(IRFS) $(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz
-	make initrd
-	cp $(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz kernel-$(T)-$(KFLAV)/
 
 $(BLD)/$(KBUILD): src/$(LINUX_VER)
 	$(MAKE) -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) allnoconfig
@@ -131,11 +91,11 @@ endif
 kernel: kernel-$(T)-$(KFLAV)
 	$(DBN)
 
-kernel-$(T)-$(KFLAV): | kernelimage modules initrd
+kernel-$(T)-$(KFLAV): | kernelimage modules
 	mkdir -p $@
 	cp $(BLD)/$(KBUILD)/vmlinuz-$(LINUX_SVER)-$(KVER) $@/
 	cp $(BLD)/$(KBUILD)/System.map $@/System.map-$(LINUX_SVER)-$(KVER)
-	cp $(BLD)/initrd-$(LINUX_SVER)-$(KVER).gz $@/
+	cp -rv $(BLD)/$(KBUILD)/modules $@/
 	echo $(LINUX_SVER)-$(KVER) > $@/kernel_version
 ifeq ($(P),rpi)
 	cp -rv $(BLD)/$(KBUILD)/arch/arm/boot/dts/*.dtb $@/
@@ -144,14 +104,14 @@ ifeq ($(P),rpi)
 endif
 
 #just to test kernel
-qemu: kernel-$(T)-$(KFLAV)
-ifeq ($(T),x86_64)
-	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -nographic \
-	-kernel kernel-$(T)-$(KFLAV)/vmlinuz-$(LINUX_SVER)-$(KVER) \
-	-initrd kernel-$(T)-$(KFLAV)/initrd-$(LINUX_SVER)-$(KVER).gz \
-	-append "console=ttyS0"
-
-endif
+#qemu: kernel-$(T)-$(KFLAV)
+#ifeq ($(T),x86_64)
+#	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -nographic \
+#	-kernel kernel-$(T)-$(KFLAV)/vmlinuz-$(LINUX_SVER)-$(KVER) \
+#	-initrd kernel-$(T)-$(KFLAV)/initrd-$(LINUX_SVER)-$(KVER).gz \
+#	-append "console=ttyS0"
+#
+#endif
 #ifeq ($(T),arm)
 #	$(SUDO) qemu-system-arm -M raspi0 -m 512 -nographic -vnc :0 \
 #	-kernel kernel-$(T)-$(P)/$(NAME).krnl \

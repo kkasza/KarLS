@@ -57,7 +57,30 @@ efi.img: $(BLD)/$(GRUB_VER)-efi
 
 KVER:=$(shell cat ../kernel/kernel-$(T)-$(KFLAV)/kernel_version)
 
-$(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
+$(BLD)/initrd:
+	mkdir -p $@/proc $@/dev $@/tmp $@/sys $@/lib/modules $@/usr/udhcpc $@/var/run $@/var/log $@/var/lock $@/var/tmp
+
+	cp -rP initrd-skel/* $@/
+
+	cp ../pkg/$(BLD)/busybox-static/busybox $@/bin
+	cp ../pkg/$(BLD)/busybox-static/examples/udhcp/simple.script $@/usr/udhcpc/default.script
+
+	cp -r ../kernel/kernel-$(T)-$(KFLAV)/modules/* $(BLD)/initrd
+	rm -f $(BLD)/initrd/lib/modules/*/build $(BLD)/initrd/lib/modules/*/source
+
+	$(SUDO) mknod -m 600 $@/dev/console c 5 1
+	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
+
+initrd: | $(BLD)/initrd-$(KVER).gz
+
+$(BLD)/initrd-$(KVER).gz: | $(BLD)/initrd
+	cd $(BLD)/initrd; find . | cpio -H newc -V -R 0:0 -o | gzip -9 -n > ../../$@
+
+rebuild_initrd:
+	rm -rf $(BLD)/initrd $(BLD)/initrd-$(KVER).gz
+	make initrd
+
+$(IMAGE): | efi.img $(BLD)/$(GRUB_VER) initrd
 	mkdir -p $@.tmp/boot/grub $@.tmp/packages
 	cp efi.img grub.cfg $@.tmp/boot/grub
 
@@ -80,7 +103,8 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER)
 	echo "	initrd /boot/initrd-$(KVER).gz" >> $@.tmp/boot/grub/grub.cfg
 	echo "}" >> $@.tmp/boot/grub/grub.cfg
 
-	cp ../kernel/kernel-$(T)-$(KFLAV)/* $@.tmp/boot
+	cp ../kernel/kernel-$(T)-$(KFLAV)/kernel_version ../kernel/kernel-$(T)-$(KFLAV)/System.map-$(KVER) ../kernel/kernel-$(T)-$(KFLAV)/vmlinuz-$(KVER) $@.tmp/boot
+	cp $(BLD)/initrd-$(KVER).gz $@.tmp/boot
 	cp ../LICENSE ../doc/UEFI_SECURE_BOOT.NOTE $@.tmp
 	cp -r install $@.tmp
 	cp ../pkg/pkg/kpm/kpm $@.tmp/install

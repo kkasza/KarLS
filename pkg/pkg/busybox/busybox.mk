@@ -40,6 +40,7 @@ $(BLD)/$(BUSYBOX_VER)-static: src/$(BUSYBOX_VER)
 	sed -i 's/^CONFIG_PIE=y/# CONFIG_PIE is not set/' $@/.config
 	sed -i 's/^# CONFIG_STATIC is not set/CONFIG_STATIC=y/' $@/.config
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
+	ln -s $(BUSYBOX_VER)-static $(BLD)/busybox-static
 
 busybox-config: $(BLD)/$(BUSYBOX_VER)-bconfig
 
