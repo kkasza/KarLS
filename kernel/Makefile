@@ -8,7 +8,7 @@ CMPL_INST:=$(CMPL)/cmpl-$(T)
 
 KERNEL_PLH:=__karls__
 
-KVER:=$(NAME)_1.0-$(KFLAV)
+KVER:=$(NAME)-$(KFLAV)
 
 #Build Number for kernel (after #)
 BNF:=buildno-$(T)-$(KFLAV)
