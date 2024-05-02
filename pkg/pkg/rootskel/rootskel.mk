@@ -17,6 +17,7 @@ $(BLD)/$(ROOTSKEL_VER):
 	var/lock \
 	var/log \
 	var/tmp \
+	var/spool/cron/crontabs \
 	tmp \
 	root
 	echo "$(ROOTSKEL_VER) : KarLS root FS skeleton" > $@/_kp_tmp/DESC

@@ -6,8 +6,7 @@ mount -a
 
 hostname -F /etc/hostname
 
-syslogd
-
-ifconfig lo up 127.0.0.1
-
-KARLS=`cat /etc/karls_version`
+for RCS in `ls -1 /etc/init.d/rc-*`; do
+  echo -n "Starting $RCS: "
+  $RCS
+done

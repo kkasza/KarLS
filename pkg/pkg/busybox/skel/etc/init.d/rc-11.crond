@@ -1,0 +1,5 @@
+#!/bin/sh
+
+mkdir -p /var/spool/cron/crontabs
+crond -l 5
+echo crond OK
