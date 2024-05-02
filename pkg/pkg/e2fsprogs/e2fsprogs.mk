@@ -24,5 +24,6 @@ $(BLD)/$(E2FSPROGS_VER): src/$(E2FSPROGS_VER)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_kp_tmp/FILES install
 	rm -rf $@/_kp_tmp/FILES/etc/cron.d $@/_kp_tmp/FILES/lib $@/_kp_tmp/FILES/usr/lib/e2fsprogs $@/_kp_tmp/FILES/usr/share
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* $@/_kp_tmp/FILES/usr/lib/e2initrd_helper || true
+	cp -r pkg/e2fsprogs/skel/* $@/_kp_tmp/FILES
 	echo "$(E2FSPROGS_VER) : e2fsprogs provides the filesystem utilities for use with the ext2 filesystem. It also supports the ext3 and ext4 filesystems." > $@/_kp_tmp/DESC
 	echo "musl-1.2.5" > $@/_kp_tmp/PREREQ

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+echo fsck
+
+for DSK in `mount | grep ext4 | cut -f1 -d' '`; do
+ /usr/sbin/fsck -p $DSK
+done

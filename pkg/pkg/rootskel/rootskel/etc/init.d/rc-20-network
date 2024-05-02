@@ -1,4 +1,4 @@
 #!/bin/sh
 
 ifconfig lo up 127.0.0.1
-echo lo OK
+echo lo
