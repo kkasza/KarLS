@@ -93,5 +93,5 @@
 
 # Stuff to do before rebooting
 ::ctrlaltdel:/sbin/reboot
-::shutdown:/bin/umount -a -r
+::shutdown:/etc/init.d/rcD
 #::shutdown:/sbin/swapoff -a

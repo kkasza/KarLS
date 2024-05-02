@@ -1,0 +1,11 @@
+#!/bin/sh
+
+for RCD in `ls -1 /var/run/*.pid`; do
+  PID=`cat $RCD`
+  echo "Stopping $RCD: $PID"
+  kill $PID
+done
+
+mount -o remount,noload,ro /
+
+umount -a -r

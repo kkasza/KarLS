@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo root
+mount -o remount,rw,errors=remount-ro /
