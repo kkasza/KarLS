@@ -1,0 +1,15 @@
+#!/bin/sh
+
+start()
+{
+ifconfig lo up 127.0.0.1
+echo lo
+}
+
+stop()
+{
+ifconfig lo down
+echo lo
+}
+
+. /etc/init.d/parse

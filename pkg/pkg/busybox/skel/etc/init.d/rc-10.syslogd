@@ -1,5 +1,0 @@
-#!/bin/sh
-
-mkdir -p /var/log
-syslogd -b 10
-echo syslogd

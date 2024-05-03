@@ -1,0 +1,18 @@
+#!/bin/sh
+
+start()
+{
+mkdir -p /var/spool/cron/crontabs
+crond -l 5
+echo crond
+}
+
+stop()
+{
+kill `cat /var/run/crond.pid`
+rm -f /var/run/crond.*
+killall -q -KILL crond
+echo crond
+}
+
+. /etc/init.d/parse

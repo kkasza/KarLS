@@ -1,0 +1,15 @@
+#!/bin/sh
+
+start()
+{
+echo root
+mount -o remount,rw,errors=remount-ro /
+}
+
+stop()
+{
+echo root
+mount -o remount,noload,ro /
+}
+
+. /etc/init.d/parse

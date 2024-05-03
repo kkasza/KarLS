@@ -1,0 +1,19 @@
+#Parameter parsing for KarLS Init Scripts
+
+CMD=`echo $1 | tr '[:upper:]' '[:lower:]'`
+
+if [ "$CMD" == "start" ]; then
+ start
+ exit 0
+fi
+if [ "$CMD" == "stop" ]; then
+ stop
+ exit 0
+fi
+if [ "$CMD" == "restart" ]; then
+ stop
+ start
+ exit 0
+fi
+echo "usage: $0 <start|stop|restart>"
+exit 1

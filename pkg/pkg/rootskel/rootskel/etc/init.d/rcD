@@ -1,11 +1,8 @@
 #!/bin/sh
 
-for RCD in `ls -1 /var/run/*.pid`; do
-  PID=`cat $RCD`
-  echo "Stopping $RCD: $PID"
-  kill $PID
+for RCD in `ls -1 /etc/init.d/rc-stop/*`; do
+ echo -n "Stopping $RCD: "
+ $RCD stop
 done
-
-mount -o remount,noload,ro /
 
 umount -a -r

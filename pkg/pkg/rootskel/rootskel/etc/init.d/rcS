@@ -6,7 +6,7 @@ mount -a
 
 hostname -F /etc/hostname
 
-for RCS in `ls -1 /etc/init.d/rc-*`; do
-  echo -n "Starting $RCS: "
-  $RCS
+for RCS in `ls -1 /etc/init.d/rc-start/*`; do
+ echo -n "Starting $RCS: "
+ $RCS start
 done
