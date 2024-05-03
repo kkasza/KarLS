@@ -163,8 +163,17 @@ kpm install grub-$GRUBVER-efi /mnt/target || { echo "kpm error, installation can
 echo "$TRGT""1		/boot/efi	vfat	ro,defaults,nosuid,nodev,noexec 0 0" >> /mnt/target/etc/fstab
 fi
 
+DEVS=`ifconfig -a | grep "Link encap" | cut -f1 -d' ' | grep -v lo`
+for dev in $DEVS; do
+ echo "Network interface $dev found, setting to dhcp. Change /etc/network/$dev for fixed IP."
+ echo "DHCP=YES" > /mnt/target/etc/network/$dev
+ echo "IP=1.1.1.1" >> /mnt/target/etc/network/$dev
+ echo "NETMASK=255.255.255.255" >> /mnt/target/etc/network/$dev
+done
+
 echo ""
 echo "KarLS Installation finished!"
+echo "WARNING! root has no password set. You know what that means."
 break
 
 done

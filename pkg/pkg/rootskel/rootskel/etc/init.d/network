@@ -2,14 +2,31 @@
 
 start()
 {
-ifconfig lo up 127.0.0.1
-echo lo
+for NET in `ls -1 /etc/network/*`; do
+ DEV=`basename $NET`
+ DHCP=`grep DHCP $NET | cut -d= -f2`
+ if [ "$DHCP" == "NO" ]; then
+  IP=`grep IP $NET | cut -d= -f2`
+  NETMASK=`grep NETMASK $NET | cut -d= -f2`
+  ifconfig $DEV up $IP netmask $NETMASK
+ else
+  udhcpc -i $DEV -p /var/run/udhcpc-$DEV.pid -n -S
+ fi
+ echo -n "$DEV "
+done
+echo ""
 }
 
 stop()
 {
-ifconfig lo down
-echo lo
+for NET in `ls -1 /etc/network/*`; do
+ DEV=`basename $NET`
+ ifconfig $DEV 0.0.0.0 down
+ echo -n "$DEV "
+done
+killall -q udhcpc
+rm -f /var/run/udhcpc-*.pid
+echo "udhcpc"
 }
 
 . /etc/init.d/parse
