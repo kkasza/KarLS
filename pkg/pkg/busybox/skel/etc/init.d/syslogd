@@ -4,15 +4,14 @@ start()
 {
 mkdir -p /var/log
 syslogd -b 10
-echo syslogd
+echo syslogd started
 }
 
 stop()
 {
-kill `cat /var/run/syslogd.pid`
+[[ -f "/var/run/syslogd.pid" ]] && kill `cat /var/run/syslogd.pid`
 rm -f /var/run/syslogd.*
-killall -q -KILL syslogd
-echo syslogd
+echo syslogd stopped
 }
 
 . /etc/init.d/parse

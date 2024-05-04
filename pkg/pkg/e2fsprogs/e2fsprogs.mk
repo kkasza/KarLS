@@ -26,4 +26,4 @@ $(BLD)/$(E2FSPROGS_VER): src/$(E2FSPROGS_VER)
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* $@/_kp_tmp/FILES/usr/lib/e2initrd_helper || true
 	cp -r pkg/e2fsprogs/skel/* $@/_kp_tmp/FILES
 	echo "$(E2FSPROGS_VER) : e2fsprogs provides the filesystem utilities for use with the ext2 filesystem. It also supports the ext3 and ext4 filesystems." > $@/_kp_tmp/DESC
-	echo "musl-1.2.5" > $@/_kp_tmp/PREREQ
+	echo "busybox-1.36.1" > $@/_kp_tmp/PREREQ

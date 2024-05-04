@@ -4,15 +4,14 @@ start()
 {
 mkdir -p /var/spool/cron/crontabs
 crond -l 5
-echo crond
+echo crond started
 }
 
 stop()
 {
-kill `cat /var/run/crond.pid`
+[[ -f "/var/run/crond.pid" ]] && kill `cat /var/run/crond.pid`
 rm -f /var/run/crond.*
-killall -q -KILL crond
-echo crond
+echo crond stopped
 }
 
 . /etc/init.d/parse

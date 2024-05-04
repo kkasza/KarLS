@@ -14,7 +14,7 @@ for NET in `ls -1 /etc/network/*`; do
  fi
  echo -n "$DEV "
 done
-echo ""
+echo "started"
 }
 
 stop()
@@ -22,11 +22,11 @@ stop()
 for NET in `ls -1 /etc/network/*`; do
  DEV=`basename $NET`
  ifconfig $DEV 0.0.0.0 down
+ [[ -f "/var/run/udhcpc-$DEV.pid" ]] && kill `cat /var/run/udhcpc-$DEV.pid`
  echo -n "$DEV "
 done
-killall -q udhcpc
 rm -f /var/run/udhcpc-*.pid
-echo "udhcpc"
+echo "udhcpc stopped"
 }
 
 . /etc/init.d/parse

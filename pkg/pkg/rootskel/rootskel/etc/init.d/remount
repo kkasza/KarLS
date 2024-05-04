@@ -2,13 +2,13 @@
 
 start()
 {
-echo root
+echo "root remounted read-write"
 mount -o remount,rw,errors=remount-ro /
 }
 
 stop()
 {
-echo root
+echo "root remounted read-only"
 mount -o remount,noload,ro /
 }
 
