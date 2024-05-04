@@ -132,7 +132,7 @@ testdisk.img:
 	dd if=/dev/zero of=$@ bs=1M count=1024
 
 qemu: iso testdisk.img
-	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot cd -cdrom $(IMAGE) -nographic -vnc :0 -drive file=testdisk.img,if=virtio,index=0
+	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot cd -cdrom $(IMAGE) -nographic -vnc :0 -drive format=raw,file=testdisk.img,if=virtio,index=0 -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::2222-:22
 
 _local_clean:
 	rm -rf $(IMAGE).tmp efi.img efi.img.mnt testdisk.img

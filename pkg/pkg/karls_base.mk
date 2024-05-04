@@ -14,4 +14,5 @@ $(BLD)/$(KARLS_BASE_VER):
 	echo "util_linux-2.40" >> $@/_kp_tmp/PREREQ
 	echo "e2fsprogs-1.47.0" >> $@/_kp_tmp/PREREQ
 	echo "ca_certs-1.0" >> $@/_kp_tmp/PREREQ
+	echo "dropbear-2024.85.kp" >> $@/_kp_tmp/PREREQ
 	touch $@/_kp_tmp/ESSENTIAL

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+start()
+{
+mkdir -p /etc/dropbear
+dropbear -R
+echo dropbear started
+}
+
+stop()
+{
+[[ -f "/var/run/dropbear.pid" ]] && kill `cat /var/run/dropbear.pid`
+rm -f /var/run/dropbear.*
+echo dropbear stopped
+}
+
+. /etc/init.d/parse
