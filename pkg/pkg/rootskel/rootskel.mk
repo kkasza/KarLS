@@ -19,6 +19,8 @@ $(BLD)/$(ROOTSKEL_VER):
 	var/tmp \
 	var/spool/cron/crontabs \
 	tmp \
+	home \
 	root
 	echo "$(ROOTSKEL_VER) : KarLS root FS skeleton" > $@/_kp_tmp/DESC
+	cp pkg/rootskel/INSTALL $@/_kp_tmp
 	touch $@/_kp_tmp/ESSENTIAL

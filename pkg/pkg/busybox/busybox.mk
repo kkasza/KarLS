@@ -24,12 +24,8 @@ $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 	cp -r pkg/busybox/skel/* $@/_kp_tmp/FILES
 	echo "$(BUSYBOX_VER) : BusyBox is a software suite that provides several Unix utilities in a single executable file." > $@/_kp_tmp/DESC
 	echo "musl-1.2.5" > $@/_kp_tmp/PREREQ
+	cp pkg/busybox/INSTALL $@/_kp_tmp
 	touch $@/_kp_tmp/ESSENTIAL
-
-#	NOTE: busybox may need setuid root...
-#	echo "#!/bin/sh" > $@/_kp_tmp/INSTALL
-#	echo "#KarLS INSTALL script for $(BUSYBOX_VER)" >> $@/_kp_tmp/INSTALL
-#	echo "\$$1/bin/busybox --install -s \$$1/bin" >> $@/_kp_tmp/INSTALL
 
 $(BLD)/$(BUSYBOX_VER)-static: src/$(BUSYBOX_VER)
 	mkdir -p $(BLD)
@@ -43,9 +39,9 @@ $(BLD)/$(BUSYBOX_VER)-static: src/$(BUSYBOX_VER)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
 	ln -s $(BUSYBOX_VER)-static $(BLD)/busybox-static
 
-busybox-config: $(BLD)/$(BUSYBOX_VER)-bconfig
+busybox-config: $(BLD)/$(BUSYBOX_VER)-config
 
-$(BLD)/$(BUSYBOX_VER)-bconfig: src/$(BUSYBOX_VER)
+$(BLD)/$(BUSYBOX_VER)-config: src/$(BUSYBOX_VER)
 	mkdir -p $(BLD)
 	cp -rP src/$(BUSYBOX_VER) $@
 	cp pkg/busybox/$(BUSYBOX_VER).config $@/.config

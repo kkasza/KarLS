@@ -31,9 +31,6 @@ $(BLD)/$(INITRD_VER): | busybox-static
 	chmod 755 $@/_kp_tmp/FILES/usr/sbin/rebuild_initrd
 
 	echo "$(INITRD_VER) : Custom Initrd for the Kernel" > $@/_kp_tmp/DESC
-
-	echo "#!/bin/sh" > $@/_kp_tmp/INSTALL
-	echo "#KarLS INSTALL script for $(INITRD_VER)" >> $@/_kp_tmp/INSTALL
-	echo "\$$1/usr/sbin/rebuild_initrd \$$1" >> $@/_kp_tmp/INSTALL
 	echo "busybox-1.36.1" > $@/_kp_tmp/PREREQ
+	cp pkg/initrd/INSTALL $@/_kp_tmp
 	touch $@/_kp_tmp/ESSENTIAL

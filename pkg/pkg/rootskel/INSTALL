@@ -1,0 +1,3 @@
+#!/bin/sh
+
+chmod 640 $1/etc/shadow $1/etc/gshadow

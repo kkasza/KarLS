@@ -1,0 +1,4 @@
+#!/bin/sh
+
+chmod 600 $1/etc/busybox.conf
+chmod 4755 $1/bin/busybox
