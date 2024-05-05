@@ -9,10 +9,11 @@ usage()
  echo ""
  echo "Usage: $0 <Command> (Package if needed) <Root directory - defaults to />"
  echo "Valid commands:"
- echo "install  - Install a package"
- echo "uninstall  - Uninstall files installed by defined package"
- echo "list     - List Installed packages"
- echo "listrepo - List packages available in repository(s)"
+ echo "install   - Install a package"
+ echo "upgrade   - Upgrade/reinstall/downgrade a package (basically force install)"
+ echo "uninstall - Uninstall files installed by defined package"
+ echo "list      - List Installed packages"
+ echo "listrepo  - List packages available in repository(s)"
  exit 1
 }
 
@@ -34,8 +35,10 @@ CMD=`echo $1 | tr '[:upper:]' '[:lower:]'`
 
 [[ "$CMD" == "" ]] && usage "Not enough parameters"
 
-# INSTALL ----------------------------------------------------------------
-if [ "$CMD" == "install" ]; then
+# INSTALL / UPGRADE ------------------------------------------------------
+if [ "$CMD" == "install" ] || [ "$CMD" == "upgrade" ]; then
+ UPG="NO"
+ [[ "$CMD" == "upgrade" ]] && UPG="YES"
  [[ "$3" == "" ]] && DST="/" || DST=$3
  [[ ! -d "$DST" ]] && error "Root directory $DST not found"
 
@@ -43,23 +46,34 @@ if [ "$CMD" == "install" ]; then
  if [ ! -f "$KPF" ]; then
   if [ -f "$DST/etc/kpm/repo" ]; then
    REPO=`head -1 $DST/etc/kpm/repo`
-   if [ ! -f "$REPO/$KPF" ]; then
-    if [ ! -f "$REPO/$KPF.kp" ]; then
-     error "Package file $KPF not found"
-    else
-     KPF="$REPO/$KPF.kp"
+   [[ ! -f "$REPO/repo.db" ]] && error "repo.db in repo $REPO not found"
+   #Try finding the package name without version first
+   FN=`grep -m 1 -e ^$KPF- $REPO/repo.db`
+   if [ ! -f "$REPO/$FN" ]; then
+    #Then with version, without .kp suffix
+    FN=`grep -m 1 -x $KPF.kp $REPO/repo.db`
+    if [ ! -f "$REPO/$FN" ]; then
+     #Then with suffix
+     FN=`grep -m 1 -x $KPF $REPO/repo.db`
+     if [ ! -f "$REPO/$FN" ]; then
+      error "Package file $KPF not found"
+     fi
     fi
-   else
-    KPF="$REPO/$KPF"
    fi
+   KPF=$REPO/$FN
   else
    error "No repo. Package file $KPF not found"
   fi
  fi
 
- KPN=`basename $KPF`
- [[ -d "$DST/etc/kpm/pkg/$KPN" ]] && noerror "Package $KPN is already installed to $DST"
- echo "Installing $KPN to $DST"
+ KPN_FULL=`basename -s .kp $KPF`
+ KPN=`echo $KPN_FULL | cut -d- -f1`
+ KPN_VER=`echo $KPN_FULL | cut -d- -f2`
+
+ if [ "$UPG" == "NO" ]; then
+  [[ -d "$DST/etc/kpm/pkg/$KPN" ]] && { VER=`tail -1 $DST/etc/kpm/pkg/$KPN/VER`; noerror "Package $KPN ($VER) is already installed to $DST"; }
+ fi
+ echo "Installing $KPN ($KPN_VER) to $DST"
  PTMP=`mktemp -d`
  tar -C $PTMP -xJf $KPF || error "Package error with $KPF, installation cancelled!"
  [[ ! -f "$PTMP/KARLS_PACKAGE" ]] && error "$KPF is not a KarLS Package, installation cancelled!"
@@ -73,6 +87,7 @@ if [ "$CMD" == "install" ]; then
  cp -Rpf $PTMP/FILES/* $DST 2> /dev/null
  mkdir -p $DST/etc/kpm/pkg/$KPN
  cp $PTMP/MANIFEST $PTMP/DESC $PTMP/KARLS_PACKAGE $PTMP/INSTALL $PTMP/ESSENTIAL $DST/etc/kpm/pkg/$KPN 2> /dev/null
+ echo "$KPN_VER" > $DST/etc/kpm/pkg/$KPN/VER
  if [ -f "$PTMP/INSTALL" ]; then
   echo "Running install script for $KPN"
   chmod 755 $PTMP/INSTALL && $PTMP/INSTALL $DST
@@ -87,16 +102,14 @@ if [ "$CMD" == "uninstall" ]; then
  [[ "$3" == "" ]] && DST="/" || DST=$3
  [[ ! -d "$DST" ]] && error "Root directory $DST not found"
  PKG=$2
- PKGRN=$PKG
- [[ ! -d "$DST/etc/kpm/pkg/$PKGRN" ]] && PKGRN=$PKG.kp
- [[ ! -d "$DST/etc/kpm/pkg/$PKGRN" ]] && error "Package $PKG not found installed in $DST"
- [[ ! -f "$DST/etc/kpm/pkg/$PKGRN/MANIFEST" ]] && error "Package MANIFEST for $PKG not found in $DST"
- [[ -f "$DST/etc/kpm/pkg/$PKGRN/ESSENTIAL" ]] && error "Package $PKG is essential, can not be uninstalled"
+ [[ ! -d "$DST/etc/kpm/pkg/$PKG" ]] && error "Package $PKG not found installed in $DST"
+ [[ ! -f "$DST/etc/kpm/pkg/$PKG/MANIFEST" ]] && error "Package MANIFEST for $PKG not found in $DST"
+ [[ -f "$DST/etc/kpm/pkg/$PKG/ESSENTIAL" ]] && error "Package $PKG is essential, can not be uninstalled"
  echo "Uninstalling $PKG from $DST"
- for pfile in `cat $DST/etc/kpm/pkg/$PKGRN/MANIFEST`; do
+ for pfile in `cat $DST/etc/kpm/pkg/$PKG/MANIFEST`; do
   rm $DST/$pfile
  done
-  rm -rf $DST/etc/kpm/pkg/$PKGRN
+  rm -rf $DST/etc/kpm/pkg/$PKG
  exit 0
 fi
 # END UNINSTALL ----------------------------------------------------------
@@ -108,9 +121,10 @@ if [ "$CMD" == "list" ]; then
  [[ ! -d "$DST/etc/kpm/pkg" ]] && noerror "No installed packages repo found in Root directory $DST"
  echo "Installed packages in $DST:"
  for pkgname in `ls -1 $DST/etc/kpm/pkg`; do
-  DSC=`tail -1 $DST/etc/kpm/pkg/$pkgname/DESC`
+  DSC=`tail -1 $DST/etc/kpm/pkg/$pkgname/DESC | cut -d: -f2`
+  VER=`tail -1 $DST/etc/kpm/pkg/$pkgname/VER`
   [[ -f "$DST/etc/kpm/pkg/$pkgname/ESSENTIAL" ]] && DSC="$DSC !!! Essential package"
-  echo $DSC
+  echo "$pkgname ($VER)$DSC"
  done
  exit 0
 fi
@@ -123,8 +137,9 @@ if [ "$CMD" == "listrepo" ]; then
  [[ ! -f "$DST/etc/kpm/repo" ]] && error "Repo not found in Root directory $DST"
  REPO=`head -1 $DST/etc/kpm/repo`
  [[ ! -d "$REPO" ]] && error "Repo directory $REPO not found"
- echo "Packages in repo in $DST:"
- ls -1 $REPO
+ [[ ! -f "$REPO/repo.db" ]] && error "Repo.db not found in repo directory $REPO"
+ echo "Packages in repo.db in $DST:"
+ cat $REPO/repo.db
  exit 0
 fi
 # END LIST REPO ----------------------------------------------------------

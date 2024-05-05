@@ -109,6 +109,8 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER) initrd
 	cp -r install $@.tmp
 	cp ../pkg/pkg/kpm/kpm $@.tmp/install
 	cp ../pkg/build-$(T)/*.kp $@.tmp/packages
+	ls -1 $@.tmp/packages > $@.tmp/repo.db
+	mv $@.tmp/repo.db $@.tmp/packages
 
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@.tmp/karls_iso
 

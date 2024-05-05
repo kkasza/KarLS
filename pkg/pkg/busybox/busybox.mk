@@ -23,7 +23,7 @@ $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 	cp $@/examples/udhcp/simple.script $@/_kp_tmp/FILES/usr/udhcpc/default.script
 	cp -r pkg/busybox/skel/* $@/_kp_tmp/FILES
 	echo "$(BUSYBOX_VER) : BusyBox is a software suite that provides several Unix utilities in a single executable file." > $@/_kp_tmp/DESC
-	echo "musl-1.2.5" > $@/_kp_tmp/PREREQ
+	echo "musl" > $@/_kp_tmp/PREREQ
 	cp pkg/busybox/INSTALL $@/_kp_tmp
 	touch $@/_kp_tmp/ESSENTIAL
 

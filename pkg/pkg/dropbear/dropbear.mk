@@ -40,4 +40,4 @@ $(BLD)/$(DROPBEAR_VER): src/$(DROPBEAR_VER)
 	done
 	cp -r pkg/dropbear/skel/* $@/_kp_tmp/FILES
 	echo "$(DROPBEAR_VER) : Dropbear is a relatively small SSH server and client." > $@/_kp_tmp/DESC
-	echo "busybox-1.36.1" > $@/_kp_tmp/PREREQ
+	echo "busybox" > $@/_kp_tmp/PREREQ

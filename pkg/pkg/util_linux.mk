@@ -48,4 +48,4 @@ $(BLD)/$(UTIL_LINUX_VER): src/$(UTIL_LINUX_VER)
 	rm -rf $@/_kp_tmp/FILES/usr/share
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* $@/_kp_tmp/FILES/usr/lib/* || true
 	echo "$(UTIL_LINUX_VER) : util-linux is a random collection of Linux utilities" > $@/_kp_tmp/DESC
-	echo "busybox-1.36.1" > $@/_kp_tmp/PREREQ
+	echo "busybox" > $@/_kp_tmp/PREREQ
