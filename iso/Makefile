@@ -130,12 +130,21 @@ iso: $(IMAGE)
 
 rebuild_iso: _local_clean iso
 
-testdisk.img:
-	dd if=/dev/zero of=$@ bs=1M count=1024
+qemu: iso
+	if [ ! -f "testdisk.img" ]; then dd if=/dev/zero of=testdisk.img bs=1M count=1024; fi
+	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot cd -cdrom $(IMAGE) -nographic -vnc :0 \
+	-device virtio-scsi-pci,id=scsi \
+	-device scsi-hd,drive=hd \
+	-drive format=raw,file=testdisk.img,if=none,id=hd,index=0,snapshot=off \
+	-device virtio-net,netdev=net0 \
+	-netdev user,id=net0,hostfwd=tcp::2222-:22
 
-qemu: iso testdisk.img
-	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot cd -cdrom $(IMAGE) -nographic -vnc :0 -drive format=raw,file=testdisk.img,if=virtio,index=0 -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::2222-:22
+gcpimage: karls-gcpimage-$(VERSION).tar.gz
+
+karls-gcpimage-$(VERSION).tar.gz:
+	ln -sf testdisk.img disk.raw
+	tar --format=oldgnu -h -Sczf $@ disk.raw
 
 _local_clean:
-	rm -rf $(IMAGE).tmp efi.img efi.img.mnt testdisk.img
+	rm -rf $(IMAGE).tmp efi.img efi.img.mnt testdisk.img disk.raw karls-gcpimage-*.tar.gz
 	rm -rf $(IMAGE)

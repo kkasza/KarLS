@@ -4,5 +4,7 @@ build-*
 *.img
 *.img.mnt
 *.iso.tmp
+*.raw
+*.tar.gz
 dl/
 src/
