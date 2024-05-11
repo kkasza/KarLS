@@ -7,34 +7,47 @@ usage()
  echo "rebuild_initrd - Rebuild the Initrd for KarLS $VER"
  echo "rebuild_initrd: $1" 1>&2
  echo ""
- echo "Usage: $0 <Destination root> <Kernel version - defaults to uname -r>"
+ echo "Usage: $0 <Destination root, defaults to /> <Kernel version (\"-\" defaults to uname -r)> <ALL to also build currently unused modules in>"
  exit 1
 }
 
-[[ "$1" == "" ]] && usage "Not enough parameters"
-DST="$1"
-[[ ! -d "$DST" ]] && usage "Destination directory $DST not found"
+DST=$1
+[[ "$1" == "" ]] && DST="/"
+[[ ! -d "$DST/boot" ]] && usage "Destination directory $DST/boot not found"
 
-[[ "$2" == "" ]] && KVER=`uname -r` || KVER=$2
+KVER=$2
+[[ "$2" == "" ]] && KVER=`uname -r`
+[[ "$2" == "-" ]] && KVER=`uname -r`
+
+[[ ! -d "$DST/lib/modules/$KVER" ]] && usage "Kernel modules directory $DST/lib/modules/$KVER not found"
+
+ALL=0
+[[ "$3" == "ALL" ]] && ALL=1
 
 echo Rebuilding Initrd for $KVER to $DST/boot
+[[ "$ALL" == "1" ]] && echo Building all possible modules in
 
 #Create temp dir and extract skeleton
 ITMP=`mktemp -d`
 
 tar -C $ITMP -xJf $DST/usr/share/initrd/initrd-skel.txz
 
-#List loaded modules
-MODS=`lsmod | tail +2 | cut -d' ' -f1`
+if [ "$ALL" == "0" ]; then
 
-#Find loaded modules by filename and attempt to copy them from a kernel module tree to the initrd skeleton
-for M in $MODS; do
- MLOC=`modinfo $M -n | sed s/$(uname -r)/$KVER/g`
- mkdir -p $ITMP/`dirname $MLOC`
- cp $MLOC $ITMP/$MLOC
-done
+ #List loaded modules
+ MODS=`lsmod | tail +2 | cut -d' ' -f1`
 
-cp /lib/modules/$KVER/modules.* $ITMP/lib/modules/$KVER
+ #Find loaded modules by filename and attempt to copy them from a kernel module tree to the initrd skeleton
+ for M in $MODS; do
+  MLOC=`modinfo $M -n | sed s/$(uname -r)/$KVER/g`
+  mkdir -p $ITMP/`dirname $MLOC`
+  cp $MLOC $ITMP/$MLOC
+ done
+ cp /lib/modules/$KVER/modules.* $ITMP/lib/modules/$KVER
+
+else
+ cp -r /lib/modules/$KVER $ITMP/lib/modules
+fi
 
 #Make cpio archive for initrd
 cd $ITMP; find . | cpio -H newc -v -R 0:0 -o | gzip -9 -n > $DST/boot/initrd-$KVER.gz
