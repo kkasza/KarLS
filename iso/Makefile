@@ -131,7 +131,7 @@ iso: $(IMAGE)
 rebuild_iso: _local_clean iso
 
 qemu: iso
-	if [ ! -f "testdisk.img" ]; then dd if=/dev/zero of=testdisk.img bs=1M count=1024; fi
+	if [ ! -f "testdisk.img" ]; then dd if=/dev/zero of=testdisk.img bs=1M count=10240; fi
 	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot cd -cdrom $(IMAGE) -nographic -vnc :0 \
 	-device virtio-scsi-pci,id=scsi \
 	-device scsi-hd,drive=hd \

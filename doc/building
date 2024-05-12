@@ -55,5 +55,7 @@
 
  ISO: iso directory for building an X86_64 ISO file for BIOS and (Unsecure!!!) UEFI booting
   make iso - will build the ISO image
+  make rebuild_initrd - rebuild the Initrd with modules in case of Kernel config changes
   make rebuild_iso - reconstruct to ISO without recompiling GRUB and such - also deletes the qemu image mentioned below
-  make qemu - Launch a qemu to test ISO with a 1GB disk to test installing to
+  make qemu - Launch a qemu to test ISO with a 10GB disk to test installing to
+  make gcpimage - Create a tar.gz file to upload to Google Compute Engine from the make qemu disk

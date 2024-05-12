@@ -1,0 +1,33 @@
+
+ KarLS can be uploaded and run on GCE.
+
+ * Build a standard x86_64 ISO image - make iso
+
+ * Install KarLS in QEMU, using the command make -C iso qemu
+ Or QEMU cmd line (from Makefile):
+ qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot cd -cdrom $(IMAGE) -nographic -vnc :0 \
+ -device virtio-scsi-pci,id=scsi \
+ -device scsi-hd,drive=hd \
+ -drive format=raw,file=testdisk.img,if=none,id=hd,index=0,snapshot=off \
+ -device virtio-net,netdev=net0 \
+ -netdev user,id=net0,hostfwd=tcp::2222-:22
+ Choose serial console in GRUB.
+ This will install KarLS on a 10GB testdisk.img
+ After booting into the installed system, remember to run "rebuild_initrd / - ALL" - this should create an Initrd with all possible modules.
+
+ Power off the installed system.
+
+ Now we are following Google's howto: https://cloud.google.com/compute/docs/images/create-custom
+
+ * Build the gcpimage target (make -C iso gcpimage)
+   This will result in a karls-gcpimage-VERSION.tar.gz / Renaming testdisk.img to disk.raw and running tar --format=oldgnu -Sczf karls-gcpimage-VERSION.tar.gz disk.raw
+
+ * Upload the .tar.gz to a GC Storage Bucket.
+ * Create Custom Image from the file in the Bucket.
+ * Create VM from the Image.
+ -- Enable serial console at VM creation by adding Metadata serial-port-enable and value TRUE.
+    See: https://cloud.google.com/compute/docs/troubleshooting/troubleshooting-using-serial-console
+
+ After booting, use the serial console to configure the system.
+ If you chose a root password, and enabled port 22 through the GC Firewall, dropbear should also be available.
+ Remember to run "rebuild_initrd" again, to build an Initrd with just the necessary Kernel modules.
