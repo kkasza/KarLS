@@ -3,7 +3,8 @@
 
 include ../common.mk
 
-CMPL_INST:=$(PWD)/../cmpl/cmpl-$(T)
+CMPL:=$(PWD)/../cmpl
+CMPL_INST:=$(CMPL)/cmpl-$(T)
 
 #Setup HOST and CROSS compilers with or without ccache
 ifdef DBG_NOCC

@@ -55,7 +55,7 @@ efi.img: $(BLD)/$(GRUB_VER)-efi
 
 	$(SUDO) umount $@.mnt
 
-KVER:=$(shell cat ../kernel/kernel-$(T)-$(KFLAV)/kernel_version)
+KVER:=$(shell cat ../pkg/build-$(T)/kernel/kernel_version)
 
 $(BLD)/initrd:
 	mkdir -p $@/proc $@/dev $@/tmp $@/sys $@/lib/modules $@/usr/udhcpc $@/var/run $@/var/log $@/var/lock $@/var/tmp
@@ -65,8 +65,7 @@ $(BLD)/initrd:
 	cp ../pkg/$(BLD)/busybox-static/busybox $@/bin
 	cp ../pkg/$(BLD)/busybox-static/examples/udhcp/simple.script $@/usr/udhcpc/default.script
 
-	cp -r ../kernel/kernel-$(T)-$(KFLAV)/modules/* $(BLD)/initrd
-	rm -f $(BLD)/initrd/lib/modules/*/build $(BLD)/initrd/lib/modules/*/source
+	cp -r ../pkg/build-$(T)/kernel/_kp_tmp/FILES/lib $(BLD)/initrd
 
 	$(SUDO) mknod -m 600 $@/dev/console c 5 1
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
@@ -103,7 +102,7 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER) initrd
 	echo "	initrd /boot/initrd-$(KVER).gz" >> $@.tmp/boot/grub/grub.cfg
 	echo "}" >> $@.tmp/boot/grub/grub.cfg
 
-	cp ../kernel/kernel-$(T)-$(KFLAV)/kernel_version ../kernel/kernel-$(T)-$(KFLAV)/System.map-$(KVER) ../kernel/kernel-$(T)-$(KFLAV)/vmlinuz-$(KVER) $@.tmp/boot
+	cp ../pkg/build-$(T)/kernel/kernel_version ../pkg/build-$(T)/kernel/_kp_tmp/FILES/boot/vmlinuz-$(KVER) ../pkg/build-$(T)/kernel/_kp_tmp/FILES/boot/System.map-$(KVER) $@.tmp/boot
 	cp $(BLD)/initrd-$(KVER).gz $@.tmp/boot
 	cp ../LICENSE ../doc/UEFI_SECURE_BOOT.NOTE $@.tmp
 	cp -r install $@.tmp
@@ -138,6 +137,9 @@ qemu: iso
 	-drive format=raw,file=testdisk.img,if=none,id=hd,index=0,snapshot=off \
 	-device virtio-net,netdev=net0 \
 	-netdev user,id=net0,hostfwd=tcp::2222-:22
+
+ssh:
+	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@127.0.0.1 -p 2222
 
 gcpimage: karls-gcpimage-$(VERSION).tar.gz
 

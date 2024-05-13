@@ -15,8 +15,7 @@
 
  The building process:
  - First build a (cross-)compiler for X86_64 with musl as libc. This is the default, later arm and other target architectures can come.
- - Then build a Kernel with modules and a really minimal initrd.
- - Then the OS packages.
+ - Then the OS packages including the Kernel.
  - Then the ISO for installing.
 
  Parameters:
@@ -42,12 +41,6 @@
  COMPILER: cmpl directory (the gcc compiler and associated programs)
    make cmpl - will compile the whole binutils+gcc+musl compiler environment (with target architecture specific kernel headers)
 
- KERNEL: kernel directory (the Linux kernel and some prebuilt Initrd-s w/ static musl busybox)
-   make kernel - will compile the Target and Platform specific Kernel w/ Initrd using the Target specific Compiler in ../cmpl
-   make kconfig - enter make menuconfig for Kernel and save a new kernel config as config-$TARGET.new and create a .diff with the supplied config
-   make rebuild_initrd - rebuild the Initrd after changes in skel or skel-$TARGET directories
-   make qemu - test the compiled Kernel with Initrd in qemu
-
  PACKAGES: pkg directory for custom distribution packages
   Packages are in pkg/ subdirectory as <Packagename>.mk or <Packege name directory + files>/<Packagename.mk>
   The download subsystem uses wget and can be used to save to different filenames and source directories for building - see util_linux.mk for example
@@ -58,4 +51,5 @@
   make rebuild_initrd - rebuild the Initrd with modules in case of Kernel config changes
   make rebuild_iso - reconstruct to ISO without recompiling GRUB and such - also deletes the qemu image mentioned below
   make qemu - Launch a qemu to test ISO with a 10GB disk to test installing to
+  make ssh - Connect w/ ssh to qemu instance for testing - remember to set root pw on console before attempting
   make gcpimage - Create a tar.gz file to upload to Google Compute Engine from the make qemu disk
