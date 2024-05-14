@@ -10,7 +10,6 @@ KERNEL_PLH:=__karls__
 #Build Number for kernel (after #)
 BNF:=pkg/kernel/buildno-$(T)-$(KFLAV)
 BN:=$$(( $(shell cat $(BNF))+1 ))
-DBN:=$(info *** Kernel: Current build number is: #$(shell cat $(BNF)) *** )
 
 KBUILD:=$($(KERNEL_VER)-REALDIR)-$(T)-$(KFLAV)
 
