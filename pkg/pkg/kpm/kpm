@@ -7,11 +7,12 @@ usage()
  echo "kpm - KarLS Package Manager $VER"
  echo "$1" 1>&2
  echo ""
- echo "Usage: $0 <Command> (Package if needed) <Root directory - defaults to />"
+ echo "Usage: $0 <Command> (Parameters if needed) <Root directory - defaults to />"
  echo "Valid commands:"
  echo "install   - Install a package"
  echo "upgrade   - Upgrade/reinstall/downgrade a package (basically force install)"
  echo "uninstall - Uninstall files installed by defined package"
+ echo "set       - Set URL/DIR for repo"
  echo "list      - List Installed packages"
  echo "listrepo  - List packages available in repository(s)"
  exit 1
@@ -119,6 +120,24 @@ if [ "$CMD" == "uninstall" ]; then
  exit 0
 fi
 # END UNINSTALL ----------------------------------------------------------
+
+# SET --------------------------------------------------------------------
+if [ "$CMD" == "set" ]; then
+ [[ "$3" == "" ]] && DST="/" || DST=$3
+ [[ ! -d "$DST" ]] && error "Root directory $DST not found"
+
+ URL="$2"
+ ISDIR=`echo $URL | egrep "^http://|^https://"`
+ if [ -z "$ISDIR" ]; then
+  [[ ! -d "$URL" ]] && error "Repo directory $URL not found"
+ fi
+ mkdir -p $DST/etc/kpm
+ echo "$URL" > $DST/etc/kpm/repo
+ echo "Setting kpm repo to $URL"
+ exit 0
+fi
+
+# END SET ----------------------------------------------------------------
 
 # LIST -------------------------------------------------------------------
 if [ "$CMD" == "list" ]; then

@@ -13,8 +13,6 @@ if [ "$KARLS_MEDIA" == "ISO" ]; then
  fi
  #If ISO is found, setup system for install
  if [ -e "/mnt/iso/karls_iso" ]; then
-  mkdir -p /etc/kpm
-  echo "/mnt/iso/packages" > /etc/kpm/repo
   [[ -e "/mnt/iso/install/setup" ]] && . /mnt/iso/install/setup
  else
   echo "Install media not found!"
