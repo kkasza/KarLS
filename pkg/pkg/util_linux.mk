@@ -38,7 +38,7 @@ UTIL_LINUX_OPTS:= \
 $(XCCACHE) \
 $(HCCACHE)
 
-util_linux: $(BLD)/$(UTIL_LINUX_VER).kp
+util_linux: $(BLD)/$(UTIL_LINUX_VER)-$(T).kp
 
 $(BLD)/$(UTIL_LINUX_VER): src/$(UTIL_LINUX_VER)
 	mkdir -p $@

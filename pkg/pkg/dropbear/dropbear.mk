@@ -27,7 +27,7 @@ DROPBEAR_PROGS:=dropbear dbclient ssh dropbearkey dropbearconvert scp
 
 DROPBEAR_MAKE_OPTS:=MULTI=1 PROGRAMS="$(DROPBEAR_PROGS)"
 
-dropbear: $(BLD)/$(DROPBEAR_VER).kp
+dropbear: $(BLD)/$(DROPBEAR_VER)-$(T).kp
 
 $(BLD)/$(DROPBEAR_VER): src/$(DROPBEAR_VER)
 	mkdir -p $@/_kp_tmp/FILES/usr/bin $@/_kp_tmp/FILES/etc/dropbear

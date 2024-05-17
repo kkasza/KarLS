@@ -2,7 +2,7 @@ INITRD_VER:=initrd-1.0
 
 PKG_LIST+=initrd
 
-initrd: $(BLD)/$(INITRD_VER).kp
+initrd: $(BLD)/$(INITRD_VER)-$(T).kp
 
 $(BLD)/$(INITRD_VER): | busybox-static
 	mkdir -p $@/initrd-skel $@/_kp_tmp/FILES/usr/share/initrd $@/_kp_tmp/FILES/usr/sbin

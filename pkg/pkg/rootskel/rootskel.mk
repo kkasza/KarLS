@@ -2,7 +2,7 @@ ROOTSKEL_VER:=rootskel-1.0
 
 PKG_LIST+=rootskel
 
-rootskel: $(BLD)/$(ROOTSKEL_VER).kp
+rootskel: $(BLD)/$(ROOTSKEL_VER)-$(T).kp
 
 $(BLD)/$(ROOTSKEL_VER):
 	mkdir -p $@/_kp_tmp/FILES

@@ -29,9 +29,9 @@ GRUB_OPTS:= \
 $(XCCACHE) \
 $(HCCACHE)
 
-grub: $(BLD)/$(GRUB_VER).kp
+grub: $(BLD)/$(GRUB_VER)-$(T).kp
 
-grub-efi: $(BLD)/$(GRUB_EFIVER).kp
+grub-efi: $(BLD)/$(GRUB_EFIVER)-$(T).kp
 
 $(BLD)/$(GRUB_VER): src/$(GRUB_VER)
 	mkdir -p $@

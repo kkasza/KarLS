@@ -2,7 +2,7 @@ KARLS_BASE_VER:=karls_base-1.0
 
 PKG_LIST+=karls_base
 
-karls_base: $(BLD)/$(KARLS_BASE_VER).kp
+karls_base: $(BLD)/$(KARLS_BASE_VER)-$(T).kp
 
 $(BLD)/$(KARLS_BASE_VER):
 	mkdir -p $@/_kp_tmp/FILES
@@ -11,9 +11,9 @@ $(BLD)/$(KARLS_BASE_VER):
 	echo "kpm-1.0" >> $@/_kp_tmp/PREREQ
 #Initrd pulls busybox, which pulls musl
 	echo "initrd-1.0" >> $@/_kp_tmp/PREREQ
-	echo "util_linux-2.40" >> $@/_kp_tmp/PREREQ
-	echo "e2fsprogs-1.47.0" >> $@/_kp_tmp/PREREQ
-	echo "tzdata-2024a" >> $@/_kp_tmp/PREREQ
-	echo "ca_certs-1.0" >> $@/_kp_tmp/PREREQ
-	echo "dropbear-2024.85.kp" >> $@/_kp_tmp/PREREQ
+	echo "util_linux" >> $@/_kp_tmp/PREREQ
+	echo "e2fsprogs" >> $@/_kp_tmp/PREREQ
+	echo "dropbear" >> $@/_kp_tmp/PREREQ
+	echo "tzdata" >> $@/_kp_tmp/PREREQ
+	echo "ca_certs" >> $@/_kp_tmp/PREREQ
 	touch $@/_kp_tmp/ESSENTIAL

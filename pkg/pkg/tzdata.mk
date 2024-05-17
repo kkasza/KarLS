@@ -14,7 +14,7 @@ $(TZCODE_VER)-SHA256:=80072894adff5a458f1d143e16e4ca1d8b2a122c9c5399da482cb68cba
 SRC_LIST+=TZDATA TZCODE
 PKG_LIST+=tzdata
 
-tzdata: $(BLD)/tzdata-$(TZ-VER).kp
+tzdata: $(BLD)/tzdata-$(TZ-VER)-$(T).kp
 
 src/tzdata-$(TZ-VER): | dl/$($(TZDATA_VER)-FILE) dl/$($(TZCODE_VER)-FILE)
 	mkdir -p $@

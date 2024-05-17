@@ -13,7 +13,7 @@ BN:=$$(( $(shell cat $(BNF))+1 ))
 
 KBUILD:=$($(KERNEL_VER)-REALDIR)-$(T)-$(KFLAV)
 
-kernel: $(BLD)/$(KERNEL_VER).kp
+kernel: $(BLD)/$(KERNEL_VER)-$(T).kp
 
 src/$(KERNEL_VER):
 	ln -s $(CMPL)/src/$($(KERNEL_VER)-REALDIR) $@

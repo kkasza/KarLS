@@ -7,7 +7,7 @@
 
  KarLS Package Format 1.0
 
- .kp files are .txz compressed files renamed.
+ .kp files are .txz compressed files renamed - <package name>-<version>-<architecture>.kp
 
  META structure in packages:
  * FILES directory contains payload, i.e. /usr/bin/whatever

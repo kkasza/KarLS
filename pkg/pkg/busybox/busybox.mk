@@ -6,7 +6,7 @@ $(BUSYBOX_VER)-SHA256:=b8cc24c9574d809e7279c3be349795c5d5ceb6fdf19ca709f80cde50e
 SRC_LIST+=BUSYBOX
 PKG_LIST+=busybox busybox-static
 
-busybox: $(BLD)/$(BUSYBOX_VER).kp
+busybox: $(BLD)/$(BUSYBOX_VER)-$(T).kp
 
 busybox-static: $(BLD)/$(BUSYBOX_VER)-static
 

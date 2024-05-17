@@ -35,6 +35,8 @@ CMD=`echo $1 | tr '[:upper:]' '[:lower:]'`
 
 [[ "$CMD" == "" ]] && usage "Not enough parameters"
 
+HW=`uname -m`
+
 # INSTALL / UPGRADE ------------------------------------------------------
 if [ "$CMD" == "install" ] || [ "$CMD" == "upgrade" ]; then
  UPG="NO"
@@ -50,13 +52,17 @@ if [ "$CMD" == "install" ] || [ "$CMD" == "upgrade" ]; then
    #Try finding the package name without version first
    FN=`grep -m 1 -e ^$KPF- $REPO/repo.db`
    if [ ! -f "$REPO/$FN" ]; then
-    #Then with version, without .kp suffix
-    FN=`grep -m 1 -x $KPF.kp $REPO/repo.db`
+    #Then with version, without arch. & .kp suffix
+    FN=`grep -m 1 -x $KPF-$HW.kp $REPO/repo.db`
     if [ ! -f "$REPO/$FN" ]; then
-     #Then with suffix
-     FN=`grep -m 1 -x $KPF $REPO/repo.db`
+     #Then with full arch w/o suffix
+     FN=`grep -m 1 -x $KPF.kp $REPO/repo.db`
      if [ ! -f "$REPO/$FN" ]; then
-      error "Package file $KPF not found"
+      #Then full filename???
+      FN=`grep -m 1 -x $KPF $REPO/repo.db`
+      if [ ! -f "$REPO/$FN" ]; then
+       error "Package file $KPF not found"
+      fi
      fi
     fi
    fi

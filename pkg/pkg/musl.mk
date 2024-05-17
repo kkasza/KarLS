@@ -2,7 +2,7 @@ MUSL_VER:=musl-1.2.5
 
 PKG_LIST+=musl
 
-musl: $(BLD)/$(MUSL_VER).kp
+musl: $(BLD)/$(MUSL_VER)-$(T).kp
 
 $(BLD)/$(MUSL_VER):
 	mkdir -p $@/_kp_tmp/FILES/lib

@@ -15,7 +15,7 @@ E2FSPROGS_OPTS:= \
 $(XCCACHE) \
 $(HCCACHE)
 
-e2fsprogs: $(BLD)/$(E2FSPROGS_VER).kp
+e2fsprogs: $(BLD)/$(E2FSPROGS_VER)-$(T).kp
 
 $(BLD)/$(E2FSPROGS_VER): src/$(E2FSPROGS_VER)
 	mkdir -p $@
