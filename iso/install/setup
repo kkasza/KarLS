@@ -74,29 +74,25 @@ mount -t vfat "$TRGT"1 /mnt/target/boot/efi > /dev/null || { echo "mount error, 
 fi
 
 echo "Installing Kernel files..."
-KVER=`cat /mnt/iso/boot/kernel_version`
 mkdir -p /mnt/target/boot/grub /mnt/target/etc/kpm
 cp /etc/kpm/repo /mnt/target/etc/kpm
 kpm install kernel /mnt/target || { echo "kpm error, installation cancelled!"; break; }
+KVER=`cat /mnt/target/etc/kpm/pkg/kernel/VER`"-karls-generic"
 
-echo "Installing GRUB boot loader..."
-
-cp /mnt/iso/install/grub.cfg /mnt/target/boot/grub
+echo -n "Installing GRUB boot loader"
 
 MODE=0
 NOFBCON=`grep "nofb nomodeset" /proc/cmdline`
 SERIALCON=`grep console=ttyS0 /proc/cmdline`
 if [ -n "$NOFBCON" ]; then
- echo "Installing with No Framebuffer, setting as default choice for boot menu"
+ echo -n " with No Framebuffer"
  MODE=1
 fi
 if [ -n "$SERIALCON" ]; then
- echo "Installing over Serial Console, setting as default choice for boot menu"
+ echo -n " over Serial Console"
  MODE=2
 fi
-echo "set default=$MODE" >> /mnt/target/boot/grub/grub.cfg
-
-echo "" >> /mnt/target/boot/grub/grub.cfg
+echo "..."
 
 if [ "$UEFI" == "0" ]; then
  BLK=`blkid "$TRGT"1 | cut -d' ' -f2 | cut -d= -f2`
@@ -104,41 +100,38 @@ else
  BLK=`blkid "$TRGT"2 | cut -d' ' -f2 | cut -d= -f2`
 fi
 
-echo "menuentry \"KarLS\" {" >> /mnt/target/boot/grub/grub.cfg
-echo "	search -u $BLK --set=root" >> /mnt/target/boot/grub/grub.cfg
-echo "	linux /boot/vmlinuz-$KVER root=$BLK" >> /mnt/target/boot/grub/grub.cfg
-echo "	initrd /boot/initrd-$KVER.gz" >> /mnt/target/boot/grub/grub.cfg
-echo "}" >> /mnt/target/boot/grub/grub.cfg
-echo "" >> /mnt/target/boot/grub/grub.cfg
-echo "menuentry \"KarLS No Framebuffer\" {" >> /mnt/target/boot/grub/grub.cfg
-echo "	search -u $BLK --set=root" >> /mnt/target/boot/grub/grub.cfg
-echo "	set gfxpayload=text" >> /mnt/target/boot/grub/grub.cfg
-echo "	linux /boot/vmlinuz-$KVER nofb nomodeset root=$BLK" >> /mnt/target/boot/grub/grub.cfg
-echo "	initrd /boot/initrd-$KVER.gz" >> /mnt/target/boot/grub/grub.cfg
-echo "}" >> /mnt/target/boot/grub/grub.cfg
-echo "" >> /mnt/target/boot/grub/grub.cfg
-echo "menuentry \"KarLS Serial Console\" {" >> /mnt/target/boot/grub/grub.cfg
-echo "	search -u $BLK --set=root" >> /mnt/target/boot/grub/grub.cfg
-echo "	linux /boot/vmlinuz-$KVER console=ttyS0,9600 root=$BLK" >> /mnt/target/boot/grub/grub.cfg
-echo "	initrd /boot/initrd-$KVER.gz" >> /mnt/target/boot/grub/grub.cfg
-echo "}" >> /mnt/target/boot/grub/grub.cfg
-
 if [ "$UEFI" == "0" ]; then
-kpm install grub || { echo "kpm error, installation cancelled!"; break; }
-grub-install --boot-directory=/mnt/target/boot "$TRGT" || { echo "grub-install error, installation cancelled!"; break; }
+kpm install grub /mnt/target || { echo "kpm error, installation cancelled!"; break; }
+/mnt/target/usr/sbin/grub-install --boot-directory=/mnt/target/boot --directory=/mnt/target/usr/lib/grub/i386-pc "$TRGT" || { echo "grub-install error, installation cancelled!"; break; }
 
 else
-kpm install grub_efi || { echo "kpm error, installation cancelled!"; break; }
+kpm install grub_efi /mnt/target || { echo "kpm error, installation cancelled!"; break; }
+
+cp /mnt/target/usr/share/grub/grub-early.cfg.templ /mnt/target/boot/grub/grub-early.cfg
+sed -i 's/_BLK_ID_/'$BLK'/' /mnt/target/boot/grub/grub-early.cfg
 mkdir -p /mnt/target/boot/efi/EFI/BOOT
 
-echo "search -u $BLK --set=root" > /mnt/target/boot/grub/grub-early.cfg
-echo "configfile /boot/grub/grub.cfg" >> /mnt/target/boot/grub/grub-early.cfg
-
-grub-mkimage -o /mnt/target/boot/efi/EFI/BOOT/BOOTX64.EFI -O x86_64-efi -c /mnt/target/boot/grub/grub-early.cfg -p /boot/grub \
+/mnt/target/usr/bin/grub-mkimage -o /mnt/target/boot/efi/EFI/BOOT/BOOTX64.EFI -O x86_64-efi -c /mnt/target/boot/grub/grub-early.cfg -p /boot/grub --directory=/mnt/target/usr/lib/grub/x86_64-efi \
 boot.mod cat.mod configfile.mod cpuid.mod disk.mod elf.mod exfat.mod ext2.mod fat.mod file.mod hdparm.mod help.mod iso9660.mod linux.mod loadenv.mod \
 lsefi.mod ls.mod msdospart.mod normal.mod ntfs.mod part_gpt.mod part_msdos.mod reboot.mod scsi.mod search_fs_file.mod search.mod \
-serial.mod terminal.mod terminfo.mod usb_keyboard.mod usbserial_common.mod usbserial_pl2303.mod
+serial.mod terminal.mod terminfo.mod usb_keyboard.mod usbserial_common.mod usbserial_pl2303.mod || { echo "grub-mkimage error, installation cancelled!"; break; }
+fi
 
+cp /mnt/target/usr/share/grub/grub.cfg.templ /mnt/target/boot/grub/grub.cfg
+sed -i 's/_BLK_ID_/'$BLK'/' /mnt/target/boot/grub/grub.cfg
+sed -i 's/_KERNEL_VER_/'$KVER'/' /mnt/target/boot/grub/grub.cfg
+
+if [ "$MODE" == "0" ]; then
+sed -i 's/_KARLS_BOOT_TITLE_//' /mnt/target/boot/grub/grub.cfg
+sed -i 's/_PARAMETERS_//' /mnt/target/boot/grub/grub.cfg
+fi
+if [ "$MODE" == "1" ]; then
+sed -i 's/_KARLS_BOOT_TITLE_/ No Framebuffer/' /mnt/target/boot/grub/grub.cfg
+sed -i 's/_PARAMETERS_/ nofb nomodeset/' /mnt/target/boot/grub/grub.cfg
+fi
+if [ "$MODE" == "2" ]; then
+sed -i 's/_KARLS_BOOT_TITLE_/ Serial Console/' /mnt/target/boot/grub/grub.cfg
+sed -i 's/_PARAMETERS_/ console=ttyS0,9600/' /mnt/target/boot/grub/grub.cfg
 fi
 
 echo "Installing base OS packages..."
@@ -151,10 +144,7 @@ else
  mv /mnt/target/etc/inittab-serial /mnt/target/etc/inittab
 fi
 
-if [ "$UEFI" == "0" ]; then
-kpm install grub /mnt/target || { echo "kpm error, installation cancelled!"; break; }
-else
-kpm install grub_efi /mnt/target || { echo "kpm error, installation cancelled!"; break; }
+if [ "$UEFI" == "1" ]; then
 echo "$TRGT""1		/boot/efi	vfat	ro,defaults,nosuid,nodev,noexec 0 0" >> /mnt/target/etc/fstab
 fi
 

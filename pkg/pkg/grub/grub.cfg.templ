@@ -1,0 +1,11 @@
+serial --unit=0 --speed=9600
+terminal_input serial console
+terminal_output serial console
+
+set timeout=1
+
+menuentry "KarLS_KARLS_BOOT_TITLE_" {"
+	search -u _BLK_ID_ --set=root"
+	linux /boot/vmlinuz-_KERNEL_VER_ root=_BLK_ID__PARAMETERS_
+	initrd /boot/initrd-_KERNEL_VER_.gz
+}

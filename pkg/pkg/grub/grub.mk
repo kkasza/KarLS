@@ -40,6 +40,8 @@ $(BLD)/$(GRUB_VER): src/$(GRUB_VER)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_kp_tmp/FILES install
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* || true
 	rm -rf $@/_kp_tmp/FILES/usr/lib/grub/i386-pc/*.module $@/_kp_tmp/FILES/usr/lib/grub/i386-pc/*.image $@/_kp_tmp/FILES/usr/share $@/_kp_tmp/FILES/etc
+	mkdir -p $@/_kp_tmp/FILES/usr/share/grub
+	cp pkg/grub/grub.cfg.templ $@/_kp_tmp/FILES/usr/share/grub
 	echo "$(GRUB_VER) : GRUB Boot Manager, BIOS version" > $@/_kp_tmp/DESC
 	echo "busybox" > $@/_kp_tmp/PREREQ
 	touch $@/_kp_tmp/ESSENTIAL
@@ -51,6 +53,8 @@ $(BLD)/$(GRUB_EFIVER): src/$(GRUB_VER)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_kp_tmp/FILES install
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* || true
 	rm -rf $@/_kp_tmp/FILES/usr/lib/grub/x86_64-efi/*.module $@/_kp_tmp/FILES/usr/share $@/_kp_tmp/FILES/etc
+	mkdir -p $@/_kp_tmp/FILES/usr/share/grub
+	cp pkg/grub/grub*.cfg.templ $@/_kp_tmp/FILES/usr/share/grub
 	echo "$(GRUB_VER)-efi : GRUB Boot Manager, EFI version" > $@/_kp_tmp/DESC
 	echo "busybox" > $@/_kp_tmp/PREREQ
 	touch $@/_kp_tmp/ESSENTIAL
