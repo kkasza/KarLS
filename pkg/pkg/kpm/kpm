@@ -86,7 +86,7 @@ if [ "$CMD" == "install" ] || [ "$CMD" == "upgrade" ]; then
  [[ ! -f "$PTMP/KARLS_PACKAGE" ]] && error "$KPF is not a KarLS Package, installation cancelled!"
  if [ -f "$PTMP/PREREQ" ]; then
   for pkg in `cat $PTMP/PREREQ`; do
-   echo "Installing $pkg as Prerequisite for $KPN"
+   echo -n "Installing $pkg as Prerequisite for $KPN: "
    # Yup, this is true recursion
    kpm install $pkg $DST || { rm -rf $PTMP; error "Error installing $pkg, installation of $KPN cancelled"; }
   done
