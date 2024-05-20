@@ -3,9 +3,15 @@ terminal_input serial console
 terminal_output serial console
 
 set timeout=1
+set default=0
 
 menuentry "KarLS_KARLS_BOOT_TITLE_" {"
 	search -u _BLK_ID_ --set=root"
 	linux /boot/vmlinuz-_KERNEL_VER_ root=_BLK_ID__PARAMETERS_
+	initrd /boot/initrd-_KERNEL_VER_.gz
+}
+menuentry "KarLS_KARLS_BOOT_TITLE_ Initrd Rescue" {"
+	search -u _BLK_ID_ --set=root"
+	linux /boot/vmlinuz-_KERNEL_VER__PARAMETERS_
 	initrd /boot/initrd-_KERNEL_VER_.gz
 }
