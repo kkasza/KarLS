@@ -77,7 +77,7 @@ echo "Installing Kernel files..."
 mkdir -p /mnt/target/boot/grub /mnt/target/etc/kpm
 cp /etc/kpm/repo /mnt/target/etc/kpm
 kpm install kernel /mnt/target || { echo "kpm error, installation cancelled!"; break; }
-KVER=`cat /mnt/target/etc/kpm/pkg/kernel/VER`"-karls-generic"
+KVER=`cat /mnt/target/etc/kpm/pkg/kernel/VER`
 
 echo -n "Installing GRUB boot loader"
 

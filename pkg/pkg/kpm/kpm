@@ -75,7 +75,7 @@ if [ "$CMD" == "install" ] || [ "$CMD" == "upgrade" ]; then
 
  KPN_FULL=`basename -s .kp $KPF`
  KPN=`echo $KPN_FULL | cut -d- -f1`
- KPN_VER=`echo $KPN_FULL | cut -d- -f2`
+ KPN_VER=`echo $KPN_FULL | cut -d- -f2- | rev | cut -d- -f2- | rev`
 
  if [ "$UPG" == "NO" ]; then
   [[ -d "$DST/etc/kpm/pkg/$KPN" ]] && { VER=`tail -1 $DST/etc/kpm/pkg/$KPN/VER`; noerror "Package $KPN ($VER) is already installed to $DST"; }
