@@ -3,10 +3,10 @@ $(BINU_VER)-URL:=https://ftpmirror.gnu.org/gnu/binutils
 $(BINU_VER)-FILE:=$(BINU_VER).tar.xz
 $(BINU_VER)-SHA256:=f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800
 
-GCC_VER:=gcc-13.2.0
+GCC_VER:=gcc-14.1.0
 $(GCC_VER)-URL:=https://ftpmirror.gnu.org/gnu/gcc/$(GCC_VER)
 $(GCC_VER)-FILE:=$(GCC_VER).tar.xz
-$(GCC_VER)-SHA256:=e275e76442a6067341a27f04c5c6b83d8613144004c0413528863dc6b5c743da
+$(GCC_VER)-SHA256:=e283c654987afe3de9d8080bc0bd79534b5ca0d681a73a11ff2b5d3767426840
 
 GMP_VER:=gmp-6.3.0
 $(GMP_VER)-URL:=https://ftpmirror.gnu.org/gnu/gmp
@@ -31,10 +31,10 @@ $(LINUX_VER)-FILE:=$(LINUX_VER).tar.gz
 $(LINUX_VER)-REALDIR:=linux-8e1110a580887f4b82303b9354c25d7e2ff5860e
 $(LINUX_VER)-SHA256:=e3244061e44426eafe97541633b87a71b8be1828d1bc48a18ec4c83fddb2f4c5
 else
-LINUX_VER:=linux-6.6.30
+LINUX_VER:=linux-6.6.39
 $(LINUX_VER)-URL:=https://cdn.kernel.org/pub/linux/kernel/v6.x
 $(LINUX_VER)-FILE:=$(LINUX_VER).tar.xz
-$(LINUX_VER)-SHA256:=b66a5b863b0f8669448b74ca83bd641a856f164b29956e539bbcb5fdeeab9cc6
+$(LINUX_VER)-SHA256:=2783d42112095f95c510e1b421f056df8cbfa845f9040c6115080434a77a776b
 endif
 
 MUSL_VER:=musl-1.2.5

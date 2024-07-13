@@ -1,7 +1,7 @@
-E2FSPROGS_VER:=e2fsprogs-1.47.0
-$(E2FSPROGS_VER)-URL:=https://mirrors.edge.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v1.47.0
+E2FSPROGS_VER:=e2fsprogs-1.47.1
+$(E2FSPROGS_VER)-URL:=https://mirrors.edge.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v1.47.1
 $(E2FSPROGS_VER)-FILE:=$(E2FSPROGS_VER).tar.xz
-$(E2FSPROGS_VER)-SHA256:=144af53f2bbd921cef6f8bea88bb9faddca865da3fbc657cc9b4d2001097d5db
+$(E2FSPROGS_VER)-SHA256:=5a33dc047fd47284bca4bb10c13cfe7896377ae3d01cb81a05d406025d99e0d1
 
 SRC_LIST+=E2FSPROGS
 PKG_LIST+=e2fsprogs

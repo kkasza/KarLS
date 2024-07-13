@@ -1,4 +1,4 @@
-KERNEL_SVER:=6.6.30
+KERNEL_SVER:=6.6.39
 KVER:=$(NAME)-$(KFLAV)
 KERNEL_VER:=kernel-$(KERNEL_SVER)-$(KVER)
 $(KERNEL_VER)-REALDIR:=linux-$(KERNEL_SVER)
@@ -16,6 +16,7 @@ KBUILD:=$($(KERNEL_VER)-REALDIR)-$(T)-$(KFLAV)
 kernel: $(BLD)/$(KERNEL_VER)-$(T).kp
 
 src/$(KERNEL_VER):
+	mkdir -p src
 	ln -s $(CMPL)/src/$($(KERNEL_VER)-REALDIR) $@
 
 kernel-config: $(BLD)/$(KERNEL_VER)-kconfig
