@@ -1,12 +1,12 @@
-BINU_VER:=binutils-2.42
+BINU_VER:=binutils-2.43
 $(BINU_VER)-URL:=https://ftpmirror.gnu.org/gnu/binutils
 $(BINU_VER)-FILE:=$(BINU_VER).tar.xz
-$(BINU_VER)-SHA256:=f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800
+$(BINU_VER)-SHA256:=b53606f443ac8f01d1d5fc9c39497f2af322d99e14cea5c0b4b124d630379365
 
-GCC_VER:=gcc-14.1.0
+GCC_VER:=gcc-14.2.0
 $(GCC_VER)-URL:=https://ftpmirror.gnu.org/gnu/gcc/$(GCC_VER)
 $(GCC_VER)-FILE:=$(GCC_VER).tar.xz
-$(GCC_VER)-SHA256:=e283c654987afe3de9d8080bc0bd79534b5ca0d681a73a11ff2b5d3767426840
+$(GCC_VER)-SHA256:=a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9
 
 GMP_VER:=gmp-6.3.0
 $(GMP_VER)-URL:=https://ftpmirror.gnu.org/gnu/gmp
