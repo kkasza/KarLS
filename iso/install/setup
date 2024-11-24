@@ -49,12 +49,16 @@ echo "Partitioning disk for MBR..."
 echo -e "o\nn\np\n1\n2048\n\na\n1\nw\n" | fdisk $TRGT > /dev/null || { echo "fdisk error, installation cancelled!"; break; }
 
 echo "Formatting Linux partition..."
+TRGTP1="$TRGT"1
+[[ ! -b "$TRGTP1" ]] && { TRGTP1="$TRGT"p1; }
+[[ ! -b "$TRGTP1" ]] && { echo "First partition not found on $TRGT?"; break; }
+
 kpm install e2fsprogs || { echo "kpm error, installation cancelled!"; break; }
-mkfs.ext4 "$TRGT"1 > /dev/null || { echo "mkfs.ext4 error, installation cancelled!"; break; }
+mkfs.ext4 $TRGTP1 > /dev/null || { echo "mkfs.ext4 error, installation cancelled!"; break; }
 
 echo "Mounting target..."
 mkdir -p /mnt/target
-mount "$TRGT"1 /mnt/target > /dev/null || { echo "mount error, installation cancelled!"; break; }
+mount $TRGTP1 /mnt/target > /dev/null || { echo "mount error, installation cancelled!"; break; }
 
 else
 kpm install util_linux || { echo "kpm error, installation cancelled!"; break; }
@@ -62,15 +66,22 @@ echo "Partitioning disk for GPT..."
 echo -e "g\nn\n1\n2048\n+64M\nt\n1\nn\n2\n\n\nw\n" | /usr/sbin/fdisk -W always $TRGT > /dev/null || { echo "fdisk error, installation cancelled!"; break; }
 
 echo "Formatting partitions..."
+TRGTP1="$TRGT"1
+[[ ! -b "$TRGTP1" ]] && { TRGTP1="$TRGT"p1; }
+[[ ! -b "$TRGTP1" ]] && { echo "First partition not found on $TRGT?"; break; }
+TRGTP2="$TRGT"2
+[[ ! -b "$TRGTP2" ]] && { TRGTP2="$TRGT"p2; }
+[[ ! -b "$TRGTP2" ]] && { echo "Second partition not found on $TRGT?"; break; }
+
 kpm install e2fsprogs || { echo "kpm error, installation cancelled!"; break; }
-mkfs.vfat "$TRGT"1 > /dev/null || { echo "mkfs.vfat error, installation cancelled!"; break; }
-mkfs.ext4 "$TRGT"2 > /dev/null || { echo "mkfs.ext4 error, installation cancelled!"; break; }
+mkfs.vfat $TRGTP1 > /dev/null || { echo "mkfs.vfat error, installation cancelled!"; break; }
+mkfs.ext4 $TRGTP2 > /dev/null || { echo "mkfs.ext4 error, installation cancelled!"; break; }
 
 echo "Mounting target..."
 mkdir -p /mnt/target
-mount "$TRGT"2 /mnt/target > /dev/null || { echo "mount error, installation cancelled!"; break; }
+mount $TRGTP2 /mnt/target > /dev/null || { echo "mount error, installation cancelled!"; break; }
 mkdir -p /mnt/target/boot/efi
-mount -t vfat "$TRGT"1 /mnt/target/boot/efi > /dev/null || { echo "mount error, installation cancelled!"; break; }
+mount -t vfat $TRGTP1 /mnt/target/boot/efi > /dev/null || { echo "mount error, installation cancelled!"; break; }
 fi
 
 echo "Installing Kernel files..."
@@ -95,9 +106,9 @@ fi
 echo "..."
 
 if [ "$UEFI" == "0" ]; then
- BLK=`blkid "$TRGT"1 | cut -d' ' -f2 | cut -d= -f2`
+ BLK=`blkid $TRGTP1 | cut -d' ' -f2 | cut -d= -f2`
 else
- BLK=`blkid "$TRGT"2 | cut -d' ' -f2 | cut -d= -f2`
+ BLK=`blkid $TRGTP2 | cut -d' ' -f2 | cut -d= -f2`
 fi
 
 if [ "$UEFI" == "0" ]; then
@@ -145,7 +156,7 @@ else
 fi
 
 if [ "$UEFI" == "1" ]; then
-echo "$TRGT""1		/boot/efi	vfat	ro,defaults,nosuid,nodev,noexec 0 0" >> /mnt/target/etc/fstab
+echo "$TRGTP1		/boot/efi	vfat	ro,defaults,nosuid,nodev,noexec 0 0" >> /mnt/target/etc/fstab
 fi
 
 DEVS=`ifconfig -a | grep "Link encap" | cut -f1 -d' ' | grep -v lo`

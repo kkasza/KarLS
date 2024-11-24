@@ -1,3 +1,8 @@
 #!/bin/sh
 
 find /sys/ -name modalias | xargs sort -u | xargs -n 1 modprobe
+
+MMC=`lsmod | grep mmc_core`
+if [ "$MMC" != "" ]; then
+ modprobe mmc_block
+fi
