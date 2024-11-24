@@ -20,7 +20,6 @@ STRIP:=$(CMPL_INST)/bin/$(TARGET-ARCH)-strip -d --strip-unneeded
 XPATH:=PATH=$(PATH):$(CMPL_INST)/bin
 XPCF:=PKG_CONFIG_PATH=$(PWD)/$(BLD)/xpc
 
-include pkg/*.mk
 include pkg/*/*.mk
 
 $(BLD)/%-$(T).kp: $(BLD)/$$*
