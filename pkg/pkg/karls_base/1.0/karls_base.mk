@@ -1,4 +1,5 @@
-KARLS_BASE_VER:=karls_base-1.0
+KARLS_BASE_VER_CUR:=1.0
+KARLS_BASE_VER:=karls_base-$(KARLS_BASE_VER_CUR)
 
 PKG_LIST+=karls_base
 

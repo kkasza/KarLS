@@ -1,6 +1,7 @@
 KERNEL_SVER:=6.6.63
 KVER:=$(NAME)-$(KFLAV)
-KERNEL_VER:=kernel-$(KERNEL_SVER)-$(KVER)
+KERNEL_VER_CUR:=$(KERNEL_SVER)-$(KVER)
+KERNEL_VER:=kernel-$(KERNEL_VER_CUR)
 $(KERNEL_VER)-REALDIR:=linux-$(KERNEL_SVER)
 
 PKG_LIST+=kernel
@@ -8,7 +9,7 @@ PKG_LIST+=kernel
 KERNEL_PLH:=__karls__
 
 #Build Number for kernel (after #)
-BNF:=pkg/kernel/buildno-$(T)-$(KFLAV)
+BNF:=pkg/kernel/$(KERNEL_VER_CUR)/buildno-$(T)-$(KFLAV)
 BN:=$$(( $(shell cat $(BNF))+1 ))
 
 KBUILD:=$($(KERNEL_VER)-REALDIR)-$(T)-$(KFLAV)
@@ -23,16 +24,16 @@ kernel-config: $(BLD)/$(KERNEL_VER)-kconfig
 
 $(BLD)/$(KERNEL_VER)-kconfig: src/$(KERNEL_VER)
 	$(MAKE) -C $< V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) allnoconfig
-	cp pkg/kernel/$(KBUILD).config $@/.config
+	cp pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config $@/.config
 	$(MAKE) -C $@ V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) menuconfig
-	cp $@/.config pkg/kernel/$(KBUILD).config.new
-	diff -q pkg/kernel/$(KBUILD).config pkg/kernel/$(KBUILD).config.new && rm -f pkg/kernel/$(KBUILD).config.new || diff -u pkg/kernel/$(KBUILD).config pkg/kernel/$(KBUILD).config.new > pkg/kernel/$(KBUILD).config.diff || true
+	cp $@/.config pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new
+	diff -q pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new && rm -f pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new || diff -u pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new > pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.diff || true
 	touch $<
 
 $(BLD)/$(KERNEL_VER): src/$(KERNEL_VER)
 #prepare
 	$(MAKE) -C $< V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) allnoconfig
-	cp pkg/kernel/$(KBUILD).config $@/.config
+	cp pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config $@/.config
 	sed -i 's/^CONFIG_LOCALVERSION=\"$(KERNEL_PLH)\"/CONFIG_LOCALVERSION=\"-$(KVER)\"/' $@/.config
 	$(MAKE) -C $< V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) prepare
 	cp $(BNF) $@/.version

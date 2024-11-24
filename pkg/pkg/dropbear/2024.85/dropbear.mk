@@ -1,4 +1,5 @@
-DROPBEAR_VER:=dropbear-2024.85
+DROPBEAR_VER_CUR:=2024.85
+DROPBEAR_VER:=dropbear-$(DROPBEAR_VER_CUR)
 $(DROPBEAR_VER)-URL:=https://matt.ucc.asn.au/dropbear/releases
 $(DROPBEAR_VER)-FILE:=$(DROPBEAR_VER).tar.bz2
 $(DROPBEAR_VER)-SHA256:=86b036c433a69d89ce51ebae335d65c47738ccf90d13e5eb0fea832e556da502
@@ -38,6 +39,6 @@ $(BLD)/$(DROPBEAR_VER): src/$(DROPBEAR_VER)
 	for PRG in $(DROPBEAR_PROGS); do \
 	ln -s dropbearmulti $@/_kp_tmp/FILES/usr/bin/$$PRG; \
 	done
-	cp -r pkg/dropbear/skel/* $@/_kp_tmp/FILES
+	cp -r pkg/dropbear/$(DROPBEAR_VER_CUR)/skel/* $@/_kp_tmp/FILES
 	echo "$(DROPBEAR_VER) : Dropbear is a relatively small SSH server and client." > $@/_kp_tmp/DESC
 	echo "busybox" > $@/_kp_tmp/PREREQ

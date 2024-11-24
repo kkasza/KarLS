@@ -20,7 +20,7 @@ STRIP:=$(CMPL_INST)/bin/$(TARGET-ARCH)-strip -d --strip-unneeded
 XPATH:=PATH=$(PATH):$(CMPL_INST)/bin
 XPCF:=PKG_CONFIG_PATH=$(PWD)/$(BLD)/xpc
 
-include pkg/*/*.mk
+include pkg/*/Current/*.mk
 
 $(BLD)/%-$(T).kp: $(BLD)/$$*
 	echo "KarLS Package Format 1.0" > $</_kp_tmp/KARLS_PACKAGE

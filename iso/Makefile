@@ -106,7 +106,7 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER) initrd
 	cp $(BLD)/initrd-$(KVER).gz $@.tmp/boot
 	cp ../LICENSE ../doc/UEFI_SECURE_BOOT.NOTE $@.tmp
 	cp -r install $@.tmp
-	cp ../pkg/pkg/kpm/kpm $@.tmp/install
+	cp ../pkg/pkg/kpm/Current/kpm $@.tmp/install
 	cp ../pkg/build-$(T)/*.kp $@.tmp/packages
 	ls -1 $@.tmp/packages > $@.tmp/repo.db
 	mv $@.tmp/repo.db $@.tmp/packages
