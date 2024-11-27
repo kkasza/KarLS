@@ -20,6 +20,8 @@ src/$(KERNEL_VER):
 	mkdir -p src
 	ln -s $(CMPL)/src/$($(KERNEL_VER)-REALDIR) $@
 
+.PHONY: $(BLD)/$(KERNEL_VER)-kconfig
+
 kernel-config: $(BLD)/$(KERNEL_VER)-kconfig
 
 $(BLD)/$(KERNEL_VER)-kconfig: src/$(KERNEL_VER)
@@ -28,7 +30,6 @@ $(BLD)/$(KERNEL_VER)-kconfig: src/$(KERNEL_VER)
 	$(MAKE) -C $@ V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) menuconfig
 	cp $@/.config pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new
 	diff -q pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new && rm -f pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new || diff -u pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new > pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.diff || true
-	touch $<
 
 $(BLD)/$(KERNEL_VER): src/$(KERNEL_VER)
 #prepare
