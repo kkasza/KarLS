@@ -14,7 +14,7 @@ echo ""
 echo "Press Any Key to start Installation or \"S\" to drop to Live ISO Shell"
 read -s -n 1
 REP=`echo $REPLY | tr '[:upper:]' '[:lower:]'`
-[[ "$REP" == "s" ]] && exit 0
+[[ "$REP" == "s" ]] && { echo "Type \"setup\" to start install again."; exit 0; }
 
 echo ""
 echo "                        * * * WARNING * * *"
@@ -178,7 +178,7 @@ echo ""
 echo "Press Any Key to Reboot or \"S\" to drop to Live ISO Shell (E.g. to install further packages with kpm to /mnt/target)"
 read -s -n 1
 REP=`echo $REPLY | tr '[:upper:]' '[:lower:]'`
-[[ "$REP" == "s" ]] && exit 0
+[[ "$REP" == "s" ]] && { echo "Type \"setup\" to start install again."; exit 0; }
 
 #Force reboot
 sync
