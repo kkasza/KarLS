@@ -9,7 +9,7 @@ PKG_LIST+=wpa_supplicant
 
 wpa_supplicant: $(BLD)/$(WPASUP_VER)-$(T).kp
 
-$(BLD)/$(WPASUP_VER): | src/$(WPASUP_VER) libnl libexecinfo iw openssl
+$(BLD)/$(WPASUP_VER): | src/$(WPASUP_VER) libnl libexecinfo libatomic iw openssl
 	mkdir -p $@/_kp_tmp/FILES/usr/bin
 
 	cp -r src/$(WPASUP_VER) $(BLD)/
@@ -27,6 +27,7 @@ $(BLD)/$(WPASUP_VER): | src/$(WPASUP_VER) libnl libexecinfo iw openssl
 
 	echo "libnl" > $@/_kp_tmp/PREREQ
 	echo "libexecinfo" >> $@/_kp_tmp/PREREQ
+	echo "libatomic" >> $@/_kp_tmp/PREREQ
 	echo "iw" >> $@/_kp_tmp/PREREQ
 	echo "openssl" >> $@/_kp_tmp/PREREQ
 	echo "$(WPASUP_VER) : user space IEEE 802.1X/WPA supplicant (wireless client)" > $@/_kp_tmp/DESC
