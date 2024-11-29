@@ -19,3 +19,4 @@ $(BLD)/$(IW_VER): | src/$(IW_VER) libnl
 
 	echo "libnl" > $@/_kp_tmp/PREREQ
 	echo "$(IW_VER) : iw is a new nl80211 based CLI configuration utility for wireless devices." > $@/_kp_tmp/DESC
+	echo "busybox" > $@/_kp_tmp/PREREQ

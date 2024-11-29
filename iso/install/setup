@@ -88,6 +88,7 @@ echo "Installing Kernel files..."
 mkdir -p /mnt/target/boot/grub /mnt/target/etc/kpm
 cp /etc/kpm/repo /mnt/target/etc/kpm
 kpm install kernel /mnt/target || { echo "kpm error, installation cancelled!"; break; }
+cp -r /lib/firmware /mnt/target/lib 2> /dev/null
 KVER=`cat /mnt/target/etc/kpm/pkg/kernel/VER`
 
 echo -n "Installing GRUB boot loader"
@@ -157,6 +158,12 @@ fi
 
 if [ "$UEFI" == "1" ]; then
 echo "$TRGTP1		/boot/efi	vfat	ro,defaults,nosuid,nodev,noexec 0 0" >> /mnt/target/etc/fstab
+fi
+
+IFWIFI=`lsmod | grep -e "wifi\|wlan\|cfg80211"`
+if [ "$IFWIFI" != "" ]; then
+ echo "Wifi device found, installing supporting packages."
+ kpm install wpa_supplicant /mnt/target
 fi
 
 DEVS=`ifconfig -a | grep "Link encap" | cut -f1 -d' ' | grep -v lo`

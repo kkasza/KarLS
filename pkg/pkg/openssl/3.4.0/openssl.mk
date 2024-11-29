@@ -35,3 +35,4 @@ $(BLD)/$(OPENSSL_VER): src/$(OPENSSL_VER)
 	cp -P $@/*.so* $@/_kp_tmp/FILES/usr/lib
 	cp -P $@/apps/openssl $@/_kp_tmp/FILES/usr/bin
 	echo "$(OPENSSL_VER) : OpenSSL software library" > $@/_kp_tmp/DESC
+	echo "busybox" > $@/_kp_tmp/PREREQ

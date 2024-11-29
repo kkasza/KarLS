@@ -48,6 +48,7 @@ if [ "$ALL" == "0" ]; then
 else
  cp -r /lib/modules/$KVER $ITMP/lib/modules
 fi
+cp -r /lib/firmware $ITMP/lib 2> /dev/null
 
 #Make cpio archive for initrd
 cd $ITMP; find . | cpio -H newc -v -R 0:0 -o | gzip -9 -n > $DST/boot/initrd-$KVER.gz

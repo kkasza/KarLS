@@ -13,6 +13,35 @@ if [ "$KARLS_MEDIA" == "ISO" ]; then
  fi
  #If ISO is found, setup system for install
  if [ -e "/mnt/iso/karls_iso" ]; then
+  #Try to load any missing firmware from iso
+  LOADMODS=""
+  FIRMWARE=`dmesg | grep "firmware load" | grep error`
+  if [ "$FIRMWARE" != "" ]; then
+   MODS=`dmesg | grep "firmware load" | grep error | cut -d' ' -f1 | sort -u`
+   LOADMODS="$LOADMODS $MODS"
+   FILES=`dmesg | grep "firmware load" | grep error | cut -d' ' -f7 | sort -u`
+   mkdir -p /lib/firmware
+   cd /mnt/iso/firmware && cp $FILES /lib/firmware 2> /dev/null
+  fi
+  FIRMWARE=`dmesg | grep regulatory.db | grep failed`
+  if [ "$FIRMWARE" != "" ]; then
+   mkdir -p /lib/firmware
+   cp /mnt/iso/firmware/regulatory.db* /lib/firmware 2> /dev/null
+   LOADMODS="$LOADMODS cfg80211"
+  fi
+  if [ "$LOADMODS" != "" ]; then
+   for M in $LOADMODS; do
+    # platform is not a module, it got in with the regulatory.db loading error message
+    [[ "$M" == "platform" ]] && continue;
+    rmmod $M
+   done
+   for M in $LOADMODS; do
+    [[ "$M" == "platform" ]] && continue;
+    modprobe $M
+   done
+   #for the terminal messages to cleanup
+   sleep 1s
+  fi
   if [ -e "/mnt/iso/install/setup" ]; then
    echo "#!/bin/sh" > /bin/setup
    echo ". /mnt/iso/install/setup" >> /bin/setup

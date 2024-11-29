@@ -65,7 +65,7 @@ $(BLD)/initrd:
 	cp ../pkg/$(BLD)/busybox-static/busybox $@/bin
 	cp ../pkg/$(BLD)/busybox-static/examples/udhcp/simple.script $@/usr/udhcpc/default.script
 
-	cp -r ../pkg/build-$(T)/kernel/_kp_tmp/FILES/lib $(BLD)/initrd
+	cp -r ../pkg/build-$(T)/kernel/_kp_tmp/FILES/lib $@
 
 	$(SUDO) mknod -m 600 $@/dev/console c 5 1
 	echo $(NICENAME) $(VERSION) $(VERSION_TAG) > $@/etc/version
@@ -80,7 +80,7 @@ rebuild_initrd:
 	make initrd
 
 $(IMAGE): | efi.img $(BLD)/$(GRUB_VER) initrd
-	mkdir -p $@.tmp/boot/grub $@.tmp/packages
+	mkdir -p $@.tmp/boot/grub $@.tmp/packages $@.tmp/firmware
 	cp efi.img grub.cfg $@.tmp/boot/grub
 
 	echo "menuentry \"KarLS ISO\" {" >> $@.tmp/boot/grub/grub.cfg
@@ -108,6 +108,8 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER) initrd
 	cp -r install $@.tmp
 	cp ../pkg/pkg/kpm/Current/kpm $@.tmp/install
 	cp ../pkg/build-$(T)/*.kp $@.tmp/packages
+	cp ../pkg/build-$(T)/wifi_regdb-*/* $@.tmp/firmware
+	cp -r ../pkg/build-$(T)/linux_firmware-*/* $@.tmp/firmware
 	ls -1 $@.tmp/packages > $@.tmp/repo.db
 	mv $@.tmp/repo.db $@.tmp/packages
 
@@ -130,7 +132,7 @@ iso: $(IMAGE)
 rebuild_iso: _local_clean iso
 
 qemu: iso
-	if [ ! -f "testdisk.img" ]; then dd if=/dev/zero of=testdisk.img bs=1M count=10240; fi
+	if [ ! -f "testdisk.img" ]; then dd if=/dev/zero of=testdisk.img bs=1M count=5120; fi
 	$(SUDO) qemu-system-x86_64 -enable-kvm -cpu host -m 1024 -boot cd -cdrom $(IMAGE) -nographic -vnc :0 \
 	-device virtio-scsi-pci,id=scsi \
 	-device scsi-hd,drive=hd \
