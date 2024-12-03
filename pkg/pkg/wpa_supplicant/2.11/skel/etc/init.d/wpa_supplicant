@@ -1,0 +1,23 @@
+#!/bin/sh
+
+start()
+{
+if [ -f "/etc/wpa_supplicant.conf" ]; then
+ wpa_supplicant -B -P /var/run/wpa_supplicant.pid -i wlan0 -s -c /etc/wpa_supplicant.conf
+ wpa_cli -i wlan0 -B -a /usr/sbin/wifi_con.sh -P /var/run/wpa_cli.pid
+ echo wpa_supplicant & wpa_cli started
+else
+ echo /etc/wpa_supplicant.conf not found, wpa_supplicant not started
+fi
+}
+
+stop()
+{
+[[ -f "/var/run/wpa_supplicant.pid" ]] && kill `cat /var/run/wpa_supplicant.pid`
+[[ -f "/var/run/wpa_cli.pid" ]] && kill `cat /var/run/wpa_cli.pid`
+rm -rf /var/run/wpa_supplicant*
+rm -rf /var/run/wpa_cli.pid
+echo wpa_supplicant & wpa_cli stopped
+}
+
+. /etc/init.d/parse

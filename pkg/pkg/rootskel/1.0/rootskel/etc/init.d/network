@@ -4,6 +4,7 @@ start()
 {
 for NET in `ls -1 /etc/network/*`; do
  DEV=`basename $NET`
+ [[ "$DEV" == "wlan0" ]] && continue
  DHCP=`grep DHCP $NET | cut -d= -f2`
  if [ "$DHCP" == "NO" ]; then
   IP=`grep IP $NET | cut -d= -f2`
@@ -21,6 +22,7 @@ stop()
 {
 for NET in `ls -1 /etc/network/*`; do
  DEV=`basename $NET`
+ [[ "$DEV" == "wlan0" ]] && continue
  ifconfig $DEV 0.0.0.0 down
  [[ -f "/var/run/udhcpc-$DEV.pid" ]] && kill `cat /var/run/udhcpc-$DEV.pid`
  echo -n "$DEV "

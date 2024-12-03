@@ -1,0 +1,4 @@
+#!/bin/sh
+# script to scan for visible SSID-s
+ifconfig wlan0 up
+iw dev wlan0 scan | grep SSID: | cut -d: -f2 | cut -d' ' -f2

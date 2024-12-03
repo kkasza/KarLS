@@ -24,6 +24,7 @@ $(BLD)/$(WPASUP_VER): | src/$(WPASUP_VER) libnl libexecinfo libatomic iw openssl
 	cp $@/wpa_supplicant/wpa_supplicant $@/_kp_tmp/FILES/usr/bin
 	cp $@/wpa_supplicant/wpa_cli $@/_kp_tmp/FILES/usr/bin
 	cp $@/wpa_supplicant/wpa_passphrase $@/_kp_tmp/FILES/usr/bin
+	cp -r pkg/wpa_supplicant/$(WPASUP_VER_CUR)/skel/* $@/_kp_tmp/FILES
 
 	echo "libnl" > $@/_kp_tmp/PREREQ
 	echo "libexecinfo" >> $@/_kp_tmp/PREREQ
