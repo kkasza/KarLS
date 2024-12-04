@@ -1,7 +1,7 @@
-BINU_VER:=binutils-2.43
+BINU_VER:=binutils-2.43.1
 $(BINU_VER)-URL:=https://ftpmirror.gnu.org/gnu/binutils
 $(BINU_VER)-FILE:=$(BINU_VER).tar.xz
-$(BINU_VER)-SHA256:=b53606f443ac8f01d1d5fc9c39497f2af322d99e14cea5c0b4b124d630379365
+$(BINU_VER)-SHA256:=13f74202a3c4c51118b797a39ea4200d3f6cfbe224da6d1d95bb938480132dfd
 
 GCC_VER:=gcc-14.2.0
 $(GCC_VER)-URL:=https://ftpmirror.gnu.org/gnu/gcc/$(GCC_VER)
