@@ -2,22 +2,42 @@
 
 start()
 {
-if [ -f "/etc/wpa_supplicant.conf" ]; then
- wpa_supplicant -B -P /var/run/wpa_supplicant.pid -i wlan0 -s -c /etc/wpa_supplicant.conf
- wpa_cli -i wlan0 -B -a /usr/sbin/wifi_con.sh -P /var/run/wpa_cli.pid
- echo wpa_supplicant & wpa_cli started
+if [ "$1" == "" ]; then
+ echo "Second parameter should be a wifi device!"
+ exit 0
+fi
+NET="/etc/network/$1"
+if [ ! -f "$NET" ]; then
+ echo "Second parameter should be a wifi device that has a config file at /etc/network/$2!"
+ exit 0
+fi
+DEV=$1
+WIFI=`grep WIFI $NET | cut -d= -f2`
+if [ "$WIFI" == "YES" ]; then
+ if [ -f "/etc/wpa_supplicant/wpa_supplicant-$DEV.conf" ]; then
+  wpa_supplicant -B -P /var/run/wpa_supplicant-$DEV.pid -i $DEV -s -c /etc/wpa_supplicant/wpa_supplicant-$DEV.conf
+  wpa_cli -i $DEV -B -a /usr/sbin/wifi_con.sh -P /var/run/wpa_cli-$DEV.pid
+  echo wpa_supplicant & wpa_cli started for $DEV
+ else
+  echo /etc/wpa_supplicant/wpa_supplicant-$DEV.conf not found, wpa_supplicant not started for $DEV
+ fi
 else
- echo /etc/wpa_supplicant.conf not found, wpa_supplicant not started
+ echo $DEV is not a Wifi device according to /etc/network/$dev
 fi
 }
 
 stop()
 {
-[[ -f "/var/run/wpa_supplicant.pid" ]] && kill `cat /var/run/wpa_supplicant.pid`
-[[ -f "/var/run/wpa_cli.pid" ]] && kill `cat /var/run/wpa_cli.pid`
-rm -rf /var/run/wpa_supplicant*
-rm -rf /var/run/wpa_cli.pid
-echo wpa_supplicant & wpa_cli stopped
+ if [ "$1" == "" ]; then
+  echo "Second parameter should be a wifi device!"
+  exit 0
+ fi
+ DEV=$1
+ [[ -f "/var/run/wpa_supplicant-$DEV.pid" ]] && kill `cat /var/run/wpa_supplicant-$DEV.pid`
+ [[ -f "/var/run/wpa_cli-$DEV.pid" ]] && kill `cat /var/run/wpa_cli-DEV.pid`
+ rm -rf /var/run/wpa_supplicant-$DEV.pid
+ rm -rf /var/run/wpa_cli-$DEV.pid
+ echo wpa_supplicant & wpa_cli stopped for $DEV
 }
 
 . /etc/init.d/parse

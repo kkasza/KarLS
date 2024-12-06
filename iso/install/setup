@@ -172,6 +172,10 @@ for dev in $DEVS; do
  echo "DHCP=YES" > /mnt/target/etc/network/$dev
  echo "IP=1.1.1.1" >> /mnt/target/etc/network/$dev
  echo "NETMASK=255.255.255.255" >> /mnt/target/etc/network/$dev
+ if [ "$dev" == "wlan0" ]; then
+  echo "Network interface $dev set to WiFi, edit /etc/wpa_supplicant/wpa_supplicant-$dev.conf to enable it."
+  echo "WIFI=YES" >> /mnt/target/etc/network/$dev
+ fi
 done
 
 echo ""

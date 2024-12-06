@@ -3,16 +3,16 @@
 CMD=`echo $1 | tr '[:upper:]' '[:lower:]'`
 
 if [ "$CMD" == "start" ]; then
- start
+ start $2
  exit 0
 fi
 if [ "$CMD" == "stop" ]; then
- stop
+ stop $2
  exit 0
 fi
 if [ "$CMD" == "restart" ]; then
- stop
- start
+ stop $2
+ start $2
  exit 0
 fi
 echo "usage: $0 <start|stop|restart>"

@@ -4,14 +4,18 @@ start()
 {
 for NET in `ls -1 /etc/network/*`; do
  DEV=`basename $NET`
- [[ "$DEV" == "wlan0" ]] && continue
- DHCP=`grep DHCP $NET | cut -d= -f2`
- if [ "$DHCP" == "NO" ]; then
-  IP=`grep IP $NET | cut -d= -f2`
-  NETMASK=`grep NETMASK $NET | cut -d= -f2`
-  ifconfig $DEV up $IP netmask $NETMASK
+ WIFI=`grep WIFI $NET | cut -d= -f2`
+ if [ "$WIFI" == "YES" ]; then
+  /etc/init.d/wpa_supplicant start $DEV
  else
-  udhcpc -i $DEV -p /var/run/udhcpc-$DEV.pid -n -S
+  DHCP=`grep DHCP $NET | cut -d= -f2`
+  if [ "$DHCP" == "NO" ]; then
+   IP=`grep IP $NET | cut -d= -f2`
+   NETMASK=`grep NETMASK $NET | cut -d= -f2`
+   ifconfig $DEV up $IP netmask $NETMASK
+  else
+   udhcpc -i $DEV -p /var/run/udhcpc-$DEV.pid -n -S
+  fi
  fi
  echo -n "$DEV "
 done
@@ -22,10 +26,14 @@ stop()
 {
 for NET in `ls -1 /etc/network/*`; do
  DEV=`basename $NET`
- [[ "$DEV" == "wlan0" ]] && continue
- ifconfig $DEV 0.0.0.0 down
- [[ -f "/var/run/udhcpc-$DEV.pid" ]] && kill `cat /var/run/udhcpc-$DEV.pid`
- echo -n "$DEV "
+ WIFI=`grep WIFI $NET | cut -d= -f2`
+ if [ "$WIFI" == "YES" ]; then
+  /etc/init.d/wpa_supplicant stop $DEV
+ else
+  ifconfig $DEV 0.0.0.0 down
+  [[ -f "/var/run/udhcpc-$DEV.pid" ]] && kill `cat /var/run/udhcpc-$DEV.pid`
+  echo -n "$DEV "
+ fi
 done
 rm -f /var/run/udhcpc-*.pid
 echo "udhcpc stopped"
