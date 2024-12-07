@@ -17,12 +17,12 @@ if [ "$WIFI" == "YES" ]; then
  if [ -f "/etc/wpa_supplicant/wpa_supplicant-$DEV.conf" ]; then
   wpa_supplicant -B -P /var/run/wpa_supplicant-$DEV.pid -i $DEV -s -c /etc/wpa_supplicant/wpa_supplicant-$DEV.conf
   wpa_cli -i $DEV -B -a /usr/sbin/wifi_con.sh -P /var/run/wpa_cli-$DEV.pid
-  echo wpa_supplicant & wpa_cli started for $DEV
+  echo -n "wpa_supplicant "
  else
-  echo /etc/wpa_supplicant/wpa_supplicant-$DEV.conf not found, wpa_supplicant not started for $DEV
+  echo /etc/wpa_supplicant/wpa_supplicant-$DEV.conf not found
  fi
 else
- echo $DEV is not a Wifi device according to /etc/network/$dev
+ echo $DEV is not a wifi device??? according to /etc/network/$dev
 fi
 }
 
@@ -37,7 +37,7 @@ stop()
  [[ -f "/var/run/wpa_cli-$DEV.pid" ]] && kill `cat /var/run/wpa_cli-DEV.pid`
  rm -rf /var/run/wpa_supplicant-$DEV.pid
  rm -rf /var/run/wpa_cli-$DEV.pid
- echo wpa_supplicant & wpa_cli stopped for $DEV
+ echo -n "wpa_supplicant "
 }
 
 . /etc/init.d/parse

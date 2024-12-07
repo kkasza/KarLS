@@ -6,6 +6,7 @@ mount -a
 
 hostname -F /etc/hostname
 
+dmesg -n 1
 for RCS in `ls -1 /etc/init.d/rc-start/*`; do
  echo -n "Starting $RCS: "
  $RCS start
