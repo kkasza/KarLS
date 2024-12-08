@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cat /sys/class/power_supply/*/uevent | grep -e "SUPPLY_NAME" -e "ONLINE" -e "STATUS" -e "CAPACITY=" | cut -d= -f2
