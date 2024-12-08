@@ -18,6 +18,6 @@ $(BLD)/$(IW_VER): | src/$(IW_VER) libnl
 	cp $@/iw $@/_kp_tmp/FILES/usr/bin
 	cp -r pkg/iw/$(IW_VER_CUR)/skel/* $@/_kp_tmp/FILES
 
-	echo "libnl" > $@/_kp_tmp/PREREQ
-	echo "$(IW_VER) : iw is a new nl80211 based CLI configuration utility for wireless devices." > $@/_kp_tmp/DESC
 	echo "busybox" > $@/_kp_tmp/PREREQ
+	echo "libnl" >> $@/_kp_tmp/PREREQ
+	echo "$(IW_VER) : iw is a new nl80211 based CLI configuration utility for wireless devices." > $@/_kp_tmp/DESC
