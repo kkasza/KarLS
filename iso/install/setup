@@ -162,7 +162,7 @@ fi
 
 IFWIFI=`lsmod | grep -e "wifi\|wlan\|cfg80211"`
 if [ "$IFWIFI" != "" ]; then
- echo "Wifi device found, installing supporting packages."
+ echo "-> Wifi device found, installing supporting packages."
  kpm install wpa_supplicant /mnt/target
 fi
 
@@ -173,8 +173,28 @@ for dev in $DEVS; do
  echo "IP=1.1.1.1" >> /mnt/target/etc/network/$dev
  echo "NETMASK=255.255.255.255" >> /mnt/target/etc/network/$dev
  if [ "$dev" == "wlan0" ]; then
-  echo "Network interface $dev set to WiFi, edit /etc/wpa_supplicant/wpa_supplicant-$dev.conf to enable it."
+  echo "-> Network interface $dev set to Wifi, trying to setup"
   echo "WIFI=YES" >> /mnt/target/etc/network/$dev
+  kpm install iw
+  echo "-> Run /usr/bin/wifi-scan to scan visible Wifi SSIDs easily."
+  echo "Currently visible SSIDs:"
+  echo "--------------------------------"
+  /usr/bin/wifi-scan
+  echo "--------------------------------"
+  echo -n "Enter SSID for wlan0 to conect (empty response to skip): "
+  read
+  SSID=$REPLY
+  if [ "$SSID" != "" ]; then
+   echo -n "Enter WPA password for $SSID: "
+   read
+   PSK=$REPLY
+   cp /mnt/target/etc/wpa_supplicant/wpa_supplicant-template.conf /mnt/target/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+   sed -i "s/^ssid=\"\"/ssid=\"$SSID\"/" /mnt/target/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+   sed -i "s/^psk=\"\"/psk=\"$PSK\"/" /mnt/target/etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+   echo "-> wlan0 configuration complete, edit /etc/wpa_supplicant/wpa_supplicant-wlan0.conf to modify"
+  else
+   echo "-> wlan0 configuration skipped, edit /etc/wpa_supplicant/wpa_supplicant-wlan0.conf to setup device"
+  fi
  fi
 done
 
