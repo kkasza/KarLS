@@ -1,7 +1,6 @@
 LIBATOMIC_VER_CUR:=14.2.0
 LIBATOMIC_VER:=libatomic-$(LIBATOMIC_VER_CUR)
 
-SRC_LIST+=LIBATOMIC
 PKG_LIST+=libatomic
 
 libatomic: $(BLD)/$(LIBATOMIC_VER)-$(T).kp

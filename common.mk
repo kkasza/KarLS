@@ -144,7 +144,7 @@ dl/%.tar.gz dl/%.tar.xz dl/%.tar.bz2:
 	$(if $($*-REALFILE),\
 	$(WGET) dl $($*-URL)/$($*-REALFILE) && mv dl/$($*-REALFILE) dl/$($*-FILE),\
 	$(WGET) dl $($*-URL)/$($*-FILE))
-	echo "$($*-SHA256)  dl/$($*-FILE)" | sha256sum -c
+	echo "$($*-SHA256)  dl/$($*-FILE)" | sha256sum -c || { echo sha256sum failed for $($*-FILE); exit 1; };
 
 .SECONDEXPANSION:
 
@@ -209,4 +209,4 @@ download:
 #Download if needed and doublecheck with sha256sum everything
 sha256sum: download
 	@$(foreach var,$(SRC_LIST),\
-		echo "$($($(var)_VER)-SHA256)  dl/$($($(var)_VER)-FILE)" | sha256sum -c;)
+		echo "$($($(var)_VER)-SHA256)  dl/$($($(var)_VER)-FILE)" | sha256sum -c || { echo sha256sum failed for $($($(var)_VER)-FILE);exit 1; }; )
