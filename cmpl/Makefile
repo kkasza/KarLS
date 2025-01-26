@@ -117,9 +117,23 @@ $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc/ligcc_s.so: | $(BLD)/$(MUSL_VER)/lib/lib
 		LN=`echo $$I | cut -d'-' -f5-` ; \
 		ln -sf $$I $(CMPL_INST)/bin/$$LN; \
 	done
+	cd dl && ls -1 > $(CMPL_INST)/versions
 	touch $@
 
-cmpl: gcc
+dl/cmpl-$(TARGET-ARCH).txz: $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc/ligcc_s.so
+	tar -C $(CMPL_INST) -cJv -f $@ .
+
+cmpl: | dl/cmpl-$(TARGET-ARCH).txz
+
+reset_cmpl:
+	@if [ -e dl/cmpl-$(TARGET-ARCH).txz ]; then \
+		rm -rf $(CMPL_INST); \
+		mkdir -p $(CMPL_INST); \
+		tar -C $(CMPL_INST) -xJv -f dl/cmpl-$(TARGET-ARCH).txz; \
+		touch $(CMPL_INST); \
+	else \
+		echo "build cmpl first"; \
+	fi
 
 _local_clean:
 	@for I in $(VALID_T); do \
