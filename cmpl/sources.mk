@@ -1,7 +1,7 @@
-BINU_VER:=binutils-2.43.1
+BINU_VER:=binutils-2.44
 $(BINU_VER)-URL:=https://ftpmirror.gnu.org/gnu/binutils
 $(BINU_VER)-FILE:=$(BINU_VER).tar.xz
-$(BINU_VER)-SHA256:=13f74202a3c4c51118b797a39ea4200d3f6cfbe224da6d1d95bb938480132dfd
+$(BINU_VER)-SHA256:=ce2017e059d63e67ddb9240e9d4ec49c2893605035cd60e92ad53177f4377237
 
 GCC_VER:=gcc-14.2.0
 $(GCC_VER)-URL:=https://ftpmirror.gnu.org/gnu/gcc/$(GCC_VER)
@@ -31,10 +31,10 @@ $(LINUX_VER)-FILE:=$(LINUX_VER).tar.gz
 $(LINUX_VER)-REALDIR:=linux-8e1110a580887f4b82303b9354c25d7e2ff5860e
 $(LINUX_VER)-SHA256:=e3244061e44426eafe97541633b87a71b8be1828d1bc48a18ec4c83fddb2f4c5
 else
-LINUX_VER:=linux-6.12.11
+LINUX_VER:=linux-6.12.13
 $(LINUX_VER)-URL:=https://cdn.kernel.org/pub/linux/kernel/v6.x
 $(LINUX_VER)-FILE:=$(LINUX_VER).tar.xz
-$(LINUX_VER)-SHA256:=475172fdbd87a153f123a57952672e773bdb6daf5b58a417d1a5e419fcfeec49
+$(LINUX_VER)-SHA256:=f3ebdeea9e555b4cface44e29670056f4024541e6bd222fbcf776c818974fbba
 endif
 
 MUSL_VER:=musl-1.2.5
