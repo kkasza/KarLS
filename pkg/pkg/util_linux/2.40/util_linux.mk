@@ -27,6 +27,9 @@ UTIL_LINUX_OPTS:= \
 --disable-pylibmount \
 --disable-liblastlog2 \
 --disable-static \
+--disable-widechar \
+--without-ncursesw \
+--with-ncurses \
 --without-python \
 --without-tinfo \
 --disable-mount \
@@ -40,12 +43,13 @@ $(HCCACHE)
 
 util_linux: $(BLD)/$(UTIL_LINUX_VER)-$(T).kp
 
-$(BLD)/$(UTIL_LINUX_VER): src/$(UTIL_LINUX_VER)
+$(BLD)/$(UTIL_LINUX_VER): | src/$(UTIL_LINUX_VER) ncurses
 	mkdir -p $@
 	cd $@; $(XPATH) $(XPCF) ../../src/$(UTIL_LINUX_VER)/configure $(UTIL_LINUX_OPTS)
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_kp_tmp/FILES install
 	rm -rf $@/_kp_tmp/FILES/usr/share
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* $@/_kp_tmp/FILES/usr/lib/* || true
-	echo "$(UTIL_LINUX_VER) : util-linux is a random collection of Linux utilities" > $@/_kp_tmp/DESC
 	echo "busybox" > $@/_kp_tmp/PREREQ
+	echo "ncurses" >> $@/_kp_tmp/PREREQ
+	echo "$(UTIL_LINUX_VER) : util-linux is a random collection of Linux utilities" > $@/_kp_tmp/DESC
