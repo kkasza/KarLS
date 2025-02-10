@@ -40,4 +40,5 @@ $(BLD)/$(NCURSES_VER): src/$(NCURSES_VER)
 	cp -P $@/progs/tic $@/progs/toe $@/progs/tput $@/progs/tset $@/_kp_tmp/FILES/usr/bin
 	cp -P $^/misc/terminfo.src $@/_kp_tmp/FILES/usr/share/terminfo
 	cp pkg/ncurses/$(NCURSES_VER_CUR)/INSTALL $@/_kp_tmp
+	echo "busybox" > $@/_kp_tmp/PREREQ
 	echo "$(NCURSES_VER) : a freely distributable clone of System V Release 4.0 (SVr4) curses" > $@/_kp_tmp/DESC
