@@ -1,0 +1,4 @@
+#!/bin/sh
+
+LD_LIBRARY_PATH=$1/usr/lib $1/usr/bin/tic -o $1/usr/share/terminfo -x $1/usr/share/terminfo/terminfo.src 2> /dev/null
+rm -f $1/usr/share/terminfo/terminfo.src
