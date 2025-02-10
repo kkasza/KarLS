@@ -198,6 +198,9 @@ for dev in $DEVS; do
  fi
 done
 
+echo "Installing optional packages..."
+kpm install tmux /mnt/target
+
 echo ""
 echo "KarLS Installation finished!"
 echo "WARNING! root has no password set. You know what that means."
