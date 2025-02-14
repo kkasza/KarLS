@@ -1,0 +1,18 @@
+[host_machine]
+system = 'linux'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'
+
+[properties]
+sys_root = '/home/scythe/KarLS/cmpl/cmpl-x86_64'
+
+[binaries]
+c = 'x86_64-karls-linux-musl-gcc'
+cpp = 'x86_64-karls-linux-musl-g++'
+ar = 'x86_64-karls-linux-musl-ar'
+ld = 'x86_64-karls-linux-musl-ld'
+objcopy = 'x86_64-karls-linux-musl-objcopy'
+strip = 'x86_64-karls-linux-musl-strip'
+pkgconfig = 'x86_64-karls-linux-musl-pkg-config'
+windres = 'x86_64-karls-linux-musl-windres'
