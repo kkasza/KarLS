@@ -1,0 +1,17 @@
+KarLS ius able to run on Asus EOL C302C(A) chromebook.
+
+TO test this, you have to delete the ChromeOS from it - the device is EOL, so it's basically a security nightmare or a paperweight anyway.
+
+First, remove the write protection screw:
+
+https://www.asty.org/location-of-asus-c302c-write-protect-screw/
+
+Then, unlock the UEFI (by reflashing it in developer mode):
+
+https://docs.mrchromebox.tech/docs/getting-started.html
+
+See this excellent tutorial on flashing Ubuntu for some other infos:
+
+https://github.com/devendor/c302ca
+
+To install KarLS, just write the ISO to a flashdrive and boot. I use Rufus.
