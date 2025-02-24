@@ -10,33 +10,33 @@ KarLS is a hobby thing, that started out like sort of a reproduciple Linux From 
 Buildroot also gave KarLS lots of inspiration of course, that's a great professional project. For any production project I highly recommend BR.
 Karls uses an own gcc/binutils/musl/ccache etc. toolchain, as BR does.
 
-Currently, KarLS is aiming to reach * *minimal* * usability, a.k.a. 1.0. - still far away from there.
+Currently, KarLS is aiming to reach *minimal* usability, a.k.a. 1.0. - still far away from there.
 
 ## To compile (I build on Debian 12):
-* *make install_deps* * - apt install a few packages - uses sudo
-* *make cmpl* * - compile the musl based gcc compiler toolchain
-* *make pkg* * - compile the packages, then package them into .kpm format
-* *make iso* * - compile and build the installation iso image
+* *make install_deps* - apt install a few packages - uses sudo
+* *make cmpl* - compile the musl based gcc compiler toolchain
+* *make pkg* - compile the packages, then package them into .kpm format
+* *make iso* - compile and build the installation iso image
 
 ## Other useful commands:
 ### / main directory and /cmpl /pkg / iso subdirectories
-* *make download* * - download all required sources before doing anything (normally done right before the compilation of the program starts)
-* *make sha256sum* * - verify all sources with sha256sum (this is done **everytime** right after download, so this is a double-check option)
-* *make clean* * - delete compiled sources
-* *make distclean* * - delete compiled sources, patched sources\ **and** compiler cache (ccache)
-* *make mrproper* * - like distclean, but delete downloaded srouces too.
-* *make genpatch* * - generate patch file from patched source package $PPKG (in */src subdirectory), $PTCNAME is the name of ther patch, $PTCCOMMENT is the patch comment - see /common.mk
+* *make download* - download all required sources before doing anything (normally done right before the compilation of the program starts)
+* *make sha256sum* - verify all sources with sha256sum (this is done **everytime** right after download, so this is a double-check option)
+* *make clean* - delete compiled sources
+* *make distclean* - delete compiled sources, patched sources\ **and** compiler cache (ccache)
+* *make mrproper* - like distclean, but delete downloaded srouces too.
+* *make genpatch* - generate patch file from patched source package $PPKG (in */src subdirectory), $PTCNAME is the name of ther patch, $PTCCOMMENT is the patch comment - see /common.mk
 
 ### in cmpl/ subdirectory
-* *make reset_cmpl* * - delete compiler and extract it as a vanilla unomdified version since the last compalation - useful for testing package library dependecies
+* *make reset_cmpl* - delete compiler and extract it as a vanilla unomdified version since the last compalation - useful for testing package library dependecies
 
 ### in pkg/ subdirectory
-* *make busybox-config* * - run make menuconfig in patched busybox source, make a diff file in pkg/busybox directory with config changes
-* *make kernel-config* * - run make menuconfig in patched kernel source, make a diff file in pkg/kernel directory with config changes
+* *make busybox-config* - run make menuconfig in patched busybox source, make a diff file in pkg/busybox directory with config changes
+* *make kernel-config* - run make menuconfig in patched kernel source, make a diff file in pkg/kernel directory with config changes
 
 ### in iso/ subdirectory
-* *make rebuild_initrd* * - rebuild the initrd for the install iso, after changing kernel/modules, etc.
-* *make rebuild_iso* * - rebuild iso, after changing packages - initrd stays the same!
-* *make gcp_image* * - package the qemu installed disk image as a Google Compute Engine image, for uploading as a custom GCE image
-* *make qemu* * - start qemu with the installation iso in a virtual cdrom drive - works in / main directory too
-* *make ssh* * - ssh into the running qemu system after installation - works in / main directory too
+* *make rebuild_initrd* - rebuild the initrd for the install iso, after changing kernel/modules, etc.
+* *make rebuild_iso* - rebuild iso, after changing packages - initrd stays the same!
+* *make gcp_image* - package the qemu installed disk image as a Google Compute Engine image, for uploading as a custom GCE image
+* *make qemu* - start qemu with the installation iso in a virtual cdrom drive - works in / main directory too
+* *make ssh* - ssh into the running qemu system after installation - works in / main directory too
