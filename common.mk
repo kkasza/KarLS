@@ -88,7 +88,7 @@ libncurses5-dev \
 uuid-dev libelf-dev \
 squashfs-tools lz4 \
 libssl-dev dosfstools \
-xorriso
+xorriso python3
 
 MYDEPS_NATIVE:=qemu-system-x86 qemu-system-arm
 
