@@ -80,7 +80,7 @@ endif
 
 #Dependencies on Debian build system
 MYDEPS:=sudo wget tar rsync xz-utils bzip2 \
-gcc g++ \
+gcc g++ ccache \
 gawk bison bc sed flex texinfo \
 libtool m4 pkg-config \
 autotools-dev automake \
@@ -90,7 +90,7 @@ squashfs-tools lz4 \
 libssl-dev dosfstools \
 xorriso
 
-MYDEPS_NATIVE:=ccache qemu-system-x86 qemu-system-arm
+MYDEPS_NATIVE:=qemu-system-x86 qemu-system-arm
 
 .PHONY: default install_deps _local_clean clean distclean download sha256sum genpatch
 
@@ -101,7 +101,7 @@ default:
 	@echo Platform: $(P)
 	@echo Possible targets: $(VALID_T) - default: $(firstword $(VALID_T)) - use make T=\<target\> to choose
 	@echo Possible platforms for $(T): $(VALID_P_$(T)) - default: $(firstword $(VALID_P_$(T))) - use make T=\<target\> P=\<platform\> to choose
-	@echo Possible debug parameters: DBG_MAKE DBG_CCLOG DBG_NOCC
+	@echo Possible debug parameters: DBG_MAKE DBG_CCLOG DBG_NOCC DBG_NOCMPLARC
 	@echo MAKE: $(MAKE)
 ifdef DBG_MAKE
 	@echo DEBUG enabled - no make -j*
@@ -111,6 +111,9 @@ ifdef DBG_CCLOG
 endif
 ifdef DBG_NOCC
 	@echo DEBUG enabled - no ccache
+endif
+ifdef DBG_NOCMPLARC
+	@echo DEBUG enabled - no cmpl archive shall be made
 endif
 ifndef CALLEDFROMROOT
 	@echo ==================================================================================================

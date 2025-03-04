@@ -121,7 +121,11 @@ $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc/ligcc_s.so: | $(BLD)/$(MUSL_VER)/lib/lib
 	touch $@
 
 dl/cmpl-$(TARGET-ARCH).txz: $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc/ligcc_s.so
+ifdef DBG_NOCMPLARC
+	touch $@
+else
 	tar -C $(CMPL_INST) -cJv -f $@ .
+endif
 
 cmpl: | dl/cmpl-$(TARGET-ARCH).txz
 
