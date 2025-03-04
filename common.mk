@@ -79,8 +79,8 @@ KFLAV:=generic
 endif
 
 #Dependencies on Debian build system
-MYDEPS:=sudo wget tar rsync \
-gcc g++ ccache \
+MYDEPS:=sudo wget tar rsync xz-utils bzip2 \
+gcc g++ \
 gawk bison bc sed flex texinfo \
 libtool m4 pkg-config \
 autotools-dev automake \
@@ -88,8 +88,9 @@ libncurses5-dev \
 uuid-dev libelf-dev \
 squashfs-tools lz4 \
 libssl-dev dosfstools \
-xorriso \
-qemu-system-x86 qemu-system-arm
+xorriso
+
+MYDEPS_NATIVE:=ccache qemu-system-x86 qemu-system-arm
 
 .PHONY: default install_deps _local_clean clean distclean download sha256sum genpatch
 
@@ -132,6 +133,9 @@ install_deps:
 	$(SUDO) apt update
 	$(SUDO) apt -y upgrade
 	$(SUDO) apt -y install $(MYDEPS)
+ifeq (,$(wildcard /.dockerenv))
+	$(SUDO) apt -y install $(MYDEPS_NATIVE)
+endif
 	$(SUDO) apt clean
 
 WGET:=wget --no-verbose --show-progress -P
