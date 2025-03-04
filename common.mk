@@ -129,10 +129,10 @@ endif
 
 #Instal DEBIAN dependencies
 install_deps:
-	$(SUDO) apt-get update
-	$(SUDO) apt-get upgrade
-	$(SUDO) apt-get install $(MYDEPS)
-	$(SUDO) apt-get clean
+	$(SUDO) apt update
+	$(SUDO) apt -y upgrade
+	$(SUDO) apt -y install $(MYDEPS)
+	$(SUDO) apt clean
 
 WGET:=wget --no-verbose --show-progress -P
 
