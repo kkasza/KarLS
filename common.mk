@@ -131,15 +131,15 @@ else
 #	@ls -al osimg/buildno-$(T) | tr -s [:blank:] | cut -d' ' -f6-8
 endif
 
-#Instal DEBIAN dependencies
+#Install DEBIAN dependencies
 install_deps:
-	$(SUDO) apt update
-	$(SUDO) apt -y upgrade
-	$(SUDO) apt -y install $(MYDEPS)
+	$(SUDO) apt-get update
+	$(SUDO) apt-get -y upgrade
+	$(SUDO) apt-get -y install $(MYDEPS)
 ifeq (,$(wildcard /.dockerenv))
-	$(SUDO) apt -y install $(MYDEPS_NATIVE)
+	$(SUDO) apt-get -y install $(MYDEPS_NATIVE)
 endif
-	$(SUDO) apt clean
+	$(SUDO) apt-get clean
 
 WGET:=wget --no-verbose --show-progress -P
 
