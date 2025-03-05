@@ -10,13 +10,20 @@ KarLS is a hobby thing, that started out like sort of a reproduciple Linux From 
 Buildroot also gave KarLS lots of inspiration of course, that's a great professional project. For any production project I highly recommend BR.
 Karls uses an own gcc/binutils/musl/ccache etc. toolchain, as BR does.
 
-Currently, KarLS is aiming to reach *minimal* usability, a.k.a. 1.0. - still far away from there.
+> [!WARNING]
+> Currently, KarLS is aiming to reach *minimal* usability, a.k.a. 1.0. - still far away from there.
 
-## To compile (I build on Debian 12):
+## To compile natively (I build on Debian 12):
 * *make install_deps* - apt install a few packages - uses sudo
 * *make cmpl* - compile the musl based gcc compiler toolchain
 * *make pkg* - compile the packages, then package them into .kpm format
 * *make iso* - compile and build the installation iso image
+
+## To compile in a Docker container
+Download the **dockerfile** from the *docker-build* subdirectory of this repo into an empty directory. No need to clone the whole git.
+Run **docker build -t karls-builder .** in the new subdirectory. I recommend running this in a detachable terminal like *tmux*, as it runs for a long time.
+This will setup a minimal Debian based container and run the whole build process. It will require around 16 GB.
+See *docker-build/README.md* for some more information.
 
 ## Other useful commands:
 ### / main directory and /cmpl /pkg / iso subdirectories

@@ -1,0 +1,51 @@
+#KarLS docker builder
+
+# Download first batch of required tools, setup user build environment
+
+FROM debian:bookworm AS system-init
+LABEL karls=builder
+RUN set -ex \
+ && apt-get update \
+ && apt-get -y upgrade \
+ && apt-get -y install ca-certificates make git sudo \
+ && useradd -U -M -d /karls builder \
+ && echo "builder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+ && mkdir /karls \
+ && chown builder:builder /karls
+
+# Clone the git repo, setup additional tools required by the make process
+
+FROM system-init AS git-clone
+LABEL karls=builder
+USER builder
+WORKDIR /karls
+RUN set -ex \
+ && git clone --depth 1 https://github.com/kkasza/KarLS.git . \
+ && make install_deps
+
+# Build the compiler, skip the archive creation
+
+FROM git-clone AS make-cmpl
+LABEL karls=builder
+USER builder
+WORKDIR /karls
+RUN set -ex \
+ && make DBG_NOCMPLARC=1 cmpl
+
+# Build the packages
+
+FROM make-cmpl AS make-pkg
+LABEL karls=builder
+USER builder
+WORKDIR /karls
+RUN set -ex \
+ && make pkg
+
+# Build the iso image
+
+FROM make-pkg AS make-iso
+LABEL karls=builder
+USER builder
+WORKDIR /karls
+RUN set -ex \
+ && make iso
