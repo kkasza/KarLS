@@ -2,7 +2,7 @@
 build-*
 *.iso
 *.img
-*.img.mnt
+*.img.fat
 *.iso.tmp
 *.raw
 *.tar.gz

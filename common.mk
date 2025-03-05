@@ -87,7 +87,7 @@ autotools-dev automake \
 libncurses5-dev \
 uuid-dev libelf-dev \
 squashfs-tools lz4 \
-libssl-dev dosfstools \
+libssl-dev mtools \
 xorriso python3
 
 MYDEPS_NATIVE:=qemu-system-x86 qemu-system-arm

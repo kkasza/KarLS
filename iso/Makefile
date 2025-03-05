@@ -43,17 +43,15 @@ $(BLD)/$(GRUB_VER)-efi: src/$(GRUB_VER)
 	$(MAKE) -C $@ V=1 $(CCACHE)
 
 efi.img: $(BLD)/$(GRUB_VER)-efi
-	$(SUDO) mkfs.msdos -I -C $@ 2048
-	mkdir -p $@.mnt
-	$(SUDO) mount $@ $@.mnt
-
-	$(SUDO) mkdir -p $@.mnt/EFI/BOOT
-	$(SUDO) $</grub-mkimage -o $@.mnt/EFI/BOOT/BOOTX64.EFI -O x86_64-efi -p /boot/grub -d $</grub-core \
+	mkdir -p $@.fat/EFI/BOOT
+	$(SUDO) $</grub-mkimage -o $@.fat/EFI/BOOT/BOOTX64.EFI -O x86_64-efi -p /boot/grub -d $</grub-core \
 	boot.mod cat.mod configfile.mod cpuid.mod disk.mod elf.mod exfat.mod ext2.mod fat.mod file.mod hdparm.mod help.mod iso9660.mod linux.mod loadenv.mod \
 	lsefi.mod ls.mod msdospart.mod normal.mod ntfs.mod part_gpt.mod part_msdos.mod reboot.mod scsi.mod search_fs_file.mod search.mod \
 	serial.mod terminal.mod terminfo.mod usb_keyboard.mod usbserial_common.mod usbserial_pl2303.mod
 
-	$(SUDO) umount $@.mnt
+	dd if=/dev/zero of=$@ bs=1M count=2
+	mformat -i $@ -v karls_efi ::
+	mcopy -sQv -i $@ $@.fat/EFI ::
 
 KVER:=$(shell cat ../pkg/build-$(T)/kernel/kernel_version)
 
@@ -154,5 +152,5 @@ karls-gcpimage-$(VERSION).tar.gz:
 	rm -f disk.raw
 
 _local_clean:
-	rm -rf $(IMAGE).tmp efi.img efi.img.mnt testdisk.img disk.raw karls-gcpimage-*.tar.gz
+	rm -rf $(IMAGE).tmp efi.img efi.img.fat testdisk.img disk.raw karls-gcpimage-*.tar.gz
 	rm -rf $(IMAGE)
