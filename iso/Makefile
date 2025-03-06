@@ -33,16 +33,19 @@ GRUB_OPTS:= \
 $(CCACHE)
 
 $(BLD)/$(GRUB_VER): src/$(GRUB_VER)
+	$(call set_stat,"[3/5] compile $@")
 	mkdir -p $@
 	cd $@; ../../src/$(GRUB_VER)/configure $(GRUB_OPTS) $(GRUB_OPTS_PC)
 	$(MAKE) -C $@ V=1 $(CCACHE)
 
 $(BLD)/$(GRUB_VER)-efi: src/$(GRUB_VER)
+	$(call set_stat,"[1/5] compile $@")
 	mkdir -p $@
 	cd $@; ../../src/$(GRUB_VER)/configure $(GRUB_OPTS) $(GRUB_OPTS_EFI)
 	$(MAKE) -C $@ V=1 $(CCACHE)
 
 efi.img: $(BLD)/$(GRUB_VER)-efi
+	$(call set_stat,"[2/5] package $@")
 	mkdir -p $@.fat/EFI/BOOT
 	$(SUDO) $</grub-mkimage -o $@.fat/EFI/BOOT/BOOTX64.EFI -O x86_64-efi -p /boot/grub -d $</grub-core \
 	boot.mod cat.mod configfile.mod cpuid.mod disk.mod elf.mod exfat.mod ext2.mod fat.mod file.mod hdparm.mod help.mod iso9660.mod linux.mod loadenv.mod \
@@ -56,6 +59,7 @@ efi.img: $(BLD)/$(GRUB_VER)-efi
 KVER:=$(shell cat ../pkg/build-$(T)/kernel/kernel_version)
 
 $(BLD)/initrd:
+	$(call set_stat,"[4/5] package $@")
 	mkdir -p $@/proc $@/dev $@/tmp $@/sys $@/lib/modules $@/usr/udhcpc $@/var/run $@/var/log $@/var/lock $@/var/tmp
 
 	cp -rP initrd-skel/* $@/
@@ -78,6 +82,7 @@ rebuild_initrd:
 	make initrd
 
 $(IMAGE): | efi.img $(BLD)/$(GRUB_VER) initrd
+	$(call set_stat,"[5/5] package $@")
 	mkdir -p $@.tmp/boot/grub $@.tmp/packages $@.tmp/firmware
 	cp efi.img grub.cfg $@.tmp/boot/grub
 
@@ -106,7 +111,7 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER) initrd
 	cp -r install $@.tmp
 	cp ../pkg/pkg/kpm/Current/kpm $@.tmp/install
 	cp ../pkg/build-$(T)/*.kp $@.tmp/packages
-	cp ../pkg/build-$(T)/wifi_regdb-*/* $@.tmp/firmware
+	cp ../pkg/build-$(T)/wifi_regdb-*/regulatory.db* $@.tmp/firmware
 	cp -r ../pkg/build-$(T)/linux_firmware-*/* $@.tmp/firmware
 	ls -1 $@.tmp/packages > $@.tmp/repo.db
 	mv $@.tmp/repo.db $@.tmp/packages
@@ -126,6 +131,7 @@ $(IMAGE): | efi.img $(BLD)/$(GRUB_VER) initrd
 	$@.tmp
 
 iso: $(IMAGE)
+	$(call set_stat,"done")
 
 rebuild_iso: _local_clean iso
 
@@ -139,7 +145,6 @@ qemu: iso
 	-drive format=qcow2,file=testdisk.img,if=none,id=hd,index=0,snapshot=off \
 	-device virtio-net,netdev=net0 \
 	-netdev user,id=net0,hostfwd=tcp::2222-:22
-
 
 ssh:
 	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@127.0.0.1 -p 2222

@@ -92,6 +92,13 @@ xorriso python3
 
 MYDEPS_NATIVE:=qemu-system-x86 qemu-system-arm
 
+define set_stat
+	@echo $1 >> .status
+	@echo --------------------
+	@echo -- $1
+	@echo --------------------
+endef
+
 .PHONY: default install_deps _local_clean clean distclean download sha256sum genpatch
 
 #Status screen / component
@@ -133,6 +140,7 @@ endif
 
 #Install DEBIAN dependencies
 install_deps:
+	$(call set_stat,"install deps")
 	$(SUDO) apt-get update
 	$(SUDO) apt-get -y upgrade
 	$(SUDO) apt-get -y install $(MYDEPS)
@@ -148,6 +156,7 @@ WGET:=wget --no-verbose --show-progress -P
 
 #Default download (And sha256sum) action for files defined in local sources.mk includes
 dl/%.tar.gz dl/%.tar.xz dl/%.tar.bz2:
+	$(call set_stat,"download $@")
 	$(if $($*-REALFILE),\
 	$(WGET) dl $($*-URL)/$($*-REALFILE) && mv dl/$($*-REALFILE) dl/$($*-FILE),\
 	$(WGET) dl $($*-URL)/$($*-FILE))
@@ -157,6 +166,7 @@ dl/%.tar.gz dl/%.tar.xz dl/%.tar.bz2:
 
 #Uncompressed source directories (patching is also done here)
 src/%: dl/$$($$*-FILE)
+	$(call set_stat,"extract $@")
 	mkdir -p src
 	$(UTAR) dl/$($*-FILE) -C src
 
@@ -195,6 +205,7 @@ clean: _local_clean
 		echo rm -rf $(PWD)/build-$$I; \
 		rm -rf $(PWD)/build-$$I; \
 	done
+	rm -rf .status
 
 #Default distclean per component
 distclean: clean

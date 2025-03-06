@@ -44,9 +44,12 @@ $(HCCACHE)
 util_linux: $(BLD)/$(UTIL_LINUX_VER)-$(T).kp
 
 $(BLD)/$(UTIL_LINUX_VER): | src/$(UTIL_LINUX_VER) ncurses
+	$(call pkg_set_stat,"configure $@")
 	mkdir -p $@
 	cd $@; $(XPATH) $(XPCF) ../../src/$(UTIL_LINUX_VER)/configure $(UTIL_LINUX_OPTS)
+	$(call pkg_set_stat,"compile $@")
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
+	$(call pkg_set_stat,"package $@")
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_kp_tmp/FILES install
 	rm -rf $@/_kp_tmp/FILES/usr/share
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* $@/_kp_tmp/FILES/usr/lib/* || true

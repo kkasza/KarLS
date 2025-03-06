@@ -57,42 +57,51 @@ RANLIB="../$(BINU_VER)/binutils/ranlib"
 binutils: $(BLD)/$(BINU_VER)
 
 $(BLD)/$(BINU_VER): src/$(BINU_VER)
+	$(call set_stat,"[1/11] configure $@")
 	mkdir -p $@
 	cd $@; $(CCACHE) ../../src/$(BINU_VER)/configure $(BINU_OPTS)
+	$(call set_stat,"[2/11] compile $@")
 	$(MAKE) -C $@ all
 	$(MAKE) -C $@ install-strip
 
 linux-headers: $(BLD)/$(LINUX_VER)
 
 $(BLD)/$(LINUX_VER): | src/$(LINUX_VER)
+	$(call set_stat,"[3/11] configure $@")
 	make -C src/$(LINUX_VER) V=1 O=$(PWD)/$@ $(CCACHE) defconfig
 	[ -d $(CMPL_INST)/usr/include/linux ] || $(MAKE) -C $(BLD)/$(LINUX_VER) V=1 O=$(PWD)/$@ INSTALL_HDR_PATH=$(CMPL_INST)/usr $(CCACHE) headers_install
 
 xgcc: $(BLD)/$(GCC_VER)/gcc/xgcc
 
 $(BLD)/$(GCC_VER)/gcc/xgcc: | $(BLD)/$(BINU_VER) $(BLD)/$(LINUX_VER) src/$(GCC_VER) src/$(GMP_VER) src/$(MPFR_VER) src/$(MPC_VER)
+	$(call set_stat,"[4/11] configure $@")
 	ln -sf ../$(GMP_VER) src/$(GCC_VER)/gmp
 	ln -sf ../$(MPFR_VER) src/$(GCC_VER)/mpfr
 	ln -sf ../$(MPC_VER) src/$(GCC_VER)/mpc
 	mkdir -p $(BLD)/$(GCC_VER)
 	cd $(BLD)/$(GCC_VER); $(CCACHE) ../../src/$(GCC_VER)/configure $(GCC_OPTS)
+	$(call set_stat,"[5/11] compile $@")
 	$(MAKE) -C $(BLD)/$(GCC_VER) all-gcc
 	touch $@
 
 $(BLD)/$(MUSL_VER)/Makefile: | $(BLD)/$(GCC_VER)/gcc/xgcc src/$(MUSL_VER)
+	$(call set_stat,"[6/11] configure $@")
 	mkdir -p $(BLD)/$(MUSL_VER)
 	cd $(BLD)/$(MUSL_VER); $(CCACHE) ../../src/$(MUSL_VER)/configure $(MUSL_OPTS)
+	$(call set_stat,"[7/11 ]compile $@")
 	$(MAKE) -C $(BLD)/$(MUSL_VER) install-headers
 	ln -sf ../include $(CMPL_INST)/$(TARGET-ARCH)/
 	touch $@
 
 $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc/libgcc.a: | $(BLD)/$(MUSL_VER)/Makefile
+	$(call set_stat,"[8/11] compile $@")
 	$(MAKE) -C $(BLD)/$(GCC_VER) enable_shared=no all-target-libgcc
 	touch $@
 
 musl: $(BLD)/$(MUSL_VER)/lib/libc.so
 
 $(BLD)/$(MUSL_VER)/lib/libc.so: | $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc/libgcc.a
+	$(call set_stat,"[9/11] compile $@")
 	$(MAKE) -C $(BLD)/$(MUSL_VER) $(MUSL_BINU)
 	$(MAKE) -C $(BLD)/$(MUSL_VER) install
 	ln -sf libc.so $(CMPL_INST)/lib/ld-musl-$(TARGET-CPU).so.1
@@ -101,6 +110,7 @@ $(BLD)/$(MUSL_VER)/lib/libc.so: | $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc/libgcc
 gcc: $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc/ligcc_s.so
 
 $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc/ligcc_s.so: | $(BLD)/$(MUSL_VER)/lib/libc.so
+	$(call set_stat,"[10/11] compile $@")
 	$(MAKE) -C $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc enable_shared=yes
 	$(MAKE) -C $(BLD)/$(GCC_VER) enable_shared=yes
 	$(MAKE) -C $(BLD)/$(GCC_VER) install-strip
@@ -124,10 +134,12 @@ dl/cmpl-$(TARGET-ARCH).txz: $(BLD)/$(GCC_VER)/$(TARGET-ARCH)/libgcc/ligcc_s.so
 ifdef DBG_NOCMPLARC
 	touch $@
 else
+	$(call set_stat,"[11/11] compress $@")
 	tar -C $(CMPL_INST) -cJv -f $@ .
 endif
 
 cmpl: | dl/cmpl-$(TARGET-ARCH).txz
+	$(call set_stat,"done")
 
 reset_cmpl:
 	@if [ -e dl/cmpl-$(TARGET-ARCH).txz ]; then \

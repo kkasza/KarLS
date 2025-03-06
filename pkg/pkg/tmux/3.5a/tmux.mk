@@ -18,9 +18,12 @@ $(HCCACHE)
 tmux: $(BLD)/$(TMUX_VER)-$(T).kp
 
 $(BLD)/$(TMUX_VER): | src/$(TMUX_VER) libevent ncurses
+	$(call pkg_set_stat,"configure $@")
 	mkdir -p $@/_kp_tmp/FILES/usr/bin
 	cd $@; $(XPATH) $(XPCF) ../../src/$(TMUX_VER)/configure $(TMUX_OPTS)
+	$(call pkg_set_stat,"compile $@")
 	$(XPATH) $(MAKE) -C $@ V=1
+	$(call pkg_set_stat,"package $@")
 	$(STRIP) $@/tmux
 	cp $@/tmux $@/_kp_tmp/FILES/usr/bin
 	echo "busybox" > $@/_kp_tmp/PREREQ

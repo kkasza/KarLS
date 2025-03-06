@@ -25,6 +25,7 @@ src/tzdata-$(TZ-VER): | dl/$($(TZDATA_VER)-FILE) dl/$($(TZCODE_VER)-FILE)
 ZICFLAGS:=ZFLAGS='-b fat'
 
 $(BLD)/tzdata-$(TZ-VER): src/tzdata-$(TZ-VER)
+	$(call pkg_set_stat,"package $@")
 	cp -r $< $(BLD)
 	$(MAKE) -C $@ $(HCCACHE) $(ZICFLAGS) DESTDIR=`pwd`/$@/install install
 	mkdir -p $@/_kp_tmp/FILES/etc $@/_kp_tmp/FILES/usr/share

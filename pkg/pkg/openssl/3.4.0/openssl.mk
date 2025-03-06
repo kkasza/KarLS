@@ -23,15 +23,16 @@ OPENSSL_TARGET:=linux-armv4
 endif
 
 $(BLD)/$(OPENSSL_VER): src/$(OPENSSL_VER)
+	$(call pkg_set_stat,"configure $@")
 	mkdir -p $@/_kp_tmp/FILES/usr/bin $@/_kp_tmp/FILES/usr/lib $(BLD)/xpc
-
 	cd $@; $(XPATH) $(XPCF) ../../src/$(OPENSSL_VER)/Configure $(OPENSSL_TARGET) $(OPENSSL_OPTS)
+	$(call pkg_set_stat,"compile $@")
 	$(XPATH) $(MAKE) -C $@ V=1
+	$(call pkg_set_stat,"package $@")
 	cp -rP src/$(OPENSSL_VER)/include/openssl $@/include/openssl src/$(OPENSSL_VER)/include/crypto $@/include/crypto $(CMPL_INST)/include/
 	$(STRIP) $@/apps/openssl $@/*.so*
 	cp -P $@/*.so* $(CMPL_INST)/lib
 	cp $@/*.pc $(BLD)/xpc
-
 	cp -P $@/*.so* $@/_kp_tmp/FILES/usr/lib
 	cp -P $@/apps/openssl $@/_kp_tmp/FILES/usr/bin
 	echo "$(OPENSSL_VER) : OpenSSL software library" > $@/_kp_tmp/DESC

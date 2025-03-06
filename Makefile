@@ -30,6 +30,26 @@ qemu: iso
 ssh:
 	$(MAKE) -C iso $@
 
+status:
+	@echo -n "[cmpl]: "
+	@if [ -e cmpl/.status ]; then \
+		tail -1 cmpl/.status; \
+	else \
+		echo not started; \
+	fi
+	@echo -n "[pkg]: "
+	@if [ -e pkg/.status ]; then \
+		tail -1 pkg/.status; \
+	else \
+		echo not started; \
+	fi
+	@echo -n "[iso]: "
+	@if [ -e iso/.status ]; then \
+		tail -1 iso/.status; \
+	else \
+		echo not started; \
+	fi
+
 #Targets to be run on all components
 clean distclean mrproper download sha256sum:
 	$(foreach var,$(COMPONENTS),\

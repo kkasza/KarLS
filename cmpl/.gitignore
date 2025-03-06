@@ -3,3 +3,4 @@ build-*
 cmpl-*
 dl/
 src/
+.status

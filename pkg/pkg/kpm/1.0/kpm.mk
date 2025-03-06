@@ -6,6 +6,7 @@ PKG_LIST+=kpm
 kpm: $(BLD)/$(KPM_VER)-$(T).kp
 
 $(BLD)/$(KPM_VER):
+	$(call pkg_set_stat,"package $@")
 	mkdir -p $@/_kp_tmp/FILES/bin
 	cp pkg/kpm/$(KPM_VER_CUR)/kpm $@/_kp_tmp/FILES/bin
 	chmod 755 $@/_kp_tmp/FILES/bin/kpm

@@ -5,6 +5,7 @@ PKG_LIST+=musl
 musl: $(BLD)/$(MUSL_VER)-$(T).kp
 
 $(BLD)/$(MUSL_VER):
+	$(call pkg_set_stat,"package $@")
 	mkdir -p $@/_kp_tmp/FILES/lib
 	cp $(CMPL_INST)/lib/libc.so $@/_kp_tmp/FILES/lib
 	ln -s libc.so $@/_kp_tmp/FILES/lib/ld-musl-$(T).so.1

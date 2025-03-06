@@ -31,9 +31,12 @@ DROPBEAR_MAKE_OPTS:=MULTI=1 PROGRAMS="$(DROPBEAR_PROGS)"
 dropbear: $(BLD)/$(DROPBEAR_VER)-$(T).kp
 
 $(BLD)/$(DROPBEAR_VER): src/$(DROPBEAR_VER)
+	$(call pkg_set_stat,"configure $@")
 	mkdir -p $@/_kp_tmp/FILES/usr/bin $@/_kp_tmp/FILES/etc/dropbear
 	cd $@; $(XPATH) $(XPCF) ../../src/$(DROPBEAR_VER)/configure $(DROPBEAR_OPTS)
+	$(call pkg_set_stat,"compile $@")
 	$(XPATH) $(DROPBEAR_CFLAGS) $(MAKE) -C $@ $(DROPBEAR_MAKE_OPTS)
+	$(call pkg_set_stat,"package $@")
 	$(STRIP) $@/dropbearmulti
 	cp $@/dropbearmulti $@/_kp_tmp/FILES/usr/bin
 	for PRG in $(DROPBEAR_PROGS); do \

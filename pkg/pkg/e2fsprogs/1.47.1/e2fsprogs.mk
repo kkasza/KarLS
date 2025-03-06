@@ -19,9 +19,12 @@ $(HCCACHE)
 e2fsprogs: $(BLD)/$(E2FSPROGS_VER)-$(T).kp
 
 $(BLD)/$(E2FSPROGS_VER): src/$(E2FSPROGS_VER)
+	$(call pkg_set_stat,"configure $@")
 	mkdir -p $@
 	cd $@; $(XPATH) $(XPCF) ../../src/$(E2FSPROGS_VER)/configure $(E2FSPROGS_OPTS)
+	$(call pkg_set_stat,"compile $@")
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
+	$(call pkg_set_stat,"package $@")
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 DESTDIR=`pwd`/$@/_kp_tmp/FILES install
 	rm -rf $@/_kp_tmp/FILES/etc/cron.d $@/_kp_tmp/FILES/lib $@/_kp_tmp/FILES/usr/lib/e2fsprogs $@/_kp_tmp/FILES/usr/share
 	$(STRIP) $@/_kp_tmp/FILES/usr/bin/* $@/_kp_tmp/FILES/usr/sbin/* $@/_kp_tmp/FILES/usr/lib/e2initrd_helper || true

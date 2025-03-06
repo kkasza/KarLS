@@ -42,6 +42,7 @@ $(BLD)/$(KERNEL_VER)-kconfig: src/$(KERNEL_VER)
 	diff -q pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new && rm -f pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new || diff -u pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.new > pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config.diff || true
 
 $(BLD)/$(KERNEL_VER): src/$(KERNEL_VER)
+	$(call pkg_set_stat,"configure $@")
 #prepare
 	$(MAKE) -C $< V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) ARCH=$(T) allnoconfig
 	cp pkg/kernel/$(KERNEL_VER_CUR)/$(KBUILD).config $@/.config
@@ -49,14 +50,16 @@ $(BLD)/$(KERNEL_VER): src/$(KERNEL_VER)
 	$(MAKE) -C $< V=1 O=$(PWD)/$@ $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) prepare
 	cp $(BNF) $@/.version
 #make image file
+	$(call pkg_set_stat,"compile $@")
 	$(MAKE) -C $@ V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" bzImage
 	echo $(BN) > $(BNF)
 #make modules
+	$(call pkg_set_stat,"compile $@ modules")
 	$(MAKE) -C $@ V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) CROSS_COMPILE="$(CMPL_INST)/bin/$(TARGET-ARCH)-" modules
+	$(call pkg_set_stat,"package $@")
 	$(MAKE) -C $@ INSTALL_MOD_PATH=modules INSTALL_MOD_STRIP=1 V=1 $(HCCACHE) $(XCCACHE) LD="$(CMPL_INST)/bin/ld" ARCH=$(T) modules_install
 #copy files for package
 	mkdir -p $@/_kp_tmp/FILES/boot
-
 	cp -L $@/arch/$(TARGET-CPU)/boot/bzImage $@/_kp_tmp/FILES/boot/vmlinuz-$(KERNEL_SVER)-$(KVER)
 	chmod 644 $@/_kp_tmp/FILES/boot/vmlinuz-$(KERNEL_SVER)-$(KVER)
 	cp $@/System.map $@/_kp_tmp/FILES/boot/System.map-$(KERNEL_SVER)-$(KVER)
@@ -64,6 +67,5 @@ $(BLD)/$(KERNEL_VER): src/$(KERNEL_VER)
 	rm -f $@/_kp_tmp/FILES/lib/modules/$(KERNEL_SVER)-$(KVER)/build $@/_kp_tmp/FILES/lib/modules/$(KERNEL_SVER)-$(KVER)/source
 	echo "$(KERNEL_VER) : The LINUX Kernel" > $@/_kp_tmp/DESC
 	touch $@/_kp_tmp/ESSENTIAL
-
 	ln -s $(KERNEL_VER) $(BLD)/kernel
 	echo $(KERNEL_SVER)-$(KVER) > $@/kernel_version

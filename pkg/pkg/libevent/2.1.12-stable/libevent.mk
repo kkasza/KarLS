@@ -21,9 +21,12 @@ $(HCCACHE)
 libevent: $(BLD)/$(LIBEVENT_VER)-$(T).kp
 
 $(BLD)/$(LIBEVENT_VER): | src/$(LIBEVENT_VER) openssl
+	$(call pkg_set_stat,"configure $@")
 	mkdir -p $@/_kp_tmp/FILES/usr/lib $(BLD)/xpc
 	cd $@; $(XPATH) $(XPCF) ../../src/$(LIBEVENT_VER)/configure $(LIBEVENT_OPTS) $(LIBEVENT_ARCH)
+	$(call pkg_set_stat,"compile $@")
 	$(XPATH) $(MAKE) -C $@ V=1
+	$(call pkg_set_stat,"package $@")
 	cp -rP src/$(LIBEVENT_VER)/include/event2 $@/include/* $(CMPL_INST)/include
 	$(STRIP) $@/.libs/*.so*
 	cp -P $@/.libs/*.so* $(CMPL_INST)/lib

@@ -6,6 +6,7 @@ PKG_LIST+=karls_base
 karls_base: $(BLD)/$(KARLS_BASE_VER)-$(T).kp
 
 $(BLD)/$(KARLS_BASE_VER):
+	$(call pkg_set_stat,"package $@")
 	mkdir -p $@/_kp_tmp/FILES
 	echo "$(KARLS_BASE_VER) : This is a meta-package for installing the base system" > $@/_kp_tmp/DESC
 	echo "rootskel-1.0" > $@/_kp_tmp/PREREQ

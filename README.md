@@ -27,6 +27,7 @@ See *docker-build/README.md* for some more information.
 
 ## Other useful commands:
 ### / main directory and /cmpl /pkg / iso subdirectories
+* *make status* - view the status of the 3 subdirectories where building is done: cmpl, pkg and iso. This is done with *tail -1 DIR/.status* - the new .status file holds a simple build log.
 * *make download* - download all required sources before doing anything (normally done right before the compilation of the program starts)
 * *make sha256sum* - verify all sources with sha256sum (this is done **everytime** right after download, so this is a double-check option)
 * *make clean* - delete compiled sources

@@ -9,9 +9,10 @@ PKG_LIST+=busybox busybox-static
 
 busybox: $(BLD)/$(BUSYBOX_VER)-$(T).kp
 
-busybox-static: $(BLD)/$(BUSYBOX_VER)-static
+busybox-static: $(BLD)/$(BUSYBOX_VER)-static-$(T).kp
 
 $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
+	$(call pkg_set_stat,"compile $@")
 	mkdir -p $(BLD)
 	cp -rP src/$(BUSYBOX_VER) $@
 	cp pkg/busybox/$(BUSYBOX_VER_CUR)/$(BUSYBOX_VER).config $@/.config
@@ -19,6 +20,7 @@ $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 	sed -i 's/^CONFIG_SYSROOT=\"\"/CONFIG_SYSROOT=\"$(subst /,\/,$(CMPL_INST))\"/' $@/.config
 	sed -i 's/^CONFIG_UNAME_OSNAME=\"GNU\/Linux\"/CONFIG_UNAME_OSNAME=\"$(subst /,\/,$(NAME))\"/' $@/.config
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
+	$(call pkg_set_stat,"package $@")
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1 CONFIG_PREFIX=`pwd`/$@/_kp_tmp/FILES install
 	mkdir -p $@/_kp_tmp/FILES/usr/udhcpc
 	cp $@/examples/udhcp/simple.script $@/_kp_tmp/FILES/usr/udhcpc/default.script
@@ -29,6 +31,7 @@ $(BLD)/$(BUSYBOX_VER): src/$(BUSYBOX_VER)
 	touch $@/_kp_tmp/ESSENTIAL
 
 $(BLD)/$(BUSYBOX_VER)-static: src/$(BUSYBOX_VER)
+	$(call pkg_set_stat,"compile $@")
 	mkdir -p $(BLD)
 	cp -rP src/$(BUSYBOX_VER) $@
 	cp pkg/busybox/$(BUSYBOX_VER_CUR)/$(BUSYBOX_VER).config $@/.config
@@ -38,6 +41,11 @@ $(BLD)/$(BUSYBOX_VER)-static: src/$(BUSYBOX_VER)
 	sed -i 's/^CONFIG_PIE=y/# CONFIG_PIE is not set/' $@/.config
 	sed -i 's/^# CONFIG_STATIC is not set/CONFIG_STATIC=y/' $@/.config
 	$(XPATH) $(MAKE) -C $@ $(XCCACHE) $(HCCACHE) KBUILD_VERBOSE=1
+	$(call pkg_set_stat,"package $@")
+	mkdir -p $@/_kp_tmp/FILES/bin $@/_kp_tmp/FILES/usr/udhcpc
+	cp $@/busybox $@/_kp_tmp/FILES/bin/busybox-static
+	cp $@/examples/udhcp/simple.script $@/_kp_tmp/FILES/usr/udhcpc/default.script-static
+	echo "$(BUSYBOX_VER) : BusyBox is a software suite that provides several Unix utilities in a single executable file. This is the static binary." > $@/_kp_tmp/DESC
 	ln -s $(BUSYBOX_VER)-static $(BLD)/busybox-static
 
 busybox-config: $(BLD)/$(BUSYBOX_VER)-config

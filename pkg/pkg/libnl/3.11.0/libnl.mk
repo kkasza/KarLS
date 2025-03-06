@@ -16,9 +16,12 @@ $(HCCACHE)
 libnl: $(BLD)/$(LIBNL_VER)-$(T).kp
 
 $(BLD)/$(LIBNL_VER): src/$(LIBNL_VER)
+	$(call pkg_set_stat,"configure $@")
 	mkdir -p $@/_kp_tmp/FILES/usr/lib $(BLD)/xpc
 	cd $@; $(XPATH) $(XPCF) ../../src/$(LIBNL_VER)/configure $(LIBNL_OPTS)
+	$(call pkg_set_stat,"compile $@")
 	$(XPATH) $(MAKE) -C $@ V=1
+	$(call pkg_set_stat,"package $@")
 	cp -rP src/$(LIBNL_VER)/include/netlink $(CMPL_INST)/include/
 	$(STRIP) $@/lib/.libs/*.so*
 	cp -P $@/lib/.libs/*.so* $(CMPL_INST)/lib

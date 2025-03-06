@@ -9,9 +9,11 @@ $(WIFI_REGDB_VER)-SHA256:=e0b60c2947125ac81ef7818c5667ef93ef3a275c0e417cf36db679
 SRC_LIST+=WIFI_REGDB
 PKG_LIST+=wifi_regdb
 
-wifi_regdb: $(BLD)/$(WIFI_REGDB_VER)
+wifi_regdb: $(BLD)/$(WIFI_REGDB_VER)-$(T).kp
 
 $(BLD)/$(WIFI_REGDB_VER): src/$(WIFI_REGDB_VER)
-	mkdir -p $@
+	$(call pkg_set_stat,"package $@")
+	mkdir -p $@/_kp_tmp/FILES
 	cp $^/regulatory.db $^/regulatory.db.p7s $@
 	cp $^/LICENSE $@/regulatory.db.LICENSE
+	echo "$(WIFI_REGDB_VER) : Linux wifi regulatory database. This is a dummy package, the actual files are on the install iso." > $@/_kp_tmp/DESC

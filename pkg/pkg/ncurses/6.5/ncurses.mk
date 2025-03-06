@@ -26,9 +26,12 @@ $(HCCACHE)
 ncurses: $(BLD)/$(NCURSES_VER)-$(T).kp
 
 $(BLD)/$(NCURSES_VER): src/$(NCURSES_VER)
+	$(call pkg_set_stat,"configure $@")
 	mkdir -p $@/_kp_tmp/FILES/usr/bin $@/_kp_tmp/FILES/usr/lib $@/_kp_tmp/FILES/usr/share/terminfo $(BLD)/xpc
 	cd $@; $(XPATH) $(XPCF) ../../src/$(NCURSES_VER)/configure $(NCURSES_OPTS) $(NCURSES_ARCH)
+	$(call pkg_set_stat,"compile $@")
 	$(XPATH) $(MAKE) -C $@ V=1
+	$(call pkg_set_stat,"package $@")
 	cp -rP src/$(NCURSES_VER)/include/ $@/include/* $(CMPL_INST)/include
 	ln -sf curses.h $(CMPL_INST)/include/ncurses.h
 	$(STRIP) $@/lib/*.so*
