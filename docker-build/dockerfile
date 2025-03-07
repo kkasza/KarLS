@@ -30,7 +30,7 @@ LABEL karls=builder
 USER builder
 WORKDIR /karls
 RUN set -ex \
- && make DBG_NOCMPLARC=1 cmpl
+ && make DBG_NOCMPLARC=1 DBG_NOCC=1 cmpl
 
 # Build the packages
 
@@ -39,7 +39,7 @@ LABEL karls=builder
 USER builder
 WORKDIR /karls
 RUN set -ex \
- && make pkg
+ && make DBG_NOCC=1 pkg
 
 # Build the iso image
 
@@ -48,4 +48,4 @@ LABEL karls=builder
 USER builder
 WORKDIR /karls
 RUN set -ex \
- && make iso
+ && make DBG_NOCC=1 iso

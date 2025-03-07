@@ -80,7 +80,7 @@ endif
 
 #Dependencies on Debian build system
 MYDEPS:=sudo wget tar rsync xz-utils bzip2 \
-gcc g++ ccache \
+gcc g++ \
 gawk bison bc sed flex texinfo \
 libtool m4 pkg-config \
 autotools-dev automake \
@@ -90,7 +90,7 @@ squashfs-tools lz4 \
 libssl-dev mtools \
 xorriso python3
 
-MYDEPS_NATIVE:=qemu-system-x86 qemu-system-arm
+MYDEPS_NATIVE:=ccache qemu-system-x86 qemu-system-arm
 
 define set_stat
 	@echo $1 >> .status
