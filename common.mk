@@ -92,6 +92,25 @@ xorriso python3
 
 MYDEPS_NATIVE:=ccache qemu-system-x86 qemu-system-arm
 
+#Test for debian
+PLAT_DEB:=0
+ifneq (,$(wildcard /etc/debian_version))
+PLAT_DEB:=1
+$(info *** Debian Linux found ***)
+ifneq (install_deps,$(firstword $(MAKECMDGOALS)))
+ifneq ($(shell dpkg -l $(MYDEPS) >> /dev/null && echo 0),0)
+$(error *** Dependencies not found, please run make install_deps ***)
+endif
+ifeq (,$(wildcard /.dockerenv))
+ifneq ($(shell dpkg -l $(MYDEPS_NATIVE) >> /dev/null && echo 0),0)
+$(error *** Dependencies not found, please run make install_deps ***)
+endif
+endif
+endif
+else
+$(info *** Unsupported Linux found, dependency check should be done manually ***)
+endif
+
 define set_stat
 	@echo $1 >> .status
 	@echo --------------------
@@ -138,6 +157,7 @@ else
 #	@ls -al osimg/buildno-$(T) | tr -s [:blank:] | cut -d' ' -f6-8
 endif
 
+ifeq ($(PLAT_DEB),1)
 #Install DEBIAN dependencies
 install_deps:
 	$(call set_stat,"install deps")
@@ -148,6 +168,7 @@ ifeq (,$(wildcard /.dockerenv))
 	$(SUDO) apt-get -y install $(MYDEPS_NATIVE)
 endif
 	$(SUDO) apt-get clean
+endif
 
 WGET:=wget --no-verbose --show-progress -P
 
