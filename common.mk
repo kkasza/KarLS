@@ -232,14 +232,14 @@ clean: _local_clean
 
 #Default distclean per component
 distclean: clean
-	@for I in $(VALID_T); do \
-		echo rm -rf $(PWD)/.ccache-$$I; \
-		rm -rf $(PWD)/.ccache-$$I; \
-	done
 	rm -rf src
 
 #also delete downloaded archives
 mrproper: distclean
+	@for I in $(VALID_T); do \
+		echo rm -rf $(PWD)/.ccache-$$I; \
+		rm -rf $(PWD)/.ccache-$$I; \
+	done
 	rm -rf dl
 
 #Download everything

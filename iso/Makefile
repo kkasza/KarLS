@@ -56,7 +56,7 @@ efi.img: $(BLD)/$(GRUB_VER)-efi
 	mformat -i $@ -v karls_efi ::
 	mcopy -sQv -i $@ $@.fat/EFI ::
 
-KVER:=$(shell cat ../pkg/build-$(T)/kernel/kernel_version)
+KVER:=$(shell cat ../pkg/build-$(T)/kernel/kernel_version 2>/dev/null)
 
 $(BLD)/initrd:
 	$(call set_stat,"[4/5] package $@")
