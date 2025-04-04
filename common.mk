@@ -92,12 +92,14 @@ xorriso python3
 
 MYDEPS_NATIVE:=ccache qemu-system-x86 qemu-system-arm
 
+PHONY:="default install_deps _local_clean clean distclean download sha256sum genpatch"
+
 #Test for debian
 PLAT_DEB:=0
 ifneq (,$(wildcard /etc/debian_version))
 PLAT_DEB:=1
 $(info *** Debian Linux found ***)
-ifneq (install_deps,$(firstword $(MAKECMDGOALS)))
+ifeq (,$(filter $(PHONY) , $(MAKECMDGOALS)))
 ifneq ($(shell dpkg -l $(MYDEPS) >> /dev/null && echo 0),0)
 $(error *** Dependencies not found, please run make install_deps ***)
 endif
@@ -118,7 +120,7 @@ define set_stat
 	@echo --------------------
 endef
 
-.PHONY: default install_deps _local_clean clean distclean download sha256sum genpatch
+.PHONY: $(PHONY)
 
 #Status screen / component
 default:
