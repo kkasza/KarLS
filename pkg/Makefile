@@ -15,9 +15,9 @@ HCCACHE:=HOSTCC="ccache gcc" HOSTCXX="ccache g++"
 XCCACHE:=CC="ccache $(CMPL_INST)/bin/gcc" CXX="ccache $(CMPL_INST)/bin/g++"
 endif
 
-STRIP:=$(CMPL_INST)/bin/$(TARGET-ARCH)-strip -d --strip-unneeded
+STRIP:="$(CMPL_INST)/bin/$(TARGET-ARCH)-strip" -d --strip-unneeded
 
-XPATH:=PATH=$(PATH):$(CMPL_INST)/bin
+XPATH:=PATH="$(PATH):$(CMPL_INST)/bin"
 XPCF:=PKG_CONFIG_PATH=$(PWD)/$(BLD)/xpc
 
 include pkg/*/Current/*.mk
