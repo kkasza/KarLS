@@ -1,0 +1,52 @@
+#!/bin/sh
+
+### KarLS Status script
+### --- This helper script can print over Make output on the terminal
+### Only runs when make is called from the main directory
+### Usage: sh <script name> <filename to watch> &
+### The & at the end of the command makes the whole thing a background process
+
+#Filename to watch
+FN="$1"
+#PID file to see if the script is running
+PIDFILE=".status.pid"
+
+#if another copy runs, try to kill it (with FIRE) - this stops the whole thing, when no arg is present
+if [ -e $PIDFILE ]; then
+ kill `head -1 $PIDFILE`
+ rm -f $PIDFILE
+fi
+
+#When no arg (filename) is present, exit
+if [ "$FN" = "" ]; then
+ exit 0
+fi
+#if the last line is done, exit
+if [ -e $FN ]; then
+ LINE=`tail -1 $FN`
+ if [ "$LINE" = "done" ]; then
+  exit 0
+ fi
+fi
+
+#create PIDFILE 
+echo $$ > $PIDFILE
+
+#while true loop, because I dare
+while true; do
+ tput sc
+ tput cup 0 0
+ tput rev
+ echo " === KarLS Compiler - "`date +%H:%M:%S`"] === "
+ echo -n " === [$FN]: "
+ LINE=`tail -1 $FN`
+ echo $LINE" === "
+ #if the last line is done, exit the script and cleanup the pidfile
+ if [ "$LINE" = "done" ]; then
+  tput rc
+  rm -f $PIDFILE
+  exit 0
+ fi
+ tput rc
+ sleep 1
+done
